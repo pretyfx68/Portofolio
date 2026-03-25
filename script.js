@@ -12,6 +12,7 @@ var czmActivePlId   = '__all__';
 /* ---------- bridge ke state script.js ---------- */
 function czmGetAudio()    { return window.audio; }
 function czmGetPlaylist() { return window.playlist; }
+function czmGetVideo()    { return document.getElementById('czm-video'); }
 
 /* ---------- state ---------- */
 let czmCurIdx  = 0;          // index di playlist[]
@@ -314,20 +315,6 @@ function czmMoveDot(id){
   });
 }
 
-/* ---------- auto next - hanya pindahkan dot, posisi tidak berubah ---------- */
-function czmAutoNext(id){
-  const pl=czmGetPlaylist();
-  if(!pl)return;
-  const idx=pl.findIndex(s=>String(s.id)===String(id));
-  if(idx<0)return;
-  czmCurIdx=idx;
-  if(typeof loadSongByIndex==='function') loadSongByIndex(idx);
-  if(typeof playAudio==='function') playAudio();
-  czmSyncUI(idx, true);
-  // Pindahkan dot — pakai timeout kecil agar DOM siap
-  setTimeout(()=>czmMoveDot(String(id)), 80);
-}
-
 /* ---------- play by id (bridge ke playlist[]) ---------- */
 window.czmPlayById=function(id, fromUser){
   const pl=czmGetPlaylist();
@@ -396,7 +383,7 @@ function czmSyncUI(idx, skipPlaylist){
 
   // Update ambient glow
   const playerEl=document.getElementById('czm-player');
-  if(playerEl && s.image) playerEl.style.setProperty('--czm-bg-img','url('+s.image+')');
+  if(playerEl) playerEl.style.removeProperty('--czm-bg-img');
   const tiEl=document.getElementById('czm-stitle');
   if(tiEl){
     const newTitle = s.title||'—';
@@ -473,54 +460,8 @@ function czmSyncUI(idx, skipPlaylist){
   if(!skipPlaylist) czmRenderPlBox(null);
 }
 
-/* ---------- Video Mode (video = sumber utama, gantikan audio) ---------- */
 let _czmVideoMode = false;
 
-function czmSetVideoMode(s){
-  const artEl = document.getElementById('czm-art');
-  const vidEl = document.getElementById('czm-video');
-  const wrap  = document.getElementById('czm-art-wrap');
-  const badge = document.getElementById('czm-mv-badge');
-  const audioEl = document.getElementById('audioPlayer'); // aman: tidak bergantung var audio
-  if(!artEl || !vidEl || !wrap) return;
-
-  const hasVideo = s && s.video && s.video.trim().length > 0;
-  _czmVideoMode = hasVideo;
-
-  if(hasVideo){
-    vidEl.src = s.video;
-    vidEl.muted = false;
-    vidEl.style.display = 'block';
-    artEl.style.display = 'none';
-    wrap.classList.add('czm-video-mode');
-    if(audioEl){ audioEl.muted = true; audioEl.pause(); audioEl.src = ''; }
-    if(badge) badge.style.display = 'none';
-  } else {
-    vidEl.pause();
-    vidEl.src = '';
-    vidEl.style.display = 'none';
-    artEl.style.display = 'block';
-    wrap.classList.remove('czm-video-mode');
-    if(audioEl){ audioEl.muted = false; }
-    if(badge) badge.style.display = 'none';
-  }
-}
-
-function czmGetVideo(){ return document.getElementById('czm-video'); }
-
-/* ---------- Sync video play/pause/seek dengan tombol kontrol ---------- */
-function czmVideoPlay(){
-  const v = czmGetVideo();
-  if(_czmVideoMode && v) v.play().catch(()=>{});
-}
-function czmVideoPause(){
-  const v = czmGetVideo();
-  if(_czmVideoMode && v) v.pause();
-}
-function czmVideoSeekTo(t){
-  const v = czmGetVideo();
-  if(_czmVideoMode && v) v.currentTime = t;
-}
 function czmVideoSyncBar(){
   const v = czmGetVideo();
   if(!_czmVideoMode || !v || !v.duration) return;
@@ -1423,10 +1364,6 @@ window.czmDoRelatedSearch = function(q){
     </div>`).join('');
 };
 
-function czmFilterRelated(q){
-  czmRenderRelatedHtml(q.trim().toLowerCase());
-}
-
 function czmRenderRelatedHtml(q){
   const box=document.getElementById('czm-related-box');if(!box)return;
   let listSongs = window._czmRelatedSongs || [];
@@ -1900,7 +1837,6 @@ if(document.readyState==='loading'){
 })();
 
 })(); /* end IIFE */
-
 
 // Global variables
 let chatHistories = { worm: [], normal: [] };
@@ -2721,7 +2657,6 @@ const durText = document.getElementById('duration');
 const nowTitle = document.getElementById('nowTitle');
 const nowArtist = document.getElementById('nowArtist');
 const playlistBox = document.getElementById('playlistBox');
-//const songSelect = document.getElementById('songSelect');
 const searchSong = document.getElementById('searchSong');
 const toggleLoopBtn = document.getElementById('toggleLoop');
 const visualBars = document.querySelectorAll('.bar');
@@ -2840,7 +2775,6 @@ function loadSongByIndex(i) {
 ====================== */
 function renderPlaylist(list, isFiltered = false) {
   playlistBox.innerHTML = "";
-  // songSelect.innerHTML = '<option value="">— Music Yang Tersedia —</option>';  ← HAPUS
 
   list.forEach((s, idx) => {
     const div = document.createElement('div');
@@ -2881,11 +2815,6 @@ function renderPlaylist(list, isFiltered = false) {
 
     playlistBox.appendChild(div);
 
-    // ❌ Bagian pembuatan option SongSelect — DIHAPUS
-    // const opt = document.createElement('option');
-    // opt.value = optId;
-    // opt.textContent = `${optTitle} - ${optArtist}`;
-    // songSelect.appendChild(opt);
   });
 
   highlightPlaying();
@@ -3153,24 +3082,6 @@ window.czmSetQuality=function(q){
   document.body.appendChild(t);setTimeout(()=>t.remove(),2000);
 };
 
-/* ======================
-   PLAY / PAUSE
-====================== */
-function playAudio() {
-    initAudio();
-    if(_czmVideoMode){
-      const v = document.getElementById('czm-video');
-      if(v){ v.play().catch(()=>{}); return; }
-    }
-    if (!audio.src) loadSongByIndex(0);
-    resumeAudioCtx();
-    audio.play().then(() => {
-        isPlaying = true;
-        playBtn.textContent = "𝗜𝗜";
-        cd.classList.add('playing');
-    }).catch(err => console.log("Audio play error:", err));
-}
-
 function playAudio() {
   if(_czmVideoMode){
     const v = document.getElementById('czm-video');
@@ -3405,97 +3316,6 @@ searchSong.addEventListener('keydown', (e) => {
 });
 
 /* ======================
-   CATEGORY SELECT (BARU)
-   - Menambahkan select kategori yang mengambil lagu berdasarkan tags:
-     ["Playlist Anda", "Lagu Terbaru", "Sedang Trend"]
-   - Jika elemen <select id="categorySelect"> tidak ada di HTML, kita buat otomatis
-====================== */
-let categorySelect = document.getElementById("categorySelect");
-if (!categorySelect) {
-  // try to create and insert it just above songSelect to avoid modifying other layout files
-  categorySelect = document.createElement("select");
-  categorySelect.id = "categorySelect";
-  categorySelect.innerHTML = `
-    <option value="">— Pilih Kategori —</option>
-    <option value="Playlist Anda">Playlist Anda</option>
-    <option value="Lagu Terbaru">Lagu Terbaru</option>
-    <option value="Sedang Trend">Sedang Trend</option>
-  `;
-  // insert before songSelect if possible, otherwise append to body
-  if (songSelect && songSelect.parentNode) {
-    songSelect.parentNode.insertBefore(categorySelect, songSelect);
-  } else {
-    document.body.insertBefore(categorySelect, document.body.firstChild);
-  }
-}
-
-function filterByCategory(tag) {
-  if (!tag) {
-    // Reset ke full playlist
-    filteredMode = false;
-    filteredList = [];
-    currentFilteredIndex = -1;
-    renderPlaylist(playlist, false);
-    return;
-  }
-
-  // build filteredList from playlist (keep original indices)
-  filteredList = playlist
-    .map((s, i) => ({ ...s, index: i }))
-    .filter(s => (s.tags || []).includes(tag));
-
-  filteredMode = true;
-  currentFilteredIndex = filteredList.length ? 0 : -1;
-
-  renderPlaylist(filteredList, true);
-
-  if (filteredList.length) {
-    highlightPlaying();
-  }
-}
-
-categorySelect.addEventListener("change", () => {
-  const tag = categorySelect.value;
-  // Clear search box when selecting category to avoid confusion
-  if (searchSong) searchSong.value = "";
-  filterByCategory(tag);
-});
-
-/* ======================
-   SELECT CHANGE (dropdown) - DISESUAIKAN AGAR SUPPORT KATEGORI
-====================== */
-function onSelectChange() {
-  const id = songSelect.value;
-  if (!id) return;
-  const activeCategory = (categorySelect && categorySelect.value) ? categorySelect.value : null;
-
-  if (activeCategory) {
-    const listTagsMatch = filteredList.length && (filteredList[0].tags || []).includes(activeCategory);
-    if (!listTagsMatch) {
-      filterByCategory(activeCategory);
-    }
-
-    const pos = filteredList.findIndex(f => String(f.id) === String(id));
-    if (pos !== -1) {
-      filteredMode = true;
-      currentFilteredIndex = pos;
-      const realIndex = filteredList[currentFilteredIndex].index;
-      loadSongByIndex(realIndex);
-      playAudio();
-      return;
-    }
-  }
-
-
-  filteredMode = false;
-  currentFilteredIndex = -1;
-  const idx = playlist.findIndex(p => String(p.id) === String(id));
-  if (idx !== -1) {
-    loadSongByIndex(idx);
-    playAudio();
-  }
-}
-/* ======================
    MENU & SUBMENU
 ====================== */
 document.addEventListener("DOMContentLoaded", () => {
@@ -3590,67 +3410,6 @@ setInterval(() => {
   // load first song (index 0)
   loadSongByIndex(0);
 })();
-function showPage(id){
-  document.querySelectorAll('.page-section').forEach(sec => {
-    sec.classList.remove('active');
-  });
-
-  const target = document.getElementById(id);
-  if(target){
-    target.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // Sembunyikan czm-npbar saat bukan di halaman music
-  const npbar = document.getElementById('czm-npbar');
-  if(npbar){
-    if(id === 'music'){
-      // Tampilkan lagi kalau ada lagu yang sedang diset
-      if(npbar.dataset.hasTrack === '1') npbar.classList.add('czm-vis');
-    } else {
-      npbar.classList.remove('czm-vis');
-    }
-  }
-
-  // Animasi masuk halaman musik
-  if (id === 'music') {
-    const resetAnim = (el, cls) => {
-      if (!el) return;
-      el.classList.remove(cls);
-      void el.offsetWidth; // reflow
-      el.classList.add(cls);
-    };
-    resetAnim(document.querySelector('#music .brand'), 'music-anim-brand');
-    resetAnim(document.querySelector('#music .cd-box'), 'music-anim-cd');
-    resetAnim(document.querySelector('#music .visualizer'), 'music-anim-visual');
-    resetAnim(document.querySelector('#music .yt-info'), 'music-anim-info');
-    resetAnim(document.querySelector('#music .yt-bar'), 'music-anim-bar');
-    resetAnim(document.querySelector('#music .controls'), 'music-anim-ctrl');
-    resetAnim(document.getElementById('searchSong'), 'music-anim-search');
-    resetAnim(document.getElementById('playlistBox'), 'music-anim-list');
-  }
-
-  // === OVERFLOW: hidden hanya saat AI ===
-  if(id === 'ai'){
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = 'auto';
-  }
-
-  // === TAMBAHAN AMAN UNTUK FOOTER ===
-  const footer = document.querySelector('.site-footer');
-  if(footer){
-    if(target && target.classList.contains('no-footer')){
-      footer.style.display = 'none';
-    }else{
-      footer.style.display = 'block';
-    }
-  }
-  // =================================
-
-  document.getElementById("panelOverlay").style.display = "none";
-}
-
 function togglePanel(btn){
   const overlay = document.getElementById("panelOverlay");
   const isOpen = overlay.style.display === "flex";
@@ -3805,7 +3564,6 @@ const apkData = [
 
 /* APK kategori mapping */
 
-
 const APK_PER_PAGE = 6;
 let _apkActiveCat = 'all';
 let _apkPage = 1;
@@ -3952,16 +3710,6 @@ function filterAPK(btn, cat){
   document.querySelectorAll('.apk-filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   apkRenderFiltered();
-}
-
-function openInfo(title, desc){
-  document.getElementById('apkTitle').innerText = title;
-  document.getElementById('apkDesc').innerText = desc;
-  document.getElementById('apkModal').style.display = 'flex';
-}
-
-function closeInfo(){
-  document.getElementById('apkModal').style.display = 'none';
 }
 
 function autoDownload(url){
@@ -5724,7 +5472,10 @@ function showInfo() {
 }
 
 function closeInfo() {
-    document.getElementById('infoModal').classList.remove('active');
+  const apkModal = document.getElementById('apkModal');
+  if(apkModal) apkModal.style.display = 'none';
+  const infoModal = document.getElementById('infoModal');
+  if(infoModal) infoModal.classList.remove('active');
 }
 
 // Show notification (dinonaktifkan)
@@ -6115,7 +5866,6 @@ function toggleMiniPlayer() {
         pauseAudio();
     }
 }
-
 
 // ===== MENGAJI PLAYER =====
 let mengajiAudio = new Audio();
@@ -6547,18 +6297,6 @@ function cekPertanyaanMengaji(message, lowerMessage) {
     return true;
 }
 
-function konfirmasiMengaji(ya) {
-    const btnWrap = document.getElementById('mengajiBtnWrap');
-    if (btnWrap) btnWrap.remove();
-    if (ya && pendingMengaji) {
-        const s = pendingMengaji;
-        pendingMengaji = null;
-        setTimeout(function() { showMengajiPlayer(s); }, 300);
-    } else {
-        pendingMengaji = null;
-    }
-}
-
 // ===== VIDSNAP DOWNLOAD FEATURE =====
 function cekDownloadVideo(message, lowerMessage) {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -6664,7 +6402,7 @@ function showDownloadCard(url, platform) {
 }
 
 // Auto-fetch URL tunnel dari server
-const HARDCODED_BACKEND_URL = 'https://translations-stockholm-advertisers-hopes.trycloudflare.com';
+const HARDCODED_BACKEND_URL = 'https://technical-onion-tea-engage.trycloudflare.com';
 let PROXY_URL = localStorage.getItem('vidsnap_proxy_url') || HARDCODED_BACKEND_URL;
 
 // Otomatis update PROXY_URL dari server setiap buka halaman
@@ -6794,9 +6532,6 @@ document.addEventListener('submit', (e) => {
     e.preventDefault();
 });
 
-
-
-
 // ═══════════════════════════════════════════════
 // Z-TOOLS — Wikipedia, Random Anime, Cek Nomor HP
 // ═══════════════════════════════════════════════
@@ -6841,7 +6576,6 @@ function ztSetAnimeCat(cat, btn) {
 // ══════════════════════════════
 // Wikipedia vars
 let ztWikiPage = 1;
-let ztWikiLastQ = '';
 let ztWikiHits = [];
 
 function ztSetLang(lang, btn) {
@@ -6964,7 +6698,6 @@ function ztWikiCloseReader() {
   document.getElementById('zt-wiki-reader').style.display = 'none';
   document.body.style.overflow = '';
 }
-
 
 // ══════════════════════════════
 // RANDOM ANIME
@@ -7311,7 +7044,6 @@ function ztNgajiPlay(idx) {
   const player = document.getElementById('zt-ngaji-player');
   player.classList.add('visible');
 
-
   // disable / enable nav
   document.getElementById('zt-ngp-prev').disabled = idx <= 0;
   document.getElementById('zt-ngp-next').disabled = idx >= mengaji.length - 1;
@@ -7391,8 +7123,6 @@ ztSwitchTab = function(tab) {
     ztNgajiInit();
   }
 };
-
-
 
 // ══════════════════════════════
 // IP & LOKASI
@@ -7547,7 +7277,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(ztIpFetchMine, 800);
 });
 
-
 // ══════════════════════════════
 // SPEED TEST
 // ══════════════════════════════
@@ -7670,19 +7399,12 @@ async function ztSpeedTest() {
   btn.innerHTML = '<i class="fas fa-redo"></i> Test Ulang';
 }
 
-
-
 // ══════════════════════════════
 // IMAGE SEARCH — Lexica.art
 // ══════════════════════════════
 var ztImgAllResults = [];
 var ztImgShown = 0;
 var ZT_IMG_PER_PAGE = 24;
-
-function ztImgOpen(el) {
-  var url = el.getAttribute('data-full');
-  if (url) window.open(url, '_blank');
-}
 
 async function ztImgSearch(loadMore) {
   loadMore = loadMore || false;
@@ -7796,7 +7518,6 @@ function ztLightboxClose() {
   });
 })();
 
-
 // ══════════════════════════════════════
 // CPANEL — Pterodactyl Panel Creator
 // ══════════════════════════════════════
@@ -7812,6 +7533,7 @@ const CP_PLANS = {
   '9':    { memo: 9048,  cpu: 260, disk: 9048,  suffix: '9gb'  },
   '10':   { memo: 10000, cpu: 290, disk: 10000, suffix: '10gb' },
   '11':   { memo: 11000, cpu: 320, disk: 11000, suffix: '11gb' },
+  '12':   { memo: 12000, cpu: 360, disk: 12000, suffix: '12gb' },
   'unli': { memo: 0,     cpu: 0,   disk: 0,     suffix: 'unli' },
 };
 
@@ -7829,15 +7551,27 @@ async function cpCreatePanel() {
     cpShowResult('error', null, 'Pilih plan dulu!'); return;
   }
 
+  // Cek limit history untuk non-premium
+  if (!_cpPremUnlocked) {
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem('cp_history') || '[]'); } catch(e) {}
+    if (hist.length >= 3) {
+      cpShowResult('error', null, '⚠️ Limit 3 panel untuk pengguna gratis! Aktifkan Premium untuk pembuatan unlimited.');
+      return;
+    }
+  }
+
   // Config diambil dari server, tidak perlu input di sini
   const loc = '1';
-  const egg = '15';
+  const egg = '16';
 
   const plan   = CP_PLANS[_cpSelectedPlan];
   const _gb = _cpSelectedPlan === 'unli' ? 'Unli' : _cpSelectedPlan + 'GB';
   const name   = username + ' | ' + _gb;
   const email  = username + '@panel.create';
-  const password = username + '001';
+  // Password: username + 6 angka random
+  const _randNum = Math.floor(100000 + Math.random() * 900000);
+  const password = username + _randNum;
 
   const spc = 'if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == "1" ]]; then git pull; fi; if [[ ! -z ${NODE_PACKAGES} ]]; then /usr/local/bin/npm install ${NODE_PACKAGES}; fi; if [[ ! -z ${UNNODE_PACKAGES} ]]; then /usr/local/bin/npm uninstall ${UNNODE_PACKAGES}; fi; if [ -f /home/container/package.json ]; then /usr/local/bin/npm install; fi; /usr/local/bin/${CMD_RUN}';
 
@@ -7889,7 +7623,7 @@ async function cpCreatePanel() {
 
     // Berhasil!
     const resultData = {
-      'Login': 'https://sanz.panelku.privateserverr.web.id',
+      'Login': 'https://pretyfx.panelserver.cloudnesia.my.id',
       'Username': user.username,
       'Password': password,
       'Email': email,
@@ -7969,43 +7703,95 @@ function cpCopyResult() {
   });
 }
 
-
-
 // ── Premium Plan System ──
 const CP_PREM_CODE = 'PanelPrem18hebcqobPbevccwyV';
-let _cpPremUnlocked = false;
+let _cpPremUnlocked = localStorage.getItem('cp_prem') === '1';
+
+// Init premium state saat halaman load
+(function cpInitPremium() {
+  if (_cpPremUnlocked) {
+    // Terapkan state premium tanpa animasi
+    setTimeout(() => {
+      const prem = document.getElementById('cp-plans-prem');
+      if (prem) prem.style.display = 'flex';
+      const card = document.getElementById('cp-arrow-card');
+      if (card) {
+        card.classList.add('unlocked');
+        card.style.display = 'none'; // sembunyikan tombol premium setelah unlock
+      }
+      const badge = document.getElementById('cp-prem-badge');
+      if (badge) badge.style.display = 'flex';
+    }, 300);
+  }
+})();
 
 function cpSelectPlan(el) {
-  document.querySelectorAll('.cpanel-plan').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('.cpanel-plan-v').forEach(p => p.classList.remove('selected'));
   el.classList.add('selected');
   _cpSelectedPlan = el.dataset.plan;
 }
 
 function cpShowTokenInput() {
-  const card = document.getElementById('cp-arrow-card');
-  const icon = card ? card.querySelector('.cpanel-arrow-icon') : null;
-  const prem = document.getElementById('cp-plans-prem');
-  const wrap = document.getElementById('cp-token-wrap');
-
-  const premVisible = prem && prem.style.display !== 'none';
-  const wrapVisible = wrap && wrap.style.display !== 'none';
-
-  // Kalau salah satu sedang tampil → sembunyikan semuanya (toggle off)
-  if (premVisible || wrapVisible) {
-    if (prem) prem.style.display = 'none';
-    if (wrap) wrap.style.display = 'none';
-    if (icon) icon.style.transform = ''; // balik ke kanan
-    return;
-  }
-
-  // Tampilkan
-  if (_cpPremUnlocked) {
-    if (prem) prem.style.display = 'grid';
-  } else {
-    if (wrap) wrap.style.display = 'block';
+  if (_cpPremUnlocked) return; // sudah premium, tombol ini harusnya hidden
+  // Open floating modal
+  const modal = document.getElementById('cp-token-modal');
+  if (modal) {
+    modal.style.display = 'flex';
     setTimeout(() => { const inp = document.getElementById('cp-prem-code'); if(inp) inp.focus(); }, 200);
   }
-  if (icon) icon.style.transform = 'rotate(90deg)';
+}
+
+function cpCloseTokenModal(e) {
+  if (e && e.target !== document.getElementById('cp-token-modal')) return;
+  document.getElementById('cp-token-modal').style.display = 'none';
+}
+
+function cpOpenPremInfo() {
+  const modal = document.getElementById('cp-prem-info-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function cpClosePremInfo(e) {
+  if (e && e.target !== document.getElementById('cp-prem-info-modal')) return;
+  document.getElementById('cp-prem-info-modal').style.display = 'none';
+}
+
+function cpLogoutPremium() {
+  if (!confirm('Yakin mau logout dari Premium? Kamu perlu masukin token lagi nanti.')) return;
+  _cpPremUnlocked = false;
+  localStorage.removeItem('cp_prem');
+
+  // Sembunyikan premium plans
+  const prem = document.getElementById('cp-plans-prem');
+  if (prem) prem.style.display = 'none';
+
+  // Tampilkan tombol premium kembali
+  const card = document.getElementById('cp-arrow-card');
+  if (card) {
+    card.classList.remove('unlocked');
+    card.style.display = 'flex';
+    const nameEl = card.querySelector('.cpv-name');
+    if (nameEl) nameEl.textContent = 'Premium';
+  }
+
+  // Sembunyikan badge
+  const badge = document.getElementById('cp-prem-badge');
+  if (badge) badge.style.display = 'none';
+
+  // Deselect kalau plan premium yang dipilih
+  const planNum = parseInt(_cpSelectedPlan);
+  if (_cpSelectedPlan === 'unli' || planNum >= 3) {
+    _cpSelectedPlan = null;
+    document.querySelectorAll('.cpanel-plan-v').forEach(p => p.classList.remove('selected'));
+  }
+
+  // Tutup modal info
+  document.getElementById('cp-prem-info-modal').style.display = 'none';
+
+  // Re-render history
+  cpRenderHistory();
+
+  if (typeof showNotification === 'function') showNotification('Logout premium berhasil.', 'success');
 }
 
 function cpCheckCode() {
@@ -8014,15 +7800,26 @@ function cpCheckCode() {
 
   if (input === CP_PREM_CODE) {
     _cpPremUnlocked = true;
+    localStorage.setItem('cp_prem', '1'); // simpan ke localStorage
     status.innerHTML = '<span style="color:#22c55e"><i class="fas fa-check-circle"></i> Token valid! Plan premium aktif.</span>';
     setTimeout(() => {
-      document.getElementById('cp-token-wrap').style.display = 'none';
+      // Tutup floating modal
+      const modal = document.getElementById('cp-token-modal');
+      if (modal) modal.style.display = 'none';
+      // Reset status & input
+      status.innerHTML = '';
+      document.getElementById('cp-prem-code').value = '';
+      // Tampilkan premium plans
       const prem = document.getElementById('cp-plans-prem');
-      if (prem) { prem.style.display = 'grid'; prem.style.animation = 'fadeIn 0.4s ease'; }
-      // Panah tetap ke bawah (plan tampil)
+      if (prem) { prem.style.display = 'flex'; prem.style.animation = 'fadeIn 0.4s ease'; }
+      // Sembunyikan tombol premium (ganti jadi badge saja)
       const card = document.getElementById('cp-arrow-card');
-      const icon = card ? card.querySelector('.cpanel-arrow-icon') : null;
-      if (icon) icon.style.transform = 'rotate(90deg)';
+      if (card) card.style.display = 'none';
+      // Tampilkan badge premium di pojok form
+      const badge = document.getElementById('cp-prem-badge');
+      if (badge) badge.style.display = 'flex';
+      // Re-render history (hapus limit)
+      cpRenderHistory();
     }, 800);
   } else {
     status.innerHTML = '<span style="color:#ef4444"><i class="fas fa-times-circle"></i> Token salah!</span>';
@@ -8037,6 +7834,13 @@ function cpSaveToHistory(data, plan, serverId) {
   const key = 'cp_history';
   let history = [];
   try { history = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+
+  // Limit 3 untuk non-premium
+  if (!_cpPremUnlocked && history.length >= 3) {
+    // Hapus yang paling lama (terakhir di array)
+    history.pop();
+  }
+
   const item = {
     id: Date.now(),
     serverId: serverId || null,
@@ -8056,18 +7860,76 @@ function cpSaveToHistory(data, plan, serverId) {
   cpRenderHistory();
 }
 
+function cpSwitchTab(tab) {
+  const formPanel = document.getElementById('cp-tab-panel-form');
+  const riwayatPanel = document.getElementById('cp-tab-panel-riwayat');
+  const tabForm = document.getElementById('cp-tab-form');
+  const tabRiwayat = document.getElementById('cp-tab-riwayat');
+
+  if (tab === 'form') {
+    formPanel.style.display = 'block';
+    riwayatPanel.style.display = 'none';
+    tabForm.classList.add('active');
+    tabRiwayat.classList.remove('active');
+  } else {
+    formPanel.style.display = 'none';
+    riwayatPanel.style.display = 'block';
+    tabForm.classList.remove('active');
+    tabRiwayat.classList.add('active');
+    cpRenderHistory();
+  }
+}
+
 function cpRenderHistory() {
-  const wrap = document.getElementById('cp-history-wrap');
   const list = document.getElementById('cp-history-list');
-  if (!wrap || !list) return;
+  const counter = document.getElementById('cp-history-counter');
+  const tabCount = document.getElementById('cp-riwayat-tab-count');
+
   let history = [];
   try { history = JSON.parse(localStorage.getItem('cp_history') || '[]'); } catch(e) {}
+
+  // Update badge di tab Riwayat
+  if (tabCount) {
+    if (history.length === 0) {
+      tabCount.style.display = 'none';
+    } else {
+      tabCount.style.display = 'inline-block';
+      if (_cpPremUnlocked) {
+        tabCount.textContent = history.length;
+        tabCount.className = 'cp-riwayat-tab-count prem';
+      } else {
+        tabCount.textContent = Math.min(history.length, 3) + '/3';
+        tabCount.className = 'cp-riwayat-tab-count' + (history.length >= 3 ? '' : '');
+        tabCount.style.background = history.length >= 3 ? '#ef4444' : '#00d9ff';
+        tabCount.style.color = history.length >= 3 ? '#fff' : '#000';
+      }
+    }
+  }
+
+  // Update counter di panel riwayat
+  if (counter) {
+    if (_cpPremUnlocked) {
+      counter.innerHTML = `<span style="color:#ffaa00;font-size:11px;font-weight:700;"><i class="fas fa-crown" style="margin-right:3px"></i>${history.length} panel</span>`;
+    } else {
+      const used = Math.min(history.length, 3);
+      counter.innerHTML = `<span style="font-size:12px;font-weight:700;color:${used>=3?'#ef4444':'rgba(255,255,255,0.5)'};">${used}/3</span>`;
+    }
+  }
+
+  if (!list) return;
+
   if (history.length === 0) {
-    wrap.style.display = 'none';
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.3);">
+      <i class="fas fa-server" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.3;"></i>
+      Belum ada panel yang dibuat
+    </div>`;
     return;
   }
-  wrap.style.display = 'block';
-  list.innerHTML = history.map(item => `
+
+  const displayHistory = _cpPremUnlocked ? history : history.slice(0, 3);
+  const isLimited = !_cpPremUnlocked && history.length >= 3;
+
+  list.innerHTML = displayHistory.map(item => `
     <div class="cpanel-history-item" id="cphi-${item.id}" onclick="cpShowHistoryDetail(${item.id})">
       <div class="cpanel-history-top">
         <div class="cpanel-history-name">
@@ -8089,13 +7951,28 @@ function cpRenderHistory() {
         </button>
       </div>
     </div>
-  `).join('');
+  `).join('') + (isLimited ? `
+    <div class="cpanel-history-limit-notice" onclick="cpShowTokenInput()">
+      <i class="fas fa-crown" style="color:#ffaa00"></i>
+      Riwayat dibatasi 3. Aktifkan Premium untuk unlimited →
+    </div>
+  ` : '');
 }
 
 async function cpDeleteHistory(id) {
   let history = [];
   try { history = JSON.parse(localStorage.getItem('cp_history') || '[]'); } catch(e) {}
   const item = history.find(h => h.id === id);
+
+  const username = item ? item.username : '';
+  const konfirmasi = await czConfirm({
+    title: `Hapus Panel "${username}"?`,
+    titleHighlight: username,
+    msg: `<span class="cz-warn-row"><i class="fas fa-exclamation-triangle"></i><b>Tindakan ini tidak dapat dipulihkan.</b></span>Seluruh data panel termasuk username, password, dan server akan dihapus secara permanen.`,
+    okLabel: '<i class="fas fa-trash"></i> Ya, Hapus',
+    iconClass: 'fas fa-trash-alt'
+  });
+  if (!konfirmasi) return;
 
   // Hapus server + user di Pterodactyl
   if (item && (item.serverId || item.userId)) {
@@ -8130,12 +8007,6 @@ async function cpDeleteHistory(id) {
 
   history = history.filter(h => h.id !== id);
   localStorage.setItem('cp_history', JSON.stringify(history));
-  cpRenderHistory();
-}
-
-function cpClearHistory() {
-  if (!confirm('Hapus semua riwayat panel?')) return;
-  localStorage.removeItem('cp_history');
   cpRenderHistory();
 }
 
@@ -8209,3 +8080,449 @@ function cpCloseResultModal(e) {
   const modal = document.getElementById('cp-result-modal');
   if (modal) modal.style.display = 'none';
 }
+
+function czConfirm({ title, titleHighlight, msg, okLabel = '<i class="fas fa-trash"></i> Hapus', iconClass = 'fas fa-trash-alt' }) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('cz-confirm-overlay');
+    document.getElementById('cz-confirm-icon').innerHTML = `<i class="${iconClass}"></i>`;
+    document.getElementById('cz-confirm-title').innerHTML = titleHighlight
+      ? title.replace(titleHighlight, `<span>${titleHighlight}</span>`)
+      : title;
+    document.getElementById('cz-confirm-msg').innerHTML = msg;
+    document.getElementById('cz-confirm-ok').innerHTML = okLabel;
+    overlay.classList.add('show');
+
+    const cleanup = (result) => {
+      overlay.classList.remove('show');
+      document.getElementById('cz-confirm-ok').onclick = null;
+      document.getElementById('cz-confirm-cancel').onclick = null;
+      overlay.onclick = null;
+      resolve(result);
+    };
+    document.getElementById('cz-confirm-ok').onclick = () => cleanup(true);
+    document.getElementById('cz-confirm-cancel').onclick = () => cleanup(false);
+    overlay.onclick = (e) => { if (e.target === overlay) cleanup(false); };
+  });
+}
+/* ===== FILE TO URL + HISTORY ===== */
+(function(){
+  let _file = null;
+  const STORAGE_KEY = 'zt_fu_history';
+
+  function fuGetHistory() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+  }
+  function fuSaveHistory(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+  function fuAddHistory(item) {
+    const arr = fuGetHistory();
+    arr.unshift(item);
+    if(arr.length > 50) arr.pop();
+    fuSaveHistory(arr);
+    fuRenderHistory();
+    fuUpdateBadge();
+  }
+  function fuRemoveHistory(url) {
+    fuSaveHistory(fuGetHistory().filter(i => i.url !== url));
+    fuRenderHistory();
+    fuUpdateBadge();
+  }
+  function fuFormatSize(b) {
+    if(b === undefined || b === null || isNaN(Number(b))) return '? MB';
+    b = Number(b);
+    if(b < 1024) return b+' B';
+    if(b < 1048576) return (b/1024).toFixed(1)+' KB';
+    return (b/1048576).toFixed(2)+' MB';
+  }
+  function fuFormatDate(ts) {
+    if(!ts || isNaN(Number(ts))) return 'Tanggal tidak diketahui';
+    return new Date(Number(ts)).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
+  function fuUpdateBadge() {
+    const arr = fuGetHistory();
+    const badge = document.getElementById('zt-fu-hist-badge');
+    if(!badge) return;
+    if(arr.length > 0){ badge.textContent = arr.length; badge.style.display='inline-block'; }
+    else badge.style.display='none';
+  }
+
+  function fuRenderHistory() {
+    const arr = fuGetHistory();
+    const hist = document.getElementById('zt-fu-history');
+    const empty = document.getElementById('zt-fu-hist-empty');
+    const top = document.getElementById('zt-fu-hist-top');
+    const count = document.getElementById('zt-fu-hist-count');
+    if(!hist) return;
+
+    if(arr.length === 0){
+      hist.innerHTML = '';
+      if(empty) empty.style.display='block';
+      if(top) top.style.display='none';
+      return;
+    }
+    if(empty) empty.style.display='none';
+    if(top) top.style.display='flex';
+    if(count) count.textContent = arr.length + ' file tersimpan';
+
+    hist.innerHTML = arr.map(item => {
+      const isImg = item.type && item.type.startsWith('image/');
+      const isVid = item.type && item.type.startsWith('video/');
+      const thumb = isImg
+        ? `<img src="${item.url}" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-image\\'></i>'">`
+        : `<i class="fas fa-${isVid ? 'film' : 'file'}"></i>`;
+
+      // Recover nama dari URL jika undefined
+      const displayName = (item.name && item.name !== 'undefined') ? item.name : (item.url ? item.url.split('/').pop() : 'File');
+
+      // Recover timestamp dari nama file (format: {timestamp}_{namafile})
+      let ts = item.timestamp;
+      if(!ts || isNaN(Number(ts))) {
+        const tsMatch = displayName.match(/^(\d{13})/);
+        if(tsMatch) ts = Number(tsMatch[1]);
+      }
+
+      // Tampil ukuran — pakai size dari localStorage, fallback '? MB' hanya jika benar-benar tidak ada
+      const sizeLabel = (item.size != null && !isNaN(Number(item.size))) ? fuFormatSize(item.size) : '? MB';
+
+      return `
+      <div class="zt-fu-hist-card" id="hist-${ts || item.timestamp}">
+        <div class="zt-fu-hist-top-row">
+          <div class="zt-fu-hist-thumb">${thumb}</div>
+          <div class="zt-fu-hist-info">
+            <div class="zt-fu-hist-name" title="${displayName}">${displayName}</div>
+            <div class="zt-fu-hist-meta">
+              <span class="zt-fu-hist-size">${sizeLabel}</span>
+              <span class="zt-fu-hist-date"><i class="fas fa-clock" style="font-size:0.62rem"></i> ${fuFormatDate(ts)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="zt-fu-hist-divider"></div>
+        <div class="zt-fu-hist-btns">
+          <button class="zt-fu-hbtn zt-fu-hbtn-copy" onclick="ztFuHistCopy('${item.url}',this)">
+            <i class="fas fa-copy"></i> Salin URL
+          </button>
+          <button class="zt-fu-hbtn zt-fu-hbtn-del" onclick="ztFuHistDelete('${item.url}','${item.sha||''}','${item.path||''}','${displayName}',this)">
+            <i class="fas fa-trash"></i> Hapus
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Tab switcher
+  window.ztFuSwitchTab = function(tab) {
+    document.getElementById('zt-fu-view-upload').style.display  = tab==='upload'  ? 'block' : 'none';
+    document.getElementById('zt-fu-view-history').style.display = tab==='history' ? 'block' : 'none';
+    document.getElementById('zt-fu-tab-upload').classList.toggle('active',  tab==='upload');
+    document.getElementById('zt-fu-tab-history').classList.toggle('active', tab==='history');
+  };
+
+  // Drag & drop
+  window.ztFuDragOver  = e => { e.preventDefault(); document.getElementById('zt-fu-dropzone').classList.add('drag-over'); };
+  window.ztFuDragLeave = () => document.getElementById('zt-fu-dropzone').classList.remove('drag-over');
+  window.ztFuDrop = e => {
+    e.preventDefault();
+    document.getElementById('zt-fu-dropzone').classList.remove('drag-over');
+    if(e.dataTransfer.files[0]) ztFuProcess(e.dataTransfer.files[0]);
+  };
+  window.ztFuSelected = inp => { if(inp.files[0]) ztFuProcess(inp.files[0]); };
+
+  window.ztFuProcess = function(file) {
+    if(file.size > 25*1024*1024){ alert('File terlalu besar! Max 25MB.'); return; }
+    _file = file;
+    document.getElementById('zt-fu-result').style.display='none';
+    document.getElementById('zt-fu-progress-wrap').style.display='none';
+    const inner = document.getElementById('zt-fu-preview-inner');
+    const objUrl = URL.createObjectURL(file);
+    if(file.type.startsWith('image/')) inner.innerHTML=`<img src="${objUrl}">`;
+    else if(file.type.startsWith('video/')) inner.innerHTML=`<video src="${objUrl}" controls></video>`;
+    else inner.innerHTML=`<div style="padding:18px;text-align:center;color:#00d9ff;font-size:1.8rem"><i class="fas fa-file"></i></div>`;
+    document.getElementById('zt-fu-meta').textContent=`${file.name} · ${fuFormatSize(file.size)} · ${file.type||'unknown'}`;
+    document.getElementById('zt-fu-preview-wrap').style.display='block';
+    document.getElementById('zt-fu-btn').style.display='block';
+  };
+
+  window.ztFuUpload = async function() {
+    if(!_file) return;
+    const proxyUrl = typeof PROXY_URL!=='undefined' ? PROXY_URL : '';
+    if(!proxyUrl){ alert('PROXY_URL belum diset!'); return; }
+    const btn=document.getElementById('zt-fu-btn');
+    const prog=document.getElementById('zt-fu-progress-wrap');
+    const bar=document.getElementById('zt-fu-bar');
+    const lbl=document.getElementById('zt-fu-bar-label');
+    btn.style.display='none'; prog.style.display='block';
+    bar.style.width='10%'; lbl.textContent='Mengirim ke server...';
+    try {
+      const fd=new FormData();
+      fd.append('file',_file,_file.name);
+      let pct=10;
+      const ticker=setInterval(()=>{ if(pct<85){pct+=3; bar.style.width=pct+'%'; lbl.textContent='Uploading... '+pct+'%';} },400);
+      const res=await fetch(`${proxyUrl}/api/upload-file`,{method:'POST',body:fd});
+      clearInterval(ticker);
+      const data=await res.json();
+      if(!res.ok||!data.ok) throw new Error(data.error||'Upload gagal');
+      bar.style.width='100%'; lbl.textContent='Selesai!';
+      fuAddHistory({ url:data.url, sha:data.sha, path:data.path, name:data.name, size: data.size ?? _file.size, type:_file.type, timestamp:data.timestamp });
+      setTimeout(()=>{
+        prog.style.display='none';
+        document.getElementById('zt-fu-url').value=data.url;
+        document.getElementById('zt-fu-open').href=data.url;
+        document.getElementById('zt-fu-result').style.display='block';
+      },400);
+    } catch(e) {
+      prog.style.display='none'; btn.style.display='block';
+      alert('❌ '+e.message);
+    }
+  };
+
+  window.ztFuCopy = function() {
+    const url=document.getElementById('zt-fu-url').value;
+    const btn=document.getElementById('zt-fu-copy-btn');
+    navigator.clipboard.writeText(url).then(()=>{
+      btn.innerHTML='<i class="fas fa-check"></i>'; btn.style.color='#22c55e';
+      setTimeout(()=>{ btn.innerHTML='<i class="fas fa-copy"></i>'; btn.style.color=''; },1800);
+    });
+  };
+
+  window.ztFuReset = function() {
+    _file=null;
+    ['zt-fu-preview-wrap','zt-fu-btn','zt-fu-result','zt-fu-progress-wrap'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+    const inp=document.getElementById('zt-fu-input'); if(inp) inp.value='';
+    const inner=document.getElementById('zt-fu-preview-inner'); if(inner) inner.innerHTML='';
+  };
+
+  window.ztFuHistCopy = function(url, btn) {
+    navigator.clipboard.writeText(url).then(()=>{
+      btn.innerHTML='<i class="fas fa-check"></i> Copied!'; btn.style.color='#22c55e';
+      setTimeout(()=>{ btn.innerHTML='<i class="fas fa-copy"></i> Copy'; btn.style.color=''; },1800);
+    });
+  };
+
+  window.ztFuHistDelete = async function(url, sha, path, name, btn) {
+    if(!confirm(`Hapus "${name}" dari GitHub juga?`)) return;
+    btn.classList.add('deleting');
+    btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    try {
+      const proxyUrl=typeof PROXY_URL!=='undefined' ? PROXY_URL : '';
+      if(proxyUrl && sha && path){
+        const res=await fetch(`${proxyUrl}/api/delete-file`,{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({sha,path,name})
+        });
+        const data=await res.json();
+        if(!data.ok) throw new Error(data.error||'Gagal hapus dari GitHub');
+      }
+      const card = btn.closest('.zt-fu-hist-card');
+      if(card){ card.style.opacity='0'; card.style.transform='translateX(40px)'; card.style.transition='all 0.25s'; }
+      setTimeout(()=>{ fuRemoveHistory(url); },260);
+    } catch(e) {
+      btn.classList.remove('deleting');
+      btn.innerHTML='<i class="fas fa-trash"></i> Hapus';
+      alert('❌ '+e.message);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', ()=>{ fuRenderHistory(); fuUpdateBadge(); });
+  fuRenderHistory(); fuUpdateBadge();
+})();
+
+/* ===== VIDEO TO AUDIO ===== */
+(function(){
+  let _vaFile = null;
+  let _vaFmt  = 'mp3';
+  let _vaBlobUrl = null;
+  let _vaFilename = 'audio.m4a';
+
+  function vaFmtSize(b) {
+    if(!b) return '';
+    if(b<1048576) return (b/1024).toFixed(1)+' KB';
+    return (b/1048576).toFixed(2)+' MB';
+  }
+
+  /* Download helper — buat <a> baru, klik, hapus. Kompatibel Samsung Browser */
+  window.ztVaDoDownload = function() {
+    if(!_vaBlobUrl) return;
+    const a = document.createElement('a');
+    a.href = _vaBlobUrl;
+    a.download = _vaFilename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 300);
+  };
+
+  window.ztVaDragOver  = e => { e.preventDefault(); document.getElementById('zt-va-dropzone').classList.add('drag-over'); };
+  window.ztVaDragLeave = () => document.getElementById('zt-va-dropzone').classList.remove('drag-over');
+  window.ztVaDrop = e => {
+    e.preventDefault();
+    document.getElementById('zt-va-dropzone').classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if(f) ztVaProcess(f);
+  };
+  window.ztVaSelected = inp => { if(inp.files[0]) ztVaProcess(inp.files[0]); };
+
+  window.ztVaProcess = function(file) {
+    if(!file.type.startsWith('video/') && !file.name.match(/\.(mp4|mkv|avi|mov|webm|flv|wmv|3gp)$/i)){
+      alert('Pilih file video!'); return;
+    }
+    _vaFile = file;
+    _vaBlobUrl = null;
+    document.getElementById('zt-va-dropzone').style.display   = 'none';
+    document.getElementById('zt-va-fileinfo').style.display   = 'flex';
+    document.getElementById('zt-va-options').style.display    = 'flex';
+    document.getElementById('zt-va-convert-btn').style.display= 'block';
+    document.getElementById('zt-va-result').style.display     = 'none';
+    document.getElementById('zt-va-progress-wrap').style.display = 'none';
+    document.getElementById('zt-va-filename').textContent = file.name;
+    document.getElementById('zt-va-filesize').textContent = vaFmtSize(file.size);
+  };
+
+  window.ztVaSetFmt = function(btn) {
+    document.querySelectorAll('.zt-va-fmt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    _vaFmt = btn.dataset.fmt;
+  };
+
+  window.ztVaReset = function() {
+    _vaFile = null;
+    _vaBlobUrl = null;
+    document.getElementById('zt-va-dropzone').style.display   = 'block';
+    document.getElementById('zt-va-fileinfo').style.display   = 'none';
+    document.getElementById('zt-va-options').style.display    = 'none';
+    document.getElementById('zt-va-convert-btn').style.display= 'none';
+    document.getElementById('zt-va-progress-wrap').style.display = 'none';
+    document.getElementById('zt-va-result').style.display     = 'none';
+    const inp = document.getElementById('zt-va-input'); if(inp) inp.value='';
+    document.querySelectorAll('.zt-va-fmt-btn').forEach(b => b.classList.toggle('active', b.dataset.fmt==='mp3'));
+    _vaFmt = 'mp3';
+  };
+
+  function vaSetProgress(pct, status) {
+    document.getElementById('zt-va-bar').style.width = pct+'%';
+    document.getElementById('zt-va-bar-label').textContent = Math.round(pct)+'%';
+    if(status) document.getElementById('zt-va-status').textContent = status;
+  }
+
+  function setResult(blobUrl, filename) {
+    _vaBlobUrl = blobUrl;
+    _vaFilename = filename;
+    const dlBtn = document.getElementById('zt-va-download-btn');
+    dlBtn.innerHTML = `<i class="fas fa-download"></i> Download Audio`;
+  }
+
+  /* ---- Buat named File → blob URL dengan nama benar ---- */
+  function namedBlobUrl(blob, filename) {
+    const file = new File([blob], filename, {type: blob.type});
+    return URL.createObjectURL(file);
+  }
+
+  /* ---- Encode PCM float32 → WAV blob ---- */
+  function encodeWAV(channelData, numChannels, sampleRate) {
+    const numFrames = channelData[0].length;
+    const bitsPerSample = 16;
+    const blockAlign = numChannels * (bitsPerSample / 8);
+    const byteRate = sampleRate * blockAlign;
+    const dataSize = numFrames * blockAlign;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+    function writeStr(off, s){ for(let i=0;i<s.length;i++) view.setUint8(off+i, s.charCodeAt(i)); }
+    writeStr(0,'RIFF'); view.setUint32(4, 36+dataSize, true);
+    writeStr(8,'WAVE'); writeStr(12,'fmt '); view.setUint32(16,16,true);
+    view.setUint16(20,1,true); view.setUint16(22,numChannels,true);
+    view.setUint32(24,sampleRate,true); view.setUint32(28,byteRate,true);
+    view.setUint16(32,blockAlign,true); view.setUint16(34,bitsPerSample,true);
+    writeStr(36,'data'); view.setUint32(40,dataSize,true);
+    let offset = 44;
+    for(let i=0;i<numFrames;i++){
+      for(let ch=0;ch<numChannels;ch++){
+        let s = Math.max(-1, Math.min(1, channelData[ch][i]));
+        view.setInt16(offset, s < 0 ? s*0x8000 : s*0x7FFF, true);
+        offset += 2;
+      }
+    }
+    return new Blob([buffer], {type:'audio/wav'});
+  }
+
+  /* ---- Encode PCM → format via MediaRecorder ---- */
+  function encodeViaMediaRecorder(channelData, numChannels, sampleRate, mimeType) {
+    return new Promise((resolve, reject) => {
+      const actx = new (window.AudioContext||window.webkitAudioContext)({sampleRate});
+      const numFrames = channelData[0].length;
+      const audioBuffer = actx.createBuffer(numChannels, numFrames, sampleRate);
+      for(let ch=0;ch<numChannels;ch++) audioBuffer.copyToChannel(channelData[ch], ch);
+      const dest = actx.createMediaStreamDestination();
+      const src  = actx.createBufferSource();
+      src.buffer = audioBuffer;
+      src.connect(dest);
+      const recorder = new MediaRecorder(dest.stream, {mimeType});
+      const chunks = [];
+      recorder.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
+      recorder.onstop = () => { actx.close(); resolve(new Blob(chunks,{type:mimeType})); };
+      recorder.onerror = e => { actx.close(); reject(e.error); };
+      recorder.start();
+      src.start(0);
+      src.onended = () => { setTimeout(()=>recorder.stop(), 100); };
+    });
+  }
+
+  window.ztVaConvert = async function() {
+    if(!_vaFile) return;
+
+    const btn  = document.getElementById('zt-va-convert-btn');
+    const prog = document.getElementById('zt-va-progress-wrap');
+    btn.style.display  = 'none';
+    prog.style.display = 'block';
+
+    try {
+      vaSetProgress(5, 'Membaca file video...');
+      const arrayBuffer = await _vaFile.arrayBuffer();
+
+      vaSetProgress(20, 'Mendecode audio...');
+      const actxDecode = new (window.AudioContext||window.webkitAudioContext)();
+      let audioBuffer;
+      try {
+        audioBuffer = await actxDecode.decodeAudioData(arrayBuffer);
+      } catch(e) {
+        throw new Error('Format video tidak didukung untuk ekstraksi audio di browser ini. Coba format MP4/WebM.');
+      }
+      await actxDecode.close();
+
+      const numChannels = audioBuffer.numberOfChannels;
+      const sampleRate  = audioBuffer.sampleRate;
+      const channelData = [];
+      for(let ch=0;ch<numChannels;ch++) channelData.push(audioBuffer.getChannelData(ch));
+
+      vaSetProgress(50, 'Encoding audio...');
+
+      const baseName = _vaFile.name.replace(/\.[^.]+$/, '');
+      let blob, filename;
+
+      filename = baseName + '.mp3';
+
+      if(MediaRecorder.isTypeSupported('audio/mp4')) {
+        blob = await encodeViaMediaRecorder(channelData, numChannels, sampleRate, 'audio/mp4');
+      } else if(MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        blob = await encodeViaMediaRecorder(channelData, numChannels, sampleRate, 'audio/webm;codecs=opus');
+      } else {
+        blob = encodeWAV(channelData, numChannels, sampleRate);
+        filename = baseName + '.wav';
+      }
+
+      vaSetProgress(95, 'Menyiapkan download...');
+      const blobUrl = namedBlobUrl(blob, filename);
+      setResult(blobUrl, filename);
+
+      vaSetProgress(100, 'Selesai!');
+      setTimeout(() => {
+        prog.style.display = 'none';
+        document.getElementById('zt-va-result').style.display = 'flex';
+      }, 400);
+
+    } catch(e) {
+      prog.style.display = 'none';
+      btn.style.display  = 'block';
+      console.error(e);
+      alert('❌ Konversi gagal: ' + e.message);
+    }
+  };
+})();
+
