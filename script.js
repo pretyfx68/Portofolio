@@ -6109,7 +6109,18 @@ function aiSignOut() {
     closeChatHistoryPanel();
 }
 function aiSignInGoogle() {} // legacy stub
-document.addEventListener('DOMContentLoaded', () => { aiUpdateSignInUI(); });
+document.addEventListener('DOMContentLoaded', () => {
+    aiUpdateSignInUI();
+    // Auto pull history dari Supabase saat page load kalau udah login
+    (async function() {
+        const user = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
+        if (!user) return;
+        const isWorm = document.getElementById('ai')?.classList.contains('angry-theme');
+        await aiPullHistoryFromServer(user.email, 'normal');
+        await aiPullHistoryFromServer(user.email, 'worm');
+        updateChatPanelHistory();
+    })();
+});
 
 // Show/hide floating chat btn based on page
 function updateFloatChatBtn(pageId) {
@@ -6520,7 +6531,7 @@ function ztSetFmt(btn, fmt) {
 }
 
 // Auto-fetch URL tunnel dari server
-const HARDCODED_BACKEND_URL = 'https://fifteen-unexpected-alarm-exclusion.trycloudflare.com';
+const HARDCODED_BACKEND_URL = 'https://himself-korea-lauderdale-teenage.trycloudflare.com';
 let PROXY_URL = localStorage.getItem('vidsnap_proxy_url') || HARDCODED_BACKEND_URL;
 
 // Otomatis update PROXY_URL dari server setiap buka halaman
