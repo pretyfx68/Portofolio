@@ -4106,7 +4106,7 @@ function addMessageInstant(text, type) {
     messageDiv.appendChild(contentDiv);
     container.appendChild(messageDiv);
     applyKaTeX(messageDiv);
-    scrollChatToBottom(true);
+    scrollChatToBottom();
 }
 
 function renderChatFromHistory(history) {
@@ -5148,7 +5148,7 @@ function addMessage(text, type, hideActions = false) {
         container.appendChild(messageDiv);
     }
     
-    // Scroll to bottom
+    // Scroll to bottom - force saat pesan baru ditambah
     scrollChatToBottom(true);
 }
 
@@ -5466,7 +5466,7 @@ function addTypingIndicator() {
     messageDiv.appendChild(contentDiv);
     container.appendChild(messageDiv);
     
-    scrollChatToBottom(true);
+    scrollChatToBottom(true); // force scroll saat thinking muncul
     
     return id;
 }
