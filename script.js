@@ -5736,6 +5736,9 @@ function aiHistCtxDoDelete() {
     }
     updateChatPanelHistory();
     showNotification('Riwayat dihapus', 'success');
+    // Sync ke Supabase
+    const isWorm = deletedKey.includes('worm');
+    aiPushHistoryToServer(isWorm ? 'worm' : 'normal');
 }
 function aiHistCtxDoPin() {
     if (_ctxKey === null || _ctxIdx === null) return;
