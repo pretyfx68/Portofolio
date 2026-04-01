@@ -6069,14 +6069,21 @@ async function aiDoSignUp() {
 }
 // Pull history dari Supabase → cache ke localStorage
 async function aiPullHistoryFromServer(email, mode) {
+    // Normalize mode: neutral = normal
+    const sbMode = (mode === 'angry' || mode === 'worm') ? 'worm' : 'normal';
     try {
-        const r = await fetch(`${_SB_URL}/rest/v1/ai_histories?email=eq.${encodeURIComponent(email)}&mode=eq.${mode}&select=sessions`, {
-            headers: _sbHeaders()
-        });
-        const rows = await r.json();
-        if (rows.length && rows[0].sessions) {
-            const key = aiHistKey(mode === 'worm' ? 'ai_chat_hist_worm' : 'ai_chat_hist_normal');
-            localStorage.setItem(key, JSON.stringify(rows[0].sessions));
+        // Coba pull dengan mode asli dulu, fallback ke 'neutral' kalau kosong
+        const tryModes = sbMode === 'normal' ? ['normal', 'neutral'] : ['worm', 'angry'];
+        for (const m of tryModes) {
+            const r = await fetch(`${_SB_URL}/rest/v1/ai_histories?email=eq.${encodeURIComponent(email)}&mode=eq.${m}&select=sessions`, {
+                headers: _sbHeaders()
+            });
+            const rows = await r.json();
+            if (rows.length && rows[0].sessions && rows[0].sessions.length) {
+                const key = aiHistKey(sbMode === 'worm' ? 'ai_chat_hist_worm' : 'ai_chat_hist_normal');
+                localStorage.setItem(key, JSON.stringify(rows[0].sessions));
+                return;
+            }
         }
     } catch(e) { console.log('Pull history gagal:', e.message); }
 }
@@ -6085,14 +6092,16 @@ async function aiPullHistoryFromServer(email, mode) {
 async function aiPushHistoryToServer(mode) {
     const user = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
     if (!user) return;
-    const key = aiHistKey(mode === 'worm' ? 'ai_chat_hist_worm' : 'ai_chat_hist_normal');
+    // Normalize mode
+    const sbMode = (mode === 'angry' || mode === 'worm') ? 'worm' : 'normal';
+    const key = aiHistKey(sbMode === 'worm' ? 'ai_chat_hist_worm' : 'ai_chat_hist_normal');
     let sessions = [];
     try { sessions = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
     try {
         await fetch(`${_SB_URL}/rest/v1/ai_histories`, {
             method: 'POST',
             headers: _sbHeaders({ 'Prefer': 'resolution=merge-duplicates' }),
-            body: JSON.stringify({ email: user.email, mode, sessions, updated_at: Date.now() })
+            body: JSON.stringify({ email: user.email, mode: sbMode, sessions, updated_at: Date.now() })
         });
     } catch(e) { console.log('Push history gagal:', e.message); }
 }
