@@ -5255,6 +5255,24 @@ function syntaxHighlight(escaped, lang) {
     return c;
 }
 
+function renderKaTeX(html) {
+    if (!window._katexReady || !window.renderMathInElement) return html;
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    try {
+        renderMathInElement(div, {
+            delimiters: [
+                { left: '\\[', right: '\\]', display: true },
+                { left: '\\(', right: '\\)', display: false },
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+        });
+    } catch(e) {}
+    return div.innerHTML;
+}
+
 function formatMessage(text) {
     const codeBlocks = [];
     text = text.replace(/```(\w+)?\n?([\s\S]*?)```/g, function(match, lang, code) {
@@ -5314,6 +5332,7 @@ function formatMessage(text) {
     text = text.replace(/(<\/?(h[1-6]|ul|ol|li|blockquote|hr|div)[^>]*>)(<br\s*\/?>)+/gi, '$1');
     inlineCodes.forEach(function(c, i) { text = text.replace('INLINE' + i + 'END', c); });
     codeBlocks.forEach(function(b, i) { text = text.replace('CODEBLOCK' + i + 'END', b); });
+    text = renderKaTeX(text);
     return text;
 }
 
