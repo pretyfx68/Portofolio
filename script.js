@@ -4106,7 +4106,7 @@ function addMessageInstant(text, type) {
     messageDiv.appendChild(contentDiv);
     container.appendChild(messageDiv);
     applyKaTeX(messageDiv);
-    scrollChatToBottom();
+    scrollChatToBottom(true);
 }
 
 function renderChatFromHistory(history) {
@@ -4129,7 +4129,7 @@ function renderChatFromHistory(history) {
     }
 }
 
-function scrollChatToBottom() {
+function scrollChatToBottom(force) {
     const container = document.getElementById('chatContainer');
     if (!container) return;
     let spacer = document.getElementById('chat-end-spacer');
@@ -4141,7 +4141,12 @@ function scrollChatToBottom() {
     } else if (spacer.nextSibling) {
         container.appendChild(spacer);
     }
-    container.scrollTop = container.scrollHeight;
+    // Hanya scroll kalau user sudah di dekat bawah (atau force=true)
+    const threshold = 120;
+    const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+    if (force || nearBottom) {
+        container.scrollTop = container.scrollHeight;
+    }
 }
 
 // Initialize on page load
@@ -5144,7 +5149,7 @@ function addMessage(text, type, hideActions = false) {
     }
     
     // Scroll to bottom
-    scrollChatToBottom();
+    scrollChatToBottom(true);
 }
 
 // Copy to clipboard function
@@ -5461,7 +5466,7 @@ function addTypingIndicator() {
     messageDiv.appendChild(contentDiv);
     container.appendChild(messageDiv);
     
-    scrollChatToBottom();
+    scrollChatToBottom(true);
     
     return id;
 }
