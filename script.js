@@ -4119,9 +4119,11 @@ function renderChatFromHistory(history) {
         updateWelcomeScreenForWormMode(responseStyle === 'angry');
         return;
     }
-    for (let i = 0; i < history.length; i += 2) {
-        if (history[i]) addMessageInstant(history[i].content, 'user');
-        if (history[i+1]) addMessageInstant(history[i+1].content, 'ai');
+    // Filter out system messages, only render user & assistant
+    const visible = history.filter(m => m.role !== 'system');
+    for (let i = 0; i < visible.length; i += 2) {
+        if (visible[i]) addMessageInstant(visible[i].content, 'user');
+        if (visible[i+1]) addMessageInstant(visible[i+1].content, 'ai');
     }
 }
 
