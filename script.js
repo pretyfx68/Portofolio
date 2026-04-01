@@ -5918,18 +5918,10 @@ function toggleChatHistoryPanel() {
     if (!isOpen) {
         updateChatPanelHistory();
         aiUpdateSignInUI();
-        // Sync worm mode style ke panel (panel di luar #ai jadi perlu manual)
         const isWorm = document.getElementById('ai').classList.contains('angry-theme');
         panel.classList.toggle('worm-mode', isWorm);
         panel.classList.add('open');
         overlay.classList.add('open');
-        // Pull history terbaru dari Supabase
-        const user = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
-        if (user) {
-            aiPullHistoryFromServer(user.email, isWorm ? 'worm' : 'normal').then(() => {
-                updateChatPanelHistory();
-            });
-        }
     } else {
         closeChatHistoryPanel();
     }
