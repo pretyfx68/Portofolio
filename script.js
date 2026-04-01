@@ -5966,6 +5966,9 @@ function aiOpenSignUp() {
 function aiCloseAuth() {
     document.getElementById('aiSignInModal').classList.remove('open');
     document.getElementById('aiSignUpModal').classList.remove('open');
+    document.getElementById('aiForgotModal').classList.remove('open');
+    document.getElementById('aiOTPModal').classList.remove('open');
+    clearInterval(_otpTimer);
 }
 function aiCloseAuthIfOutside(e) {
     if (e.target === e.currentTarget) aiCloseAuth();
@@ -8679,3 +8682,165 @@ function czConfirm({ title, titleHighlight, msg, okLabel = '<i class="fas fa-tra
 
 
 
+
+// ============================================================
+// EMAILJS OTP + FORGOT PASSWORD + EDIT USERNAME
+// ============================================================
+const _EJS_PUBLIC = 'F_UJqm1TcysJKBnhq';
+const _EJS_SERVICE = 'service_27lp7r8';
+const _EJS_TEMPLATE = 'template_p28jn2r';
+emailjs.init(_EJS_PUBLIC);
+
+let _otpCode = null;
+let _otpEmail = null;
+let _otpExpiry = null;
+let _otpTimer = null;
+
+function aiOpenForgotPassword() {
+    aiCloseAuth();
+    setTimeout(() => {
+        document.getElementById('aiForgotModal').classList.add('open');
+        document.getElementById('aiForgotEmail').value = '';
+    }, 150);
+}
+
+function aiOpenOTPModal() {
+    document.getElementById('aiForgotModal').classList.remove('open');
+    document.getElementById('aiOTPModal').classList.add('open');
+    document.getElementById('aiOTPInput').value = '';
+    document.getElementById('aiNewPw').value = '';
+    document.getElementById('aiNewPwConfirm').value = '';
+    // Countdown timer 5 menit
+    let sisa = 300;
+    clearInterval(_otpTimer);
+    _otpTimer = setInterval(() => {
+        sisa--;
+        const m = Math.floor(sisa / 60);
+        const s = sisa % 60;
+        const el = document.getElementById('aiOTPTimer');
+        if (el) el.textContent = `Kode berlaku ${m}:${s < 10 ? '0' + s : s}`;
+        if (sisa <= 0) { clearInterval(_otpTimer); if (el) el.textContent = 'Kode sudah kedaluwarsa'; }
+    }, 1000);
+}
+
+async function aiSendOTP() {
+    const email = document.getElementById('aiForgotEmail').value.trim();
+    if (!email) { showNotification('Masukkan email dulu', 'error'); return; }
+
+    // Cek email terdaftar di Supabase
+    const btn = document.getElementById('aiForgotSendBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i>Mengirim...';
+    try {
+        const r = await fetch(`${_SB_URL}/rest/v1/ai_accounts?email=eq.${encodeURIComponent(email)}&select=email`, {
+            headers: _sbHeaders()
+        });
+        const rows = await r.json();
+        if (!rows.length) { showNotification('Email tidak terdaftar', 'error'); return; }
+
+        // Generate 6 digit OTP
+        _otpCode = String(Math.floor(100000 + Math.random() * 900000));
+        _otpEmail = email;
+        _otpExpiry = Date.now() + 5 * 60 * 1000; // 5 menit
+
+        const now = new Date(_otpExpiry);
+        const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        await emailjs.send(_EJS_SERVICE, _EJS_TEMPLATE, {
+            email: email,
+            passcode: _otpCode,
+            time: timeStr
+        });
+
+        showNotification('Kode OTP terkirim ke email!', 'success');
+        aiOpenOTPModal();
+    } catch(e) {
+        showNotification('Gagal kirim email, coba lagi', 'error');
+        console.log(e);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Kirim Kode';
+    }
+}
+
+async function aiVerifyOTP() {
+    const otp = document.getElementById('aiOTPInput').value.trim();
+    const newPw = document.getElementById('aiNewPw').value;
+    const newPwConfirm = document.getElementById('aiNewPwConfirm').value;
+
+    if (!otp || otp.length !== 6) { showNotification('Masukkan kode 6 digit', 'error'); return; }
+    if (Date.now() > _otpExpiry) { showNotification('Kode sudah kedaluwarsa', 'error'); return; }
+    if (otp !== _otpCode) { showNotification('Kode salah', 'error'); return; }
+    if (!newPw || newPw.length < 6) { showNotification('Password minimal 6 karakter', 'error'); return; }
+    if (newPw !== newPwConfirm) { showNotification('Password tidak cocok', 'error'); return; }
+
+    const btn = document.getElementById('aiOTPVerifyBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i>Menyimpan...';
+    try {
+        // Update password di Supabase
+        const r = await fetch(`${_SB_URL}/rest/v1/ai_accounts?email=eq.${encodeURIComponent(_otpEmail)}`, {
+            method: 'PATCH',
+            headers: _sbHeaders({ 'Prefer': 'return=minimal' }),
+            body: JSON.stringify({ pw: newPw })
+        });
+        if (!r.ok) { showNotification('Gagal update password', 'error'); return; }
+        clearInterval(_otpTimer);
+        _otpCode = null;
+        aiCloseAuth();
+        setTimeout(() => { aiOpenSignIn(); showNotification('Password berhasil direset! Silakan sign in.', 'success'); }, 200);
+    } catch(e) {
+        showNotification('Gagal reset password', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Confirm Password';
+    }
+}
+
+// Edit Username
+function aiOpenEditUsername() {
+    const user = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
+    if (!user) return;
+    const modal = document.getElementById('aiEditUsernameModal');
+    modal.classList.add('open');
+    document.getElementById('aiNewUsername').value = user.name || '';
+}
+
+function aiCloseEditUsername(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('aiEditUsernameModal').classList.remove('open');
+}
+
+async function aiSaveUsername() {
+    const newName = document.getElementById('aiNewUsername').value.trim();
+    if (!newName) { showNotification('Username tidak boleh kosong', 'error'); return; }
+    const user = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
+    if (!user) return;
+
+    const btn = document.getElementById('aiSaveUsernameBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;"></i>Menyimpan...';
+    try {
+        const r = await fetch(`${_SB_URL}/rest/v1/ai_accounts?email=eq.${encodeURIComponent(user.email)}`, {
+            method: 'PATCH',
+            headers: _sbHeaders({ 'Prefer': 'return=minimal' }),
+            body: JSON.stringify({ username: newName })
+        });
+        if (!r.ok) { showNotification('Gagal update username', 'error'); return; }
+        user.name = newName;
+        localStorage.setItem('ai_panel_user', JSON.stringify(user));
+        aiUpdateSignInUI();
+        document.getElementById('aiEditUsernameModal').classList.remove('open');
+        showNotification('Username berhasil diubah!', 'success');
+    } catch(e) {
+        showNotification('Gagal update username', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Simpan';
+    }
+}
+
+function aiSwitchToSignIn() {
+    aiCloseAuth();
+    setTimeout(() => aiOpenSignIn(), 150);
+}
