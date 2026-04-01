@@ -5548,7 +5548,7 @@ async function _uploadImgToSupabase(base64, key) {
         const mime = meta.match(/:(.*?);/)[1];
         const ext = mime.split('/')[1] || 'jpg';
         const blob = await fetch(base64).then(r => r.blob());
-        const filename = `chat-images/${key}.${ext}`;
+        const filename = `zain/chat-images/${key}.${ext}`;
         const r = await fetch(`${_SB_URL}/storage/v1/object/${filename}`, {
             method: 'POST',
             headers: {
@@ -6531,7 +6531,7 @@ function ztSetFmt(btn, fmt) {
 }
 
 // Auto-fetch URL tunnel dari server
-const HARDCODED_BACKEND_URL = 'https://himself-korea-lauderdale-teenage.trycloudflare.com';
+const HARDCODED_BACKEND_URL = 'https://fifteen-unexpected-alarm-exclusion.trycloudflare.com';
 let PROXY_URL = localStorage.getItem('vidsnap_proxy_url') || HARDCODED_BACKEND_URL;
 
 // Otomatis update PROXY_URL dari server setiap buka halaman
