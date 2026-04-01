@@ -5909,6 +5909,13 @@ function toggleChatHistoryPanel() {
         panel.classList.toggle('worm-mode', isWorm);
         panel.classList.add('open');
         overlay.classList.add('open');
+        // Pull history terbaru dari Supabase
+        const user = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
+        if (user) {
+            aiPullHistoryFromServer(user.email, isWorm ? 'worm' : 'normal').then(() => {
+                updateChatPanelHistory();
+            });
+        }
     } else {
         closeChatHistoryPanel();
     }
