@@ -5758,8 +5758,12 @@ function aiHistCtxDoPin() {
     }
     localStorage.setItem(_ctxKey, JSON.stringify(sessions));
     document.getElementById('aiHistCtxMenu').classList.remove('show');
+    const pinnedKey = _ctxKey;
     _ctxKey = null; _ctxIdx = null;
     updateChatPanelHistory();
+    // Sync ke Supabase
+    const isWormPin = pinnedKey.includes('worm');
+    aiPushHistoryToServer(isWormPin ? 'worm' : 'normal');
 }
 function aiHistCtxDoRename() {
     if (_ctxKey === null || _ctxIdx === null) return;
@@ -5800,10 +5804,14 @@ function aiRenameConfirm(key, idx, overlay) {
     try { sessions = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
     if (sessions[idx]) {
         sessions[idx].name = newName;
+        sessions[idx].msg = newName; // update msg juga biar konsisten
         localStorage.setItem(key, JSON.stringify(sessions));
     }
     overlay.remove();
     updateChatPanelHistory();
+    // Sync ke Supabase
+    const isWormRename = key.includes('worm');
+    aiPushHistoryToServer(isWormRename ? 'worm' : 'normal');
 }
 // Close context menu on tap outside
 document.addEventListener('touchstart', (e) => {
@@ -5877,6 +5885,7 @@ async function loadChatSession(key, idx, mode) {
     if (welcome) welcome.remove();
     container.innerHTML = '';
     resolvedMessages.forEach(m => {
+        if (m.role === 'system') return; // skip system messages
         addMessageInstant(m.content, m.role === 'user' ? 'user' : 'ai');
     });
     // Tandai sesi aktif
