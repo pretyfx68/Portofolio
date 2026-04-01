@@ -4030,6 +4030,7 @@ function addMessageInstant(text, type) {
         }
         messageDiv.appendChild(contentDiv);
         container.appendChild(messageDiv);
+        applyKaTeX(messageDiv);
         return;
     }
 
@@ -4104,6 +4105,7 @@ function addMessageInstant(text, type) {
 
     messageDiv.appendChild(contentDiv);
     container.appendChild(messageDiv);
+    applyKaTeX(messageDiv);
     scrollChatToBottom();
 }
 
@@ -5195,6 +5197,7 @@ function typeWriter(element, text, index) {
             setTimeout(renderChunk, speed);
         } else {
             element.innerHTML = formatMessage(text);
+            applyKaTeX(element);
             scrollChatToBottom();
             isGenerating = false;
             updateSendButton();
@@ -5255,26 +5258,61 @@ function syntaxHighlight(escaped, lang) {
     return c;
 }
 
-function renderKaTeX(html) {
-    if (!window._katexReady || !window.renderMathInElement) return html;
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    try {
-        renderMathInElement(div, {
-            delimiters: [
-                { left: '\\[', right: '\\]', display: true },
-                { left: '\\(', right: '\\)', display: false },
-                { left: '$$', right: '$$', display: true },
-                { left: '$', right: '$', display: false }
-            ],
-            throwOnError: false
-        });
-    } catch(e) {}
-    return div.innerHTML;
+function applyKaTeX(element) {
+    if (!element) return;
+    function run() {
+        if (!window.renderMathInElement) return;
+        try {
+            renderMathInElement(element, {
+                delimiters: [
+                    { left: '\\[', right: '\\]', display: true },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false }
+                ],
+                throwOnError: false,
+                ignoredTags: ['script','noscript','style','textarea','pre','code']
+            });
+        } catch(e) {}
+    }
+    if (window._katexReady) run();
+    else {
+        const check = setInterval(() => {
+            if (window.renderMathInElement) { clearInterval(check); run(); }
+        }, 100);
+    }
 }
 
 function formatMessage(text) {
     const codeBlocks = [];
+    // Pre-extract LaTeX sebelum HTML escape supaya KaTeX bisa detect delimiter
+    const latexBlocks = [];
+    // Display math: \[...\]
+    text = text.replace(/\\\[([\s\S]*?)\\\]/g, function(m, inner) {
+        const ph = 'LATEXBLOCK' + latexBlocks.length + 'END';
+        latexBlocks.push('\\[' + inner + '\\]');
+        return ph;
+    });
+    // Inline math: \(...\)
+    text = text.replace(/\\\(([\s\S]*?)\\\)/g, function(m, inner) {
+        const ph = 'LATEXBLOCK' + latexBlocks.length + 'END';
+        latexBlocks.push('\\(' + inner + '\\)');
+        return ph;
+    });
+    // Display math: $$...$$
+    text = text.replace(/\$\$([\s\S]*?)\$\$/g, function(m, inner) {
+        const ph = 'LATEXBLOCK' + latexBlocks.length + 'END';
+        latexBlocks.push('$$' + inner + '$$');
+        return ph;
+    });
+    // Inline math: $...$ (hindari $ tunggal di luar konteks math)
+    text = text.replace(/\$([^$\n]{1,200}?)\$/g, function(m, inner) {
+        // Skip kalau bukan ekspresi math (tidak ada operator/huruf math)
+        if (!/[\^_\\{}]|\d/.test(inner) && inner.trim().split(' ').length > 5) return m;
+        const ph = 'LATEXBLOCK' + latexBlocks.length + 'END';
+        latexBlocks.push('$' + inner + '$');
+        return ph;
+    });
     text = text.replace(/```(\w+)?\n?([\s\S]*?)```/g, function(match, lang, code) {
         // 1. Escape HTML dulu
         var escaped = code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -5332,7 +5370,7 @@ function formatMessage(text) {
     text = text.replace(/(<\/?(h[1-6]|ul|ol|li|blockquote|hr|div)[^>]*>)(<br\s*\/?>)+/gi, '$1');
     inlineCodes.forEach(function(c, i) { text = text.replace('INLINE' + i + 'END', c); });
     codeBlocks.forEach(function(b, i) { text = text.replace('CODEBLOCK' + i + 'END', b); });
-    text = renderKaTeX(text);
+    latexBlocks.forEach(function(b, i) { text = text.replace('LATEXBLOCK' + i + 'END', b); });
     return text;
 }
 
