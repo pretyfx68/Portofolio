@@ -6796,3 +6796,16 @@ pointer-events:none; /* TANPA CONTROL */
 
 
 
+
+/* ── KaTeX display math spacing fix ── */
+.katex-display {
+    margin: 4px 0 !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.katex-display > .katex {
+    white-space: normal;
+}
+.message-bubble .katex-display {
+    margin: 2px 0 !important;
+}
