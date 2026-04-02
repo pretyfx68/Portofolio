@@ -103,7 +103,7 @@ function czmRenderHome(f){
         ${heroList.map((s,i)=>`
           <div class="czm-hero-slide" data-id="${s.id}">
             <img class="czm-hero-img" src="${s.image}" loading="lazy"
-              onerror="this.src='https://raw.githubusercontent.com/NdikzDatabase/Database/main/Database/1762559143736-x3crbj.jpg'">
+              onerror="this.style.display='none'">
             <div class="czm-hero-overlay">
               <div class="czm-hero-bottom">
                 <div class="czm-hero-text">
@@ -136,7 +136,7 @@ function czmRenderHome(f){
               <div class="czm-qslide">
                 ${slide.map(s=>`
                   <div class="czm-qitem" onclick="czmPlayById('${s.id}',true)">
-                    <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/NdikzDatabase/Database/main/Database/1762559143736-x3crbj.jpg'">
+                    <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
                     <div class="czm-q-info">
                       <div class="czm-q-title">${s.title}</div>
                       <div class="czm-q-sub">${s.artist} · ${fv(s.views)} pemutaran</div>
@@ -157,7 +157,7 @@ function czmRenderHome(f){
       <div class="czm-grid">
         ${grid.map(s=>`
           <div class="czm-gcard" onclick="czmPlayById('${s.id}',true)">
-            <img src="${s.image}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/NdikzDatabase/Database/main/Database/1762559143736-x3crbj.jpg'">
+            <img src="${s.image}" loading="lazy" onerror="this.style.display='none'">
             <div class="czm-glabel">${s.title}</div>
           </div>`).join('')}
       </div>
@@ -171,7 +171,7 @@ function czmRenderHome(f){
       <div class="czm-hrow">
         ${trend.map(s=>`
           <div class="czm-hcard" onclick="czmPlayById('${s.id}',true)">
-            <img class="czm-h-img" src="${s.image}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/NdikzDatabase/Database/main/Database/1762559143736-x3crbj.jpg'">
+            <img class="czm-h-img" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
             <div class="czm-h-title">${s.title}</div>
             <div class="czm-h-sub">${s.artist}</div>
           </div>`).join('')}
@@ -186,7 +186,7 @@ function czmRenderHome(f){
       <div class="czm-qlist" id="czm-all-songs-list">
         ${list.slice(0,8).map(s=>`
           <div class="czm-qitem" onclick="czmPlayById('${s.id}',true)">
-            <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/NdikzDatabase/Database/main/Database/1762559143736-x3crbj.jpg'">
+            <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
             <div class="czm-q-info">
               <div class="czm-q-title">${s.title}</div>
               <div class="czm-q-sub">${s.artist} • ${fv(s.views)} pemutaran</div>
@@ -229,7 +229,7 @@ window.czmShowMoreSongs=function(){
   // Render semua lagu
   container.innerHTML=list.map(s=>`
     <div class="czm-qitem" onclick="czmPlayById('${s.id}',true)">
-      <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/NdikzDatabase/Database/main/Database/1762559143736-x3crbj.jpg'">
+      <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
       <div class="czm-q-info">
         <div class="czm-q-title">${s.title}</div>
         <div class="czm-q-sub">${s.artist} • ${fv(s.views)} pemutaran</div>
@@ -8941,3 +8941,4 @@ function aiSwitchToSignIn() {
     aiCloseAuth();
     setTimeout(() => aiOpenSignIn(), 150);
 }
+
