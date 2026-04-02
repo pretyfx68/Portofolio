@@ -5663,8 +5663,10 @@ async function saveChatSession(mode, firstMessage) {
     try { sessions = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
 
     const rawMessages = JSON.parse(JSON.stringify(mode === 'angry' ? chatHistories.worm : chatHistories.normal));
-    const existingIdx = sessions.length > 0 && sessions[0].msg === firstMessage ? 0 : -1;
-    const sessionId = existingIdx === 0 ? (sessions[0].id || sessions[0].ts) : Date.now();
+
+    // Cari sesi yang sudah ada berdasarkan firstMessage (cari semua, bukan cuma index 0)
+    const existingIdx = sessions.findIndex(s => s.msg === firstMessage || s.name === firstMessage);
+    const sessionId = existingIdx >= 0 ? (sessions[existingIdx].id || sessions[existingIdx].ts) : Date.now();
 
     // Upload base64 foto ke Supabase Storage, fallback ke IndexedDB kalau gagal
     const strippedMessages = await Promise.all(rawMessages.map(async (m, i) => {
@@ -5674,7 +5676,6 @@ async function saveChatSession(mode, firstMessage) {
                 const sbKey = sessionId + '_' + i;
                 const sbUrl = await _uploadImgToSupabase(imgItem.image_url.url, sbKey);
                 if (sbUrl) {
-                    // Simpan ke Supabase Storage → pakai prefix __sb__
                     return {
                         ...m,
                         content: m.content.map(c =>
@@ -5682,7 +5683,6 @@ async function saveChatSession(mode, firstMessage) {
                         )
                     };
                 } else {
-                    // Fallback ke IndexedDB
                     _czmImgDB.set(sbKey, imgItem.image_url.url);
                     return {
                         ...m,
@@ -5696,16 +5696,19 @@ async function saveChatSession(mode, firstMessage) {
         return m;
     }));
 
-    if (existingIdx === 0) {
-        sessions[0].messages = strippedMessages;
-        sessions[0].ts = Date.now();
-        sessions[0].id = sessionId;
+    if (existingIdx >= 0) {
+        // Update sesi yang sudah ada (pertahankan posisi & pinned state)
+        sessions[existingIdx].messages = strippedMessages;
+        sessions[existingIdx].ts = Date.now();
+        sessions[existingIdx].id = sessionId;
     } else {
+        // Sesi baru — tambah di atas
         sessions.unshift({ id: sessionId, msg: firstMessage, ts: Date.now(), messages: strippedMessages });
     }
-    if (sessions.length > 10) {
-        sessions.slice(10).forEach(s => _czmImgDB.deletePrefix((s.id || s.ts) + '_'));
-        sessions = sessions.slice(0, 10);
+    // Limit 50 sesi (bukan 10)
+    if (sessions.length > 50) {
+        sessions.slice(50).forEach(s => _czmImgDB.deletePrefix((s.id || s.ts) + '_'));
+        sessions = sessions.slice(0, 50);
     }
     localStorage.setItem(key, JSON.stringify(sessions));
     updateChatPanelHistory();
