@@ -4843,6 +4843,10 @@ pointer-events:none; /* TANPA CONTROL */
 .ai-chat-new-btn:hover { background: rgba(255,255,255,0.13); }
 .ai-chat-hist-section {
   padding: 6px 14px 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 .ai-chat-hist-label {
   font-size: 11px;
