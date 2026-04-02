@@ -4930,52 +4930,45 @@ async function sendMessage() {
         clearAttachedImage();
 
         // Strip base64 dari chatHistory sebelum dikirim ke API supaya payload ga membengkak
+        // Tapi tetap kasih konteks ke AI bahwa ada gambar yang pernah dikirim
         const chatHistoryForAPI = chatHistory.map(m => {
             if (Array.isArray(m.content)) {
                 const imgItem = m.content.find(c => c.type === 'image_url');
                 const textItem = m.content.find(c => c.type === 'text');
                 if (imgItem && imgItem.image_url?.url?.startsWith('data:')) {
+                    // Ganti base64 jadi deskripsi teks supaya AI masih tau konteks gambarnya
                     const txtPart = textItem?.text && textItem.text !== '(Gambar)' ? textItem.text : '';
                     return { role: m.role, content: '[Pengguna mengirim gambar]' + (txtPart ? ': ' + txtPart : '') };
                 }
             }
             return m;
-        }).filter(m => m.role !== 'system');
+        });
 
-        // Fungsi fetch ke API dengan jumlah history tertentu
-        async function fetchWithHistory(histSlice) {
-            return fetch(PROXY_URL + '/api/chat', {
-                method: 'POST',
-                signal: _abortController.signal,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: isVision ? 'meta-llama/llama-4-scout-17b-16e-instruct' : model,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        ...histSlice,
-                        { role: 'user', content: userContent }
-                    ],
-                    temperature: temperature,
-                    max_tokens: maxTokens,
-                    top_p: 1,
-                    stream: false
-                })
-            });
-        }
-
-        // Coba kirim full history dulu, kalau error coba dengan history lebih sedikit
-        let apiResponse;
-        try {
-            apiResponse = await fetchWithHistory(chatHistoryForAPI);
-            if (!apiResponse.ok && (apiResponse.status === 413 || apiResponse.status === 400)) {
-                // Payload terlalu besar, coba dengan 10 pesan terakhir
-                apiResponse = await fetchWithHistory(chatHistoryForAPI.slice(-10));
-            }
-        } catch(fetchErr) {
-            throw fetchErr;
-        }
-
-        const response = apiResponse;
+        const response = await fetch(PROXY_URL + '/api/chat', {
+            method: 'POST',
+            signal: _abortController.signal,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: isVision ? 'meta-llama/llama-4-scout-17b-16e-instruct' : model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    ...chatHistoryForAPI,
+                    {
+                        role: 'user',
+                        content: userContent
+                    }
+                ],
+                temperature: temperature,
+                max_tokens: maxTokens,
+                top_p: 1,
+                stream: false
+            })
+        });
 
         removeTypingIndicator(typingId);
 
