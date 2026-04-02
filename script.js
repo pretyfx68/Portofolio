@@ -4152,16 +4152,23 @@ function scrollChatToBottom(force) {
     }
 }
 
-// Deteksi user touch/scroll di chatContainer → stop auto-scroll
+// Deteksi user scroll ke atas di chatContainer
 document.addEventListener('DOMContentLoaded', () => {
     const _initScrollDetect = () => {
         const container = document.getElementById('chatContainer');
         if (!container) return setTimeout(_initScrollDetect, 500);
-        // Touch: saat user menyentuh container, hentikan auto-scroll
-        container.addEventListener('touchstart', () => {
-            _userScrolledUp = true;
+
+        let _touchStartY = 0;
+        // Catat posisi awal sentuhan
+        container.addEventListener('touchstart', (e) => {
+            _touchStartY = e.touches[0].clientY;
         }, { passive: true });
-        // Kalau user balik ke bawah, aktifkan lagi
+        // Kalau swipe ke atas (jari naik = scroll ke atas), set flag
+        container.addEventListener('touchmove', (e) => {
+            const dy = e.touches[0].clientY - _touchStartY;
+            if (dy > 10) _userScrolledUp = true; // jari naik = scroll ke atas
+        }, { passive: true });
+        // Reset flag kalau user balik ke bawah
         container.addEventListener('scroll', () => {
             const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 40;
             if (atBottom) _userScrolledUp = false;
