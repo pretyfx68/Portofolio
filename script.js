@@ -3860,11 +3860,15 @@ function showPage(pageId) {
     }
   }
 
-  // Reset background saat pindah halaman
+  // Background hitam penuh saat di music, hilangkan cyan glow clock
   if (pageId === 'music') {
     document.body.style.background = '#0f2035';
+    const topBar = document.querySelector('.top-bar');
+    if (topBar) { topBar.style.boxShadow = 'none'; topBar.style.border = 'none'; }
   } else {
     document.body.style.background = '';
+    const topBar = document.querySelector('.top-bar');
+    if (topBar) { topBar.style.boxShadow = ''; topBar.style.border = ''; }
   }
 
   // overflow: hidden hanya saat AI
@@ -4852,7 +4856,7 @@ async function sendMessage() {
 
     try {
         // Buat system prompt berdasarkan responseLength dan responseStyle
-        let systemPrompt = 'Kamu adalah ZainAI, asisten AI yang sangat pintar, membantu, dan profesional. Kamu dibuat oleh Zain Suryo Negoro. Berikut adalah informasi tentang Zain (pembuatmu): Nama lengkap: Zain Suryo Negoro. Tanggal lahir: 15 Juni 2009. Sekolah: SMAN 01 Brebes. Kelas: 10. Umur: 16 tahun. Alamat rumah: Jl. Merdeka Utara Tengki. No HP: 0857 1316 4894. Les/Bimbel: Ghanesa Operation. Nama adik: Yaksa dan Kemal. Gunakan informasi ini jika user bertanya tentang Zain. WAJIB gunakan markdown: setiap item list numbered HARUS bold judulnya contoh "1. **Ketuhanan Yang Maha Esa**". Kata penting pakai **bold**. Gunakan ## atau ### untuk heading. ATURAN KODE WAJIB: Jika user meminta kode yang melibatkan HTML, CSS, dan/atau JavaScript, SELALU gabungkan semuanya dalam SATU code block html saja. Jangan pisah-pisah menjadi beberapa block terpisah. CSS taruh di dalam tag \x3cstyle\x3e di dalam HTML, JavaScript taruh di dalam tag \x3cscript\x3e di dalam HTML. Selalu gunakan \`\`\`html sebagai pembuka code block. ATURAN MATEMATIKA WAJIB: Jika ada rumus atau ekspresi matematika, WAJIB gunakan LaTeX. Untuk rumus inline gunakan \\( ... \\), untuk rumus display/blok gunakan \\[ ... \\]. DILARANG KERAS menulis rumus dalam bentuk plain text biasa seperti f(x) = a(x-x1)(x-x2), karena akan tampil dobel. Contoh benar: \\( f(x) = a(x - x_1)(x - x_2) \\). Gunakan #### untuk sub-heading langkah penyelesaian. ';
+        let systemPrompt = 'Kamu adalah ZainAI, asisten AI yang sangat pintar, membantu, dan profesional. Kamu dibuat oleh Zain Suryo Negoro. Berikut adalah informasi tentang Zain (pembuatmu): Nama lengkap: Zain Suryo Negoro. Tanggal lahir: 15 Juni 2009. Sekolah: SMAN 01 Brebes. Kelas: 10. Umur: 16 tahun. Alamat rumah: Jl. Merdeka Utara Tengki. No HP: 0857 1316 4894. Les/Bimbel: Ghanesa Operation. Nama adik: Yaksa dan Kemal. Gunakan informasi ini jika user bertanya tentang Zain. WAJIB gunakan markdown: setiap item list numbered HARUS bold judulnya contoh "1. **Ketuhanan Yang Maha Esa**". Kata penting pakai **bold**. Gunakan ## atau ### untuk heading. ATURAN KODE WAJIB: Jika user meminta kode yang melibatkan HTML, CSS, dan/atau JavaScript, SELALU gabungkan semuanya dalam SATU code block html saja. Jangan pisah-pisah menjadi beberapa block terpisah. CSS taruh di dalam tag \x3cstyle\x3e di dalam HTML, JavaScript taruh di dalam tag \x3cscript\x3e di dalam HTML. Selalu gunakan \`\`\`html sebagai pembuka code block. ';
         // Inject username ke system prompt
         const _aiUser = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
         if (_aiUser && _aiUser.name) {
@@ -5366,11 +5370,9 @@ function formatMessage(text) {
         inlineCodes.push('<code>' + code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code>');
         return ph;
     });
-    text = text.replace(/^##### (.+)$/gm, '<h5 style="margin:8px 0 4px;font-size:13px;color:#00d9ff;font-weight:bold;">$1</h5>');
-    text = text.replace(/^#### (.+)$/gm,  '<h4 style="margin:9px 0 4px;font-size:14px;color:#00d9ff;font-weight:bold;">$1</h4>');
-    text = text.replace(/^### (.+)$/gm,   '<h3 style="margin:10px 0 5px;font-size:16px;color:#fff;font-weight:bold;">$1</h3>');
-    text = text.replace(/^## (.+)$/gm,    '<h2 style="margin:12px 0 6px;font-size:18px;color:#fff;font-weight:bold;">$1</h2>');
-    text = text.replace(/^# (.+)$/gm,     '<h1 style="margin:14px 0 7px;font-size:20px;color:#fff;font-weight:bold;">$1</h1>');
+    text = text.replace(/^### (.+)$/gm, '<h3 style="margin:10px 0 5px;font-size:16px;color:#fff;font-weight:bold;">$1</h3>');
+    text = text.replace(/^## (.+)$/gm,  '<h2 style="margin:12px 0 6px;font-size:18px;color:#fff;font-weight:bold;">$1</h2>');
+    text = text.replace(/^# (.+)$/gm,   '<h1 style="margin:14px 0 7px;font-size:20px;color:#fff;font-weight:bold;">$1</h1>');
     text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;">');
     text = text.replace(/\*\*\*([^*\n]+)\*\*\*/g, '<strong><em>$1</em></strong>');
     text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
