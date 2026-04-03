@@ -3860,17 +3860,6 @@ function showPage(pageId) {
     }
   }
 
-  // Background hitam penuh saat di music, hilangkan cyan glow clock
-  if (pageId === 'music') {
-    document.body.style.background = '#0f2035';
-    const topBar = document.querySelector('.top-bar');
-    if (topBar) { topBar.style.boxShadow = 'none'; topBar.style.border = 'none'; }
-  } else {
-    document.body.style.background = '';
-    const topBar = document.querySelector('.top-bar');
-    if (topBar) { topBar.style.boxShadow = ''; topBar.style.border = ''; }
-  }
-
   // overflow: hidden hanya saat AI
   if (pageId === 'ai') {
     document.body.style.overflow = 'hidden';
