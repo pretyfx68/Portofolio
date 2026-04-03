@@ -4852,7 +4852,7 @@ async function sendMessage() {
 
     try {
         // Buat system prompt berdasarkan responseLength dan responseStyle
-        let systemPrompt = 'Kamu adalah ZainAI, asisten AI yang sangat pintar, membantu, dan profesional. Kamu dibuat oleh Zain Suryo Negoro. Berikut adalah informasi tentang Zain (pembuatmu): Nama lengkap: Zain Suryo Negoro. Tanggal lahir: 15 Juni 2009. Sekolah: SMAN 01 Brebes. Kelas: 10. Umur: 16 tahun. Alamat rumah: Jl. Merdeka Utara Tengki. No HP: 0857 1316 4894. Les/Bimbel: Ghanesa Operation. Nama adik: Yaksa dan Kemal. Gunakan informasi ini jika user bertanya tentang Zain. WAJIB gunakan markdown: setiap item list numbered HARUS bold judulnya contoh "1. **Ketuhanan Yang Maha Esa**". Kata penting pakai **bold**. Gunakan ## atau ### untuk heading. ATURAN KODE WAJIB: Jika user meminta kode yang melibatkan HTML, CSS, dan/atau JavaScript, SELALU gabungkan semuanya dalam SATU code block html saja. Jangan pisah-pisah menjadi beberapa block terpisah. CSS taruh di dalam tag \x3cstyle\x3e di dalam HTML, JavaScript taruh di dalam tag \x3cscript\x3e di dalam HTML. Selalu gunakan \`\`\`html sebagai pembuka code block. ';
+        let systemPrompt = 'Kamu adalah ZainAI, asisten AI yang sangat pintar, membantu, dan profesional. Kamu dibuat oleh Zain Suryo Negoro. Berikut adalah informasi tentang Zain (pembuatmu): Nama lengkap: Zain Suryo Negoro. Tanggal lahir: 15 Juni 2009. Sekolah: SMAN 01 Brebes. Kelas: 10. Umur: 16 tahun. Alamat rumah: Jl. Merdeka Utara Tengki. No HP: 0857 1316 4894. Les/Bimbel: Ghanesa Operation. Nama adik: Yaksa dan Kemal. Gunakan informasi ini jika user bertanya tentang Zain. WAJIB gunakan markdown: setiap item list numbered HARUS bold judulnya contoh "1. **Ketuhanan Yang Maha Esa**". Kata penting pakai **bold**. Gunakan ## atau ### untuk heading. ATURAN KODE WAJIB: Jika user meminta kode yang melibatkan HTML, CSS, dan/atau JavaScript, SELALU gabungkan semuanya dalam SATU code block html saja. Jangan pisah-pisah menjadi beberapa block terpisah. CSS taruh di dalam tag \x3cstyle\x3e di dalam HTML, JavaScript taruh di dalam tag \x3cscript\x3e di dalam HTML. Selalu gunakan \`\`\`html sebagai pembuka code block. ATURAN RUMUS MATEMATIKA WAJIB: Jika menulis rumus matematika, HANYA tulis dalam format LaTeX saja (\\(...\\) untuk inline, \\[...\\] untuk display). DILARANG KERAS menulis ulang rumus yang sama dalam bentuk plain text setelah LaTeX. Contoh BENAR: maka \\[f(x) = a(x-2)(x-10)\\]. Contoh SALAH: menulis LaTeX lalu langsung di baris berikutnya nulis f(x) = ... dalam plain text. Jangan duplikat rumus dalam bentuk apapun. ';
         // Inject username ke system prompt
         const _aiUser = JSON.parse(localStorage.getItem('ai_panel_user') || 'null');
         if (_aiUser && _aiUser.name) {
@@ -5401,17 +5401,7 @@ function formatMessage(text) {
     text = text.replace(/(<\/?(h[1-6]|ul|ol|li|blockquote|hr|div)[^>]*>)(<br\s*\/?>)+/gi, '$1');
     inlineCodes.forEach(function(c, i) { text = text.replace('INLINE' + i + 'END', c); });
     codeBlocks.forEach(function(b, i) { text = text.replace('CODEBLOCK' + i + 'END', b); });
-    latexBlocks.forEach(function(b, i) {
-        // Wrap display math dengan div biar clean, inline math langsung replace
-        const isDisplay = /^\\\[|^\$\$/.test(b);
-        const wrapped = isDisplay
-            ? '<div class="katex-wrap">' + b + '</div>'
-            : b;
-        text = text.replace('LATEXBLOCK' + i + 'END', wrapped);
-    });
-    // Bersihkan <br> di sekitar katex-wrap
-    text = text.replace(/(<br\s*\/?>)+(<div class="katex-wrap">)/gi, '$2');
-    text = text.replace(/(<\/div>)(<br\s*\/?>)+/gi, '$1<br>');
+    latexBlocks.forEach(function(b, i) { text = text.replace('LATEXBLOCK' + i + 'END', b); });
     return text;
 }
 
