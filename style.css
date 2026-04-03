@@ -3403,6 +3403,9 @@ pointer-events:none; /* TANPA CONTROL */
   color:#aaa; font-size:13px; font-weight:500; white-space:nowrap; cursor:pointer;
   transition:all .18s; flex-shrink:0;
 }
+#music .czm-filter-bar {
+  border-bottom: 1px solid rgba(0,217,255,0.20);
+}
 #music .czm-pill.active { background:#fff; color:#000; border-color:#fff; }
 #music .czm-pill:not(.active):hover { background:#152840; color:#fff; }
 
