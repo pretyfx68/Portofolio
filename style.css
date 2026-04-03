@@ -6866,3 +6866,12 @@ pointer-events:none; /* TANPA CONTROL */
     margin: 2px 0 !important;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
