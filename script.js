@@ -5401,7 +5401,24 @@ function formatMessage(text) {
     text = text.replace(/(<\/?(h[1-6]|ul|ol|li|blockquote|hr|div)[^>]*>)(<br\s*\/?>)+/gi, '$1');
     inlineCodes.forEach(function(c, i) { text = text.replace('INLINE' + i + 'END', c); });
     codeBlocks.forEach(function(b, i) { text = text.replace('CODEBLOCK' + i + 'END', b); });
+    // Sebelum restore latex, tandai setiap placeholder display math
+    // supaya setelah restore kita bisa hapus plain text duplikat di baris berikutnya
+    var displayLatexIndices = [];
+    latexBlocks.forEach(function(b, i) {
+        if (/^(\\[|\$\$)/.test(b)) displayLatexIndices.push(i);
+    });
     latexBlocks.forEach(function(b, i) { text = text.replace('LATEXBLOCK' + i + 'END', b); });
+    // Hapus plain text duplikat yang muncul tepat setelah display math
+    // Pola: setelah \[...\] ada <br> lalu teks mirip ekspresi math
+    text = text.replace(/(\\[[\s\S]*?\\]|\$\$[\s\S]*?\$\$)(<br\s*\/?>)([^
+<]{2,150})(?=<br|<h[1-6]|<ul|<ol|<div|$)/g, function(m, latex, br, after) {
+        var trimmed = after.trim();
+        // Hapus kalau: pendek, ada karakter math, bukan kalimat normal
+        if (trimmed.length < 120 && /[=\+\^\-]/.test(trimmed) && !/[,.!?]$/.test(trimmed) && trimmed.split(' ').length < 15) {
+            return latex;
+        }
+        return m;
+    });
     return text;
 }
 

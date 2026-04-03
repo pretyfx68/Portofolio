@@ -6886,10 +6886,13 @@ pointer-events:none; /* TANPA CONTROL */
     overflow-y: hidden;
     padding: 2px 0;
 }
-/* Pastiin font KaTeX keliatan bagus */
+/* KaTeX font size - gede & jelas kayak before */
 .message-bubble .katex {
-    font-size: 1em;
+    font-size: 1.1em;
 }
 .message-bubble .katex-display .katex {
-    font-size: 1.05em;
+    font-size: 1.25em;
+}
+.katex-display {
+    text-align: center;
 }
