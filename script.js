@@ -5366,9 +5366,11 @@ function formatMessage(text) {
         inlineCodes.push('<code>' + code.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code>');
         return ph;
     });
-    text = text.replace(/^### (.+)$/gm, '<h3 style="margin:10px 0 5px;font-size:16px;color:#fff;font-weight:bold;">$1</h3>');
-    text = text.replace(/^## (.+)$/gm,  '<h2 style="margin:12px 0 6px;font-size:18px;color:#fff;font-weight:bold;">$1</h2>');
-    text = text.replace(/^# (.+)$/gm,   '<h1 style="margin:14px 0 7px;font-size:20px;color:#fff;font-weight:bold;">$1</h1>');
+    text = text.replace(/^#{5,} (.+)$/gm, '<h5 style="margin:8px 0 4px;font-size:13px;color:#00d9ff;font-weight:bold;">$1</h5>');
+    text = text.replace(/^#### (.+)$/gm,  '<h4 style="margin:9px 0 4px;font-size:14px;color:#00d9ff;font-weight:bold;">$1</h4>');
+    text = text.replace(/^### (.+)$/gm,   '<h3 style="margin:10px 0 5px;font-size:16px;color:#fff;font-weight:bold;">$1</h3>');
+    text = text.replace(/^## (.+)$/gm,    '<h2 style="margin:12px 0 6px;font-size:18px;color:#fff;font-weight:bold;">$1</h2>');
+    text = text.replace(/^# (.+)$/gm,     '<h1 style="margin:14px 0 7px;font-size:20px;color:#fff;font-weight:bold;">$1</h1>');
     text = text.replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;">');
     text = text.replace(/\*\*\*([^*\n]+)\*\*\*/g, '<strong><em>$1</em></strong>');
     text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
@@ -5399,7 +5401,17 @@ function formatMessage(text) {
     text = text.replace(/(<\/?(h[1-6]|ul|ol|li|blockquote|hr|div)[^>]*>)(<br\s*\/?>)+/gi, '$1');
     inlineCodes.forEach(function(c, i) { text = text.replace('INLINE' + i + 'END', c); });
     codeBlocks.forEach(function(b, i) { text = text.replace('CODEBLOCK' + i + 'END', b); });
-    latexBlocks.forEach(function(b, i) { text = text.replace('LATEXBLOCK' + i + 'END', b); });
+    latexBlocks.forEach(function(b, i) {
+        // Wrap display math dengan div biar clean, inline math langsung replace
+        const isDisplay = /^\\\[|^\$\$/.test(b);
+        const wrapped = isDisplay
+            ? '<div class="katex-wrap">' + b + '</div>'
+            : b;
+        text = text.replace('LATEXBLOCK' + i + 'END', wrapped);
+    });
+    // Bersihkan <br> di sekitar katex-wrap
+    text = text.replace(/(<br\s*\/?>)+(<div class="katex-wrap">)/gi, '$2');
+    text = text.replace(/(<\/div>)(<br\s*\/?>)+/gi, '$1<br>');
     return text;
 }
 

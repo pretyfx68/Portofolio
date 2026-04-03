@@ -6878,3 +6878,18 @@ pointer-events:none; /* TANPA CONTROL */
 .message-bubble .katex-display {
     margin: 2px 0 !important;
 }
+/* ── KaTeX wrap untuk display math ── */
+.katex-wrap {
+    display: block;
+    margin: 8px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 0;
+}
+/* Pastiin font KaTeX keliatan bagus */
+.message-bubble .katex {
+    font-size: 1em;
+}
+.message-bubble .katex-display .katex {
+    font-size: 1.05em;
+}
