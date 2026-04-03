@@ -1,8 +1,3 @@
-/* Hide scrollbar globally */
-::-webkit-scrollbar { display: none; }
-* { scrollbar-width: none; -ms-overflow-style: none; }
-html { overflow-x: hidden; max-width: 100%; }
-
 body, html {
   margin:0; padding:0;
   font-family:'Arial',sans-serif;
@@ -483,10 +478,10 @@ filter: drop-shadow(0 0 6px #00d9ff);
   align-items:center;
   justify-content:space-between;
 
-  background: rgba(6,14,28,0.35);
-  backdrop-filter:blur(16px) saturate(1.3);
-  -webkit-backdrop-filter:blur(16px) saturate(1.3);
-  border: 1px solid rgba(0,217,255,0.20);
+  background: rgba(6,14,28,0.75);
+  backdrop-filter:blur(20px) saturate(1.5);
+  -webkit-backdrop-filter:blur(20px) saturate(1.5);
+  border: 1px solid rgba(0,217,255,0.15);
   border-radius:20px;
   padding:10px 14px;
 
@@ -1727,7 +1722,7 @@ pointer-events:none; /* TANPA CONTROL */
     box-shadow: 0 4px 20px var(#00D9FF);
     position: relative;
     z-index: 100;
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 #ai .header-content {
@@ -3395,19 +3390,13 @@ pointer-events:none; /* TANPA CONTROL */
 /* ===== MOOD PILLS ===== */
 #music .czm-pills {
   padding:10px 16px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none;
-  border-bottom:1px solid rgba(0,217,255,0.20);
+  border-bottom:1px solid rgba(255,255,255,0.05);
 }
 #music .czm-pills::-webkit-scrollbar { display:none; }
 #music .czm-pill {
   padding:8px 18px; border-radius:20px; background:#152840; border:1px solid #363636;
   color:#aaa; font-size:13px; font-weight:500; white-space:nowrap; cursor:pointer;
   transition:all .18s; flex-shrink:0;
-}
-#music .czm-filter-bar {
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  width: 100%;
-  min-width: 100%;
-  box-sizing: border-box;
 }
 #music .czm-pill.active { background:#fff; color:#000; border-color:#fff; }
 #music .czm-pill:not(.active):hover { background:#152840; color:#fff; }
@@ -3611,10 +3600,8 @@ pointer-events:none; /* TANPA CONTROL */
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 10005;
-  background: rgba(6,14,28,0.35);
-  backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  border-bottom: 1px solid rgba(0,217,255,0.20);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,217,255,0.06);
+  background: rgba(15,32,53,0.98);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   padding: 12px 16px;
   display: flex; align-items: center; gap: 10px;
 }
@@ -6866,6 +6853,7 @@ pointer-events:none; /* TANPA CONTROL */
 
 
 
+/* ── KaTeX display math spacing fix ── */
 .katex-display {
     margin: 4px 0 !important;
     overflow-x: auto;
@@ -6877,3 +6865,4 @@ pointer-events:none; /* TANPA CONTROL */
 .message-bubble .katex-display {
     margin: 2px 0 !important;
 }
+
