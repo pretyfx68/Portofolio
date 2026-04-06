@@ -440,6 +440,8 @@ function czmSyncUI(idx, skipPlaylist){
   }
   const arEl=document.getElementById('czm-sartist');
   if(arEl)arEl.textContent=s.artist||'—';
+  // Update inline artist section di bawah full view
+  czmRenderInlineArtist();
   const viEl=document.getElementById('czm-sviews');
   if(viEl)viEl.textContent=s.views?fv(s.views)+' pemutaran':'';
   const tEl=document.getElementById('czm-np-thumb');
@@ -465,11 +467,20 @@ function czmSyncUI(idx, skipPlaylist){
   if(typeof czmUpdateTopbarSource==='function') czmUpdateTopbarSource();
   // update now playing row di tab berikutnya
   if(typeof czmUpdateNowPlayingRow==='function') czmUpdateNowPlayingRow();
+  // re-render artist page kalau sedang terbuka (biar highlight lagu aktif pindah)
+  const _apPage = document.getElementById('czm-artist-page');
+  if(_apPage && _apPage.classList.contains('open')){
+    const _apKey = _apPage.dataset.artistKey || '';
+    if(_apKey && typeof czmOpenArtistPage === 'function') setTimeout(()=>czmOpenArtistPage(_apKey), 120);
+  }
   // sync topbar mini (tampil saat tab terbuka)
   const tma=document.getElementById('czm-topbar-mini-art');
   const tmt=document.getElementById('czm-topbar-mini-title');
   const tmar=document.getElementById('czm-topbar-mini-artist');
   if(tma) tma.src=s.image||'';
+  // Sync artist page controls album art
+  const ctrlArt = document.getElementById('czm-ap-ctrl-art');
+  if(ctrlArt) ctrlArt.src = s.image||'';
   if(tmt){
     const t=s.title||'—';
     tmt.textContent=t;
@@ -665,6 +676,24 @@ function czmSyncPlayState(){
   if(ico)ico.className=playing?'fa-solid fa-pause':'fa-solid fa-play';
   if(npIco)npIco.className=playing?'fa-solid fa-pause':'fa-solid fa-play';
   if(miniIco)miniIco.className=playing?'fa-solid fa-pause':'fa-solid fa-play';
+  // Sync artist page play button icon langsung
+  const apIco=document.getElementById('czm-ap-play-ico');
+  if(apIco){
+    const apPage=document.getElementById('czm-artist-page');
+    if(apPage && apPage.classList.contains('open')){
+      const pl=czmGetPlaylist();
+      const curSong=pl?.[czmCurIdx];
+      const curId=curSong?String(curSong.id):null;
+      const apNameEl=document.getElementById('czm-ap-name');
+      const artistName=(apNameEl?apNameEl.textContent:'').toLowerCase();
+      const artistSongs=pl?pl.slice(1).filter(s=>(s.artist||'').toLowerCase().includes(artistName)):[];
+      const hasActive=artistSongs.some(s=>String(s.id)===curId);
+      apIco.className=(hasActive&&playing)?'fa-solid fa-pause':'fa-solid fa-play';
+      // Sync bars
+      const bars=apPage.querySelector('.czm-ap-bars');
+      if(bars){playing?bars.classList.remove('czm-paused'):bars.classList.add('czm-paused');}
+    }
+  }
 }
 window.czmSeek=function(e){
   if(_czmVideoMode){
@@ -792,9 +821,10 @@ window.czmOpenPlayer=function(){
   // Reset tab — sembunyikan list dulu, kembali ke full view
   document.getElementById('czm-tab-next')?.classList.remove('active');
   document.getElementById('czm-tab-related')?.classList.remove('active');
+  document.getElementById('czm-tab-artist')?.classList.remove('active');
   document.getElementById('czm-tab-content-next')?.classList.add('czm-tab-hidden');
   document.getElementById('czm-tab-content-related')?.classList.add('czm-tab-hidden');
-  const _fv2=document.getElementById('czm-full-view'); if(_fv2){_fv2.style.display='flex';requestAnimationFrame(function(){_fv2.classList.remove('czm-hidden');});}
+  document.getElementById('czm-tab-content-artist')?.classList.add('czm-tab-hidden'); const _fv2=document.getElementById('czm-full-view'); if(_fv2){_fv2.style.display='flex';requestAnimationFrame(function(){_fv2.classList.remove('czm-hidden');});}
   const _cv2=document.getElementById('czm-collapsed-view'); if(_cv2) _cv2.classList.remove('czm-visible');
   document.getElementById('czm-player')?.classList.remove('czm-tab-open');
   // Pastikan next-header & filter chips tersembunyi saat kembali ke full view
@@ -804,7 +834,7 @@ window.czmOpenPlayer=function(){
   czmRefreshPlSelector();
   setTimeout(()=>{
     const _sa=document.getElementById('czm-scroll-area'); 
-    if(_sa){ _sa.scrollTop=0; _sa.style.overflowY='hidden'; }
+    if(_sa){ _sa.scrollTop=0;  }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 30);
   czmRenderPlBox(null);
@@ -818,8 +848,10 @@ window.czmGoHome=function(){
     // Tutup semua tab, kembali ke full view
     document.getElementById('czm-tab-next')?.classList.remove('active');
     document.getElementById('czm-tab-related')?.classList.remove('active');
+    document.getElementById('czm-tab-artist')?.classList.remove('active');
     document.getElementById('czm-tab-content-next')?.classList.add('czm-tab-hidden');
     document.getElementById('czm-tab-content-related')?.classList.add('czm-tab-hidden');
+    document.getElementById('czm-tab-content-artist')?.classList.add('czm-tab-hidden');
     const _fv3=document.getElementById('czm-full-view'); if(_fv3){_fv3.style.display='flex';requestAnimationFrame(function(){_fv3.classList.remove('czm-hidden');});}
     const _cv3=document.getElementById('czm-collapsed-view'); if(_cv3) _cv3.classList.remove('czm-visible');
     playerEl.classList.remove('czm-tab-open');
@@ -828,7 +860,7 @@ window.czmGoHome=function(){
     // Sembunyikan icon search TERKAIT
     const _si=document.getElementById('czm-related-search-icon'); if(_si) _si.style.display='none';
     const _sa=document.getElementById('czm-scroll-area'); 
-    if(_sa){ _sa.scrollTop=0; _sa.style.overflowY='hidden'; }
+    if(_sa){ _sa.scrollTop=0;  }
     setTimeout(czmRunMarquee, 350);
     return; // jangan lanjut ke home
   }
@@ -1305,22 +1337,25 @@ window.czmToggleShuffle=function(){
 window.czmSwitchTab=function(tab){
   const tabNext    = document.getElementById('czm-tab-next');
   const tabRelated = document.getElementById('czm-tab-related');
+  const tabArtist  = document.getElementById('czm-tab-artist');
   const contentNext    = document.getElementById('czm-tab-content-next');
   const contentRelated = document.getElementById('czm-tab-content-related');
+  const contentArtist  = document.getElementById('czm-tab-content-artist');
   const fullView       = document.getElementById('czm-full-view');
   const collapsedView  = document.getElementById('czm-collapsed-view');
   const playerEl       = document.getElementById('czm-player');
 
-  const isAlreadyActive = (tab==='next' && tabNext.classList.contains('active'))
-                       || (tab==='related' && tabRelated.classList.contains('active'));
+  const isAlreadyActive = (tab==='next'    && tabNext.classList.contains('active'))
+                       || (tab==='related' && tabRelated.classList.contains('active'))
+                       || (tab==='artist'  && !!tabArtist?.classList.contains('active'));
 
   if(isAlreadyActive){
-    // Toggle off — kembali ke full view
     tabNext.classList.remove('active');
     tabRelated.classList.remove('active');
+    tabArtist?.classList.remove('active');
     contentNext.classList.add('czm-tab-hidden');
     contentRelated.classList.add('czm-tab-hidden');
-    // Fade out collapsed, fade in full
+    contentArtist.classList.add('czm-tab-hidden');
     if(collapsedView) collapsedView.classList.remove('czm-visible');
     setTimeout(function(){
       if(fullView){ fullView.style.display='flex'; requestAnimationFrame(function(){ fullView.classList.remove('czm-hidden'); }); }
@@ -1331,34 +1366,30 @@ window.czmSwitchTab=function(tab){
     const _si0 = document.getElementById('czm-related-search-icon');
     if(_si0) _si0.style.display = 'none';
     const _sa=document.getElementById('czm-scroll-area'); if(_sa) _sa.scrollTop=0;
-    // Disable scroll saat full view
-    const _sa2=document.getElementById('czm-scroll-area'); if(_sa2) _sa2.style.overflowY='hidden';
     setTimeout(czmRunMarquee, 350);
     return;
   }
 
-  // Aktifkan tab — enable scroll
   const _saEnable=document.getElementById('czm-scroll-area'); if(_saEnable) _saEnable.style.overflowY='auto';
   tabNext.classList.toggle('active', tab==='next');
   tabRelated.classList.toggle('active', tab==='related');
+  tabArtist?.classList.toggle('active', tab==='artist');
   contentNext.classList.toggle('czm-tab-hidden', tab!=='next');
   contentRelated.classList.toggle('czm-tab-hidden', tab!=='related');
+  contentArtist.classList.toggle('czm-tab-hidden', tab!=='artist');
 
   if(fullView){ fullView.classList.add('czm-hidden'); setTimeout(function(){ fullView.style.display='none'; }, 220); }
   if(collapsedView){ collapsedView.style.display='flex'; requestAnimationFrame(function(){ collapsedView.classList.add('czm-visible'); }); }
   if(playerEl) playerEl.classList.add('czm-tab-open');
 
-  // Sync mini-view + topbar mini
   const s = window.playlist?.[window.currentRealIndex];
   if(s){
-    // mini-view (sticky header)
     const ma=document.getElementById('czm-mini-art');
     const mt=document.getElementById('czm-mini-title');
     const mar=document.getElementById('czm-mini-artist');
     if(ma) ma.src=s.image||'';
     if(mt) mt.textContent=s.title||'—';
     if(mar) mar.textContent=s.artist||'—';
-    // topbar mini
     const tma=document.getElementById('czm-topbar-mini-art');
     const tmt=document.getElementById('czm-topbar-mini-title');
     const tmar=document.getElementById('czm-topbar-mini-artist');
@@ -1390,20 +1421,283 @@ window.czmSwitchTab=function(tab){
 
   if(tab==='related') czmRenderRelated();
   if(tab==='next'){ czmUpdateNowPlayingRow(); czmRenderPlBox(null); }
+  if(tab==='artist') czmRenderArtistTab();
 
-  // Tampilkan header yang sesuai
   const _nh = document.getElementById('czm-next-header');
   if(_nh) _nh.style.display = tab==='next' ? 'block' : 'none';
-
-  // Tampilkan icon search di tab TERKAIT saat aktif
   const _si = document.getElementById('czm-related-search-icon');
   if(_si) _si.style.display = tab==='related' ? 'inline' : 'none';
 
-  // Reset scroll
   const _sa=document.getElementById('czm-scroll-area');
   if(_sa) _sa.scrollTop = 0;
   setTimeout(()=>{ if(_sa) _sa.scrollTop=0; }, 80);
 };
+/* ===== Inline Artist Card (scroll ke bawah di full view) ===== */
+function czmRenderInlineArtist(){
+  const box = document.getElementById('czm-inline-artist');
+  if(!box) return;
+  const pl = czmGetPlaylist();
+  const s  = pl?.[czmCurIdx];
+  if(!s){ box.innerHTML=''; return; }
+
+  const songArtist = (s.artist||'').toLowerCase();
+  const matchKey   = Object.keys(artists).find(k => songArtist.includes(k.toLowerCase()));
+  const a          = matchKey ? artists[matchKey] : null;
+
+  const artistImg  = a ? a.image : s.image;
+  const artistName = a ? a.name : s.artist;
+  const listeners  = a ? a.pendengar+' pendengar bulanan' : '';
+  const genre      = a ? a.genre : '';
+
+  box.innerHTML = `
+    <div class="czm-ia-card" onclick="czmOpenArtistPage('${(matchKey||s.artist).replace(/'/g,"\\'")}')">
+      <img class="czm-ia-bg" src="${artistImg}">
+      <div class="czm-ia-banner-overlay"></div>
+      <div class="czm-ia-card-label">TENTANG ARTIS</div>
+      <div class="czm-ia-banner-info">
+        <div class="czm-ia-name">${artistName}</div>
+        ${listeners ? `<div class="czm-ia-listeners">${listeners}</div>` : ''}
+      </div>
+    </div>`;
+}
+
+/* ===== Artist Page (fullscreen) ===== */
+window.czmOpenArtistPage = function(artistKey){
+  const pl = czmGetPlaylist();
+  const a  = artists[artistKey];
+  const artistName = a ? a.name : artistKey;
+  const artistImg  = a ? a.image : (pl?.[czmCurIdx]?.image||'');
+
+  // Isi hero
+  const heroImg = document.getElementById('czm-ap-hero-img');
+  if(heroImg) heroImg.src = artistImg;
+  const apName = document.getElementById('czm-ap-name');
+  if(apName) apName.textContent = artistName;
+  const apMeta = document.getElementById('czm-ap-meta');
+  if(apMeta) apMeta.textContent = a ? a.pendengar+' pendengar bulanan' : '';
+  const apGenre = document.getElementById('czm-ap-genre');
+  if(apGenre) apGenre.textContent = a ? a.genre : '';
+
+  // Lagu-lagu artis
+  const artistSongs = pl ? pl.slice(1).filter(song =>
+    (song.artist||'').toLowerCase().includes(artistKey.toLowerCase())
+  ) : [];
+
+  const fv2 = v => {
+    if(!v) return '0';
+    if(v>=1e9) return (v/1e9).toFixed(1)+'M';
+    if(v>=1e6) return (v/1e6).toFixed(1)+' jt';
+    if(v>=1e3) return (v/1e3).toFixed(0)+' rb';
+    return v;
+  };
+
+  // Cek lagu yang sedang aktif
+  const curSong = pl?.[czmCurIdx];
+  const curId = curSong ? String(curSong.id) : null;
+  // Cek apakah lagu aktif dari artis ini
+  const artistHasActiveSong = artistSongs.some(s => String(s.id) === curId);
+
+  const songsBox = document.getElementById('czm-ap-songs');
+  if(songsBox){
+    songsBox.innerHTML = artistSongs.length
+      ? artistSongs.map((song,i)=>{
+          const isActive = String(song.id) === curId;
+          return `
+          <div class="czm-ap-song${isActive?' czm-ap-active':''}" onclick="czmPlayById('${song.id}',true)">
+            ${isActive
+              ? `<div class="czm-ap-bars${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>`
+              : `<span class="czm-ap-song-num">${i+1}</span>`
+            }
+            <img src="${song.image}" loading="lazy">
+            <div style="flex:1;min-width:0;overflow:hidden;" class="czm-ap-song-info">
+              <div class="czm-ap-song-title">${song.title}</div>
+              <div class="czm-ap-song-views">${fv2(song.views)} pemutaran</div>
+            </div>
+            <button class="czm-ap-song-more" onclick="event.stopPropagation();czmOpenBs('${song.id}',event)">
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+          </div>`;
+        }).join('')
+      : '<div style="color:#555;padding:20px 0;font-size:13px;">Tidak ada lagu dari artis ini.</div>';
+  }
+
+  // Sync play button state
+  czmApSyncPlayBtn(artistHasActiveSong);
+  czmApSyncRepeatBtn();
+
+  // Set marquee untuk lagu aktif (sama kayak czm-pl-t)
+  requestAnimationFrame(()=>{
+    const activeRow = document.querySelector('#czm-ap-songs .czm-ap-song.czm-ap-active');
+    if(!activeRow) return;
+    const titleEl  = activeRow.querySelector('.czm-ap-song-title');
+    const wrapEl   = activeRow.querySelector('.czm-ap-song-info');
+    if(!titleEl) return;
+    // Ukur wrap width
+    const wrapW = (wrapEl ? wrapEl.getBoundingClientRect().width : titleEl.parentElement.getBoundingClientRect().width);
+    const textW = titleEl.scrollWidth;
+    if(textW > wrapW + 2){
+      const gap = 50;
+      if(!titleEl.dataset.apMarqueeSet){
+        const orig = titleEl.textContent;
+        titleEl.dataset.apMarqueeSet = '1';
+        titleEl.innerHTML = `${orig}<span style="display:inline-block;width:${gap}px;"></span>${orig}<span style="display:inline-block;width:${gap}px;"></span>`;
+      }
+      const fullW = titleEl.scrollWidth / 2;
+      const dur   = Math.max(4, fullW / 60) + 's';
+      titleEl.style.setProperty('--ap-ex', -fullW + 'px');
+      titleEl.style.setProperty('--ap-dur', dur);
+    } else {
+      titleEl.style.animation = 'none';
+    }
+  });
+
+  const page = document.getElementById('czm-artist-page');
+  if(page){
+    page.dataset.artistKey = artistKey;
+    const wasAlreadyOpen = page.classList.contains('open');
+    page.classList.add('open');
+    if(!wasAlreadyOpen) page.scrollTop = 0;
+  }
+  // Sync album art thumbnail di controls
+  const ctrlArt = document.getElementById('czm-ap-ctrl-art');
+  if(ctrlArt && curSong) ctrlArt.src = curSong.image||'';
+};
+
+// Buka bottom sheet untuk lagu yang sedang diputar (dari artist page controls)
+window.czmApOpenCurrentBs = function(){
+  const pl = czmGetPlaylist();
+  const curSong = pl?.[czmCurIdx];
+  if(!curSong) return;
+  czmOpenBs(curSong.id, null);
+};
+// Tambah lagu yang sedang diputar ke playlist
+window.czmApAddCurrentToPl = function(){
+  const pl = czmGetPlaylist();
+  const curSong = pl?.[czmCurIdx];
+  if(!curSong) return;
+  if(typeof czmAddSongToPl === 'function') czmAddSongToPl(String(curSong.id));
+};
+// Sync tombol play/pause di artist page
+window.czmApSyncPlayBtn = function(artistHasActiveSong){
+  const btn = document.getElementById('czm-ap-play-btn');
+  const ico = document.getElementById('czm-ap-play-ico');
+  if(!btn||!ico) return;
+  if(artistHasActiveSong && window.isPlaying){
+    ico.className = 'fa-solid fa-pause';
+  } else {
+    ico.className = 'fa-solid fa-play';
+  }
+};
+window.czmApSyncRepeatBtn = function(){
+  const btn = document.getElementById('czm-ap-repeat-btn');
+  if(!btn) return;
+  btn.classList.toggle('active', !!czmLoop);
+};
+
+// Toggle play/pause dari artist page
+window.czmArtistPageTogglePlay = function(){
+  const pl = czmGetPlaylist();
+  const curSong = pl?.[czmCurIdx];
+  const apName = document.getElementById('czm-ap-name');
+  const artistName = apName ? apName.textContent.toLowerCase() : '';
+  const artistSongs = pl ? pl.slice(1).filter(s => (s.artist||'').toLowerCase().includes(artistName)) : [];
+  const curId = curSong ? String(curSong.id) : null;
+  const artistHasActiveSong = artistSongs.some(s => String(s.id) === curId);
+
+  if(artistHasActiveSong){
+    // Pakai playAudio/pauseAudio biar isPlaying terupdate
+    if(window.isPlaying){
+      if(typeof pauseAudio==='function') pauseAudio();
+    } else {
+      if(typeof playAudio==='function') playAudio();
+    }
+  } else {
+    if(artistSongs.length) czmPlayById(artistSongs[0].id, true);
+  }
+  // Sync icon setelah state berubah
+  setTimeout(czmSyncPlayState, 80);
+};
+window.czmCloseArtistPage = function(){
+  const page = document.getElementById('czm-artist-page');
+  if(page){ page.classList.remove('open'); }
+};
+
+function czmRenderArtistTab(){
+  const box = document.getElementById('czm-artist-box');
+  if(!box) return;
+  const pl  = czmGetPlaylist();
+  const s   = pl?.[czmCurIdx];
+  if(!s){ box.innerHTML='<div style="text-align:center;color:#555;padding:48px 0;">Tidak ada lagu aktif.</div>'; return; }
+
+  // Cari artis yang cocok: cek apakah nama artis di-const artists ada di string artist lagu (case-insensitive)
+  const songArtist = (s.artist||'').toLowerCase();
+  const matchKey   = Object.keys(artists).find(k => songArtist.includes(k.toLowerCase()));
+  const a          = matchKey ? artists[matchKey] : null;
+
+  // Ambil lagu-lagu lain dari artis yang sama (contains match)
+  const artistSongs = pl.slice(1).filter(song =>
+    song.id !== s.id &&
+    (matchKey
+      ? (song.artist||'').toLowerCase().includes(matchKey.toLowerCase())
+      : (song.artist||'').toLowerCase() === songArtist)
+  ).slice(0, 6);
+
+  if(!a){
+    // Fallback: tidak ada di const artists, tampilkan lagu saja
+    box.innerHTML = `
+      <div style="padding:20px 16px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+          <img src="${s.image}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,217,255,0.4);">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#fff;">${s.artist}</div>
+            <div style="font-size:13px;color:#888;margin-top:4px;">Artis</div>
+          </div>
+        </div>
+        ${artistSongs.length ? `
+          <div style="font-size:13px;font-weight:600;color:#888;letter-spacing:.5px;margin-bottom:10px;">LAGU LAINNYA</div>
+          ${artistSongs.map(song=>`
+            <div onclick="czmPlayById('${song.id}',true)" style="display:flex;align-items:center;gap:12px;padding:9px 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);">
+              <img src="${song.image}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${song.title}</div>
+                <div style="font-size:12px;color:#888;margin-top:2px;">${fv(song.views)} pemutaran</div>
+              </div>
+            </div>`).join('')}` : ''}
+      </div>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <!-- Hero full-bleed ala Spotify -->
+    <div style="position:relative;width:100%;height:220px;overflow:hidden;flex-shrink:0;">
+      <img src="${a.image}" style="width:100%;height:100%;object-fit:cover;object-position:top;filter:brightness(0.55);">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 25%,rgba(10,22,40,0.95) 100%);"></div>
+      <div style="position:absolute;bottom:14px;left:14px;right:14px;">
+        <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.1;text-shadow:0 1px 6px rgba(0,0,0,0.7);">${a.name}</div>
+        <div style="font-size:12px;color:#bbb;margin-top:4px;">${a.pendengar} pendengar bulanan</div>
+      </div>
+    </div>
+
+    <div style="padding:12px 16px 20px;">
+      ${artistSongs.length ? `
+        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:.3px;margin-bottom:12px;margin-top:8px;">LAGU POPULER</div>
+        ${artistSongs.map((song,i)=>`
+          <div onclick="czmPlayById('${song.id}',true)" style="display:flex;align-items:center;gap:12px;padding:8px 0;cursor:pointer;transition:background .15s;"
+            onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background=''">
+            <div style="width:20px;text-align:center;color:#888;font-size:13px;flex-shrink:0;">${i+1}</div>
+            <img src="${song.image}" style="width:44px;height:44px;border-radius:4px;object-fit:cover;flex-shrink:0;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${song.title}</div>
+              <div style="font-size:12px;color:#888;margin-top:2px;">${fv(song.views)} pemutaran</div>
+            </div>
+            <button onclick="event.stopPropagation();czmOpenBs('${song.id}',event)" style="background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;">
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+          </div>`).join('')}
+      ` : `<div style="text-align:center;color:#555;padding:20px 0;font-size:13px;">Tidak ada lagu lain dari artis ini.</div>`}
+    </div>`;
+}
+
 /* Render related songs - mirip YT Music */
 function czmRenderRelated(){
   const box=document.getElementById('czm-related-box');if(!box)return;
@@ -2014,6 +2308,171 @@ function kirimPesan() {
 
 /* ===== SECTION BREAK ===== */
 
+// ===== DATA ARTIS =====
+// Cocokkan dengan field artist di songs (case-insensitive contains match)
+const artists = {
+  "Tenxi": {
+    name: "Tenxi",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Bintang5.jpg",
+    pendengar: "12.4 juta"
+    },
+  "Nadhif Basalamah": {
+    name: "Nadhif Basalamah",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/nadhif.jpg",
+    pendengar: "8.1 juta"
+  },
+  "Virgoun": {
+    name: "Virgoun",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Virgoun.png",
+    pendengar: "9.7 juta"
+  },
+  "Naykilla": {
+    name: "Naykilla",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/SO%20ASU.png",
+    pendengar: "3.2 juta"
+  },
+  "MikkyZia": {
+    name: "MikkyZia",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Aku%20Dah%20Lupa.jpg",
+    pendengar: "5.6 juta"
+  },
+  "Fourtwnty": {
+    name: "Fourtwnty",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/mangu.jpg",
+    pendengar: "7.3 juta"
+  },
+  "Auric Veil": {
+    name: "Auric Veil",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Oh%20no%2CI%20like%20you.jpg",
+    pendengar: "1.8 juta"
+  },
+  "Lady Gaga": {
+    name: "Lady Gaga",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/die%20with%20a%20smile.jpg",
+    pendengar: "87.4 juta"
+  },
+  "DEWA 19": {
+    name: "DEWA 19",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Kangen.jpg",
+    pendengar: "14.2 juta"
+  },
+  "NOAH": {
+    name: "NOAH",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/NoahBintangdiSurga.jpg",
+    pendengar: "11.5 juta"
+  },
+  "Andmesh": {
+    name: "Andmesh",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Anigrah%20Terindah.jpg",
+    pendengar: "6.8 juta"
+  },
+  "Gustixa": {
+    name: "Gustixa",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/somewhere1.jpg",
+    pendengar: "4.1 juta"
+  },
+  "Keane": {
+    name: "Keane",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/somewhere2.jpg",
+    pendengar: "18.7 juta"
+  },
+  "The Weeknd": {
+    name: "The Weeknd",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/starboy.jpg",
+    pendengar: "111.3 juta"
+  },
+  "Kendrick Lamar": {
+    name: "Kendrick Lamar",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/HUMBLE.jpg",
+    pendengar: "62.4 juta"
+  },
+  "Travis Scott": {
+    name: "Travis Scott",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Fein.jpg",
+    pendengar: "74.9 juta"
+  },
+  "Lil Wayne": {
+    name: "Lil Wayne",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Lil%20Wayne.jpg",
+    pendengar: "35.6 juta"
+  },
+  "FloyyMenor": {
+    name: "FloyyMenor",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/peligrosa.jpg",
+    pendengar: "22.8 juta"
+  },
+  "Lil Nas X": {
+    name: "Lil Nas X",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/old%20town%20roand.jpg",
+    pendengar: "39.2 juta"
+  },
+  "21 Savage": {
+    name: "21 Savage",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/redrum.jpg",
+    pendengar: "42.3 juta"
+  },
+  "Future": {
+    name: "Future",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/mask%20off.jpg",
+    pendengar: "56.1 juta"
+  },
+  "Ariana Grande": {
+    name: "Ariana Grande",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/women.png",
+    pendengar: "92.5 juta"
+  },
+  "d4vd": {
+    name: "d4vd",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_68760dcc-7c2c-4ea2-a7cb-f164aedc9afd.jpg",
+    pendengar: "21.4 juta"
+  },
+  "Chase Atlantic": {
+    name: "Chase Atlantic",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files2/refs/heads/main/swim.jpg",
+    pendengar: "14.8 juta"
+  },
+  "Rich Brian": {
+    name: "Rich Brian",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/dat%20stick.jpg",
+    pendengar: "9.9 juta"
+  },
+  "Metro Boomin": {
+    name: "Metro Boomin",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files2/refs/heads/main/too%20many.png",
+    pendengar: "31.7 juta"
+  },
+  "Sal Priadi": {
+    name: "Sal Priadi",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/amin%20paling%20serius.jpg",
+    pendengar: "5.2 juta"
+  },
+  "Jung Kook": {
+    name: "Jung Kook",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files2/refs/heads/main/still%20witth%20you.jpg",
+    pendengar: "44.6 juta"
+  },
+  "Don Toliver": {
+    name: "Don Toliver",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/no%20pole.jpg",
+    pendengar: "22.1 juta"
+  },
+  "Piche Kota": {
+    name: "Piche Kota",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/FHUtwGLydD.jpg",
+    pendengar: "2.3 juta"
+  },
+  "Black Eyed Peas": {
+    name: "Black Eyed Peas",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files2/refs/heads/main/rock%20that.jpg",
+    pendengar: "26.4 juta"
+  },
+  "Chris Brown": {
+    name: "Chris Brown",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Girl%20you%20Loud.jpg",
+    pendengar: "49.8 juta"
+  }
+};
+
 const songs = {
   0: { audio: "https://raw.githubusercontent.com/PretyFX69/music-files2/refs/heads/main/avatars-000034313304-f1lisi-t1080x1080.jpg",
        image: "https://raw.githubusercontent.com/PretyFX69/music-files2/refs/heads/main/avatars-000034313304-f1lisi-t1080x1080.jpg", 
@@ -2417,7 +2876,7 @@ const songs = {
         artist: "Camila Cabello & Young Thug",
         tags: ["😝🤙🏻"],
         views: 4000000000},
-  71: { audio: "https://github.com/PretyFX69/music-files/refs/heads/main/Dat%20tick.mp3", 
+  71: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/Dat%20tick.mp3", 
         image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/dat%20stick.jpg", 
         title: "Dat $tick", 
         artist: "Rich Brian",
@@ -3782,6 +4241,7 @@ function showPage(pageId) {
       void target.offsetWidth; // force reflow
       target.classList.add('zt-entering');
       setTimeout(() => target.classList.remove('zt-entering'), 800);
+      setTimeout(() => ztOpenMenu(), 100);
     }
   }
 
@@ -9205,3 +9665,4 @@ function ztQrDownload(fmt) {
 
   document.addEventListener('DOMContentLoaded', ztDashInit);
 })();
+

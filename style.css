@@ -3370,8 +3370,9 @@ pointer-events:none; /* TANPA CONTROL */
   z-index: 1;
   overscroll-behavior: none;
 }
+/* Full view tetap bisa scroll untuk lihat Tentang Artis */
 #music:not(.has-tab) .czm-scroll-area {
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 /* Tab bar: flex-shrink:0, selalu nempel di bawah */
@@ -3684,14 +3685,209 @@ pointer-events:none; /* TANPA CONTROL */
 }
 
 /* Nutupin gap transparan antara waveform dan tab bar */
-#music .czm-full-view::after {
-  content: '';
+/* === INLINE ARTIST SECTION (scroll ke bawah di full view) === */
+#music .czm-inline-artist {
+  width: 100%;
+  margin-top: 28px;
+  padding-bottom: 40px;
+}
+#music .czm-inline-artist:empty { display: none; }
+
+/* Artist card — clickable, like Spotify */
+#music .czm-ia-card {
+  position: relative;
+  width: 100%;
+  height: 190px;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#music .czm-ia-card:active { opacity: 0.85; }
+#music .czm-ia-card-label {
+  position: absolute;
+  top: 14px; left: 14px;
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: .6px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+#music .czm-ia-card img.czm-ia-bg {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: top;
+  filter: brightness(0.6);
+}
+#music .czm-ia-banner-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.85) 100%);
+}
+#music .czm-ia-banner-info {
+  position: absolute; bottom: 14px; left: 14px; right: 14px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+#music .czm-ia-avatar { display: none; }
+#music .czm-ia-name {
+  font-size: 20px; font-weight: 800; color: #fff; line-height: 1.2;
+}
+#music .czm-ia-listeners {
+  font-size: 12px; color: #ccc; margin-top: 2px;
+}
+#music .czm-ia-genre {
+  display: none;
+}
+
+/* === ARTIST PAGE (fullscreen overlay) === */
+#czm-artist-page {
+  position: fixed; inset: 0;
+  background: #0a1628;
+  z-index: 10050;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
+}
+#czm-artist-page.open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.czm-ap-hero {
+  position: relative; width: 100%; height: 220px; flex-shrink: 0;
+}
+.czm-ap-hero img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: top;
+}
+.czm-ap-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.7) 100%);
+}
+.czm-ap-back {
+  position: absolute; top: 14px; left: 14px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  border: none; color: #fff; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.czm-ap-name {
+  position: absolute; bottom: 30px; left: 16px;
+  font-size: 28px; font-weight: 800; color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+.czm-ap-meta {
+  position: absolute; bottom: 10px; left: 16px;
+  font-size: 13px; color: rgba(255,255,255,0.75);
+}
+.czm-ap-body { padding: 0 16px 40px; }
+/* Controls row: repeat kiri, play kanan */
+.czm-ap-section-label {
+  font-size: 12px; font-weight: 700; color: #aaa;
+  letter-spacing: 1px; margin: 14px 0 6px;
+}
+.czm-ap-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; padding: 12px 0 8px;
+}
+.czm-ap-ctrl-left { display: flex; align-items: center; gap: 10px; }
+.czm-ap-ctrl-right { display: flex; align-items: center; gap: 14px; }
+.czm-ap-ctrl-art {
+  width: 44px; height: 44px; border-radius: 8px;
+  object-fit: cover; flex-shrink: 0;
+  background: rgba(255,255,255,0.07);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.czm-ap-ctrl-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: none; color: #aaa; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: transform .15s, color .15s, background .15s;
+  flex-shrink: 0;
+}
+.czm-ap-ctrl-btn:active { transform: scale(0.93); }
+.czm-ap-ctrl-btn.czm-ap-plus { color: #00d9ff; background: rgba(0,217,255,0.10); }
+/* Repeat button */
+.czm-ap-repeat-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: none; color: #aaa; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: transform .15s, color .15s, background .15s;
+}
+.czm-ap-repeat-btn:active { transform: scale(0.93); }
+.czm-ap-repeat-btn.active { color: #00d9ff; background: rgba(0,217,255,0.12); }
+/* Play/pause button */
+.czm-ap-play-btn {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #ffffff;
+  border: none; color: #0a1628;
+  font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  transition: transform .15s;
+}
+.czm-ap-play-btn:active { transform: scale(0.93); }
+.czm-ap-song {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 0; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background .15s;
+}
+.czm-ap-song:active { background: rgba(255,255,255,0.04); }
+.czm-ap-song-num {
+  width: 20px; text-align: center;
+  color: #555; font-size: 12px; flex-shrink: 0;
+}
+.czm-ap-song img {
+  width: 46px; height: 46px; border-radius: 7px;
+  object-fit: cover; flex-shrink: 0;
+}
+.czm-ap-song-title {
+  font-size: 14px; font-weight: 600; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   display: block;
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  background: #0f2035;
-  flex: 1;
-  min-height: 140px;
+}
+/* Marquee untuk judul lagu aktif di artist page - sama kayak czm-pl-t */
+.czm-ap-song.czm-ap-active .czm-ap-song-title {
+  text-overflow: clip;
+  display: inline-block;
+  overflow: visible;
+  animation: czm-ap-marquee var(--ap-dur, 8s) linear infinite;
+  will-change: transform;
+}
+@keyframes czm-ap-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(var(--ap-ex, -200px)); }
+}
+.czm-ap-song-views { font-size: 12px; color: #888; margin-top: 2px; }
+.czm-ap-song-more {
+  background: none; border: none; color: #555;
+  font-size: 18px; cursor: pointer; padding: 4px; flex-shrink: 0;
+}
+/* Active song row in artist page */
+.czm-ap-song.czm-ap-active .czm-ap-song-title { color: #00d9ff; }
+.czm-ap-song.czm-ap-active .czm-ap-song-num { color: #00d9ff; }
+/* Animated bars icon (like Spotify "now playing" indicator) */
+.czm-ap-bars {
+  display: flex; align-items: flex-end; gap: 2px;
+  height: 14px; width: 14px; flex-shrink: 0;
+}
+.czm-ap-bars span {
+  display: block; width: 3px; border-radius: 1px;
+  background: #00d9ff;
+  animation: czm-bar-anim 0.8s ease-in-out infinite alternate;
+}
+.czm-ap-bars span:nth-child(1) { height: 6px; animation-delay: 0s; }
+.czm-ap-bars span:nth-child(2) { height: 12px; animation-delay: 0.2s; }
+.czm-ap-bars span:nth-child(3) { height: 8px; animation-delay: 0.4s; }
+.czm-ap-bars.czm-paused span { animation-play-state: paused; }
+@keyframes czm-bar-anim {
+  from { transform: scaleY(0.4); }
+  to   { transform: scaleY(1); }
 }
 
 /* === FULL VIEW (normal): art besar === */
@@ -3940,6 +4136,7 @@ pointer-events:none; /* TANPA CONTROL */
   cursor: pointer; border-bottom: 2px solid transparent;
   transition: color .18s, border-color .18s;
   -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 #music .czm-tab.active {
   color: #fff; border-bottom-color: #fff;
@@ -4109,9 +4306,9 @@ pointer-events:none; /* TANPA CONTROL */
 #music .czm-search-res { flex:1; overflow-y:auto; padding:16px; }
 
 /* ===== BOTTOM SHEET ===== */
-#music .czm-bs-ov   { display:none; position:fixed; inset:0; background:rgba(15,32,53,0.5); z-index:10010; }
+#music .czm-bs-ov   { display:none; position:fixed; inset:0; background:rgba(15,32,53,0.5); z-index:10060; }
 #music .czm-bs-menu {
-  display:none; position:fixed; bottom:0; left:0; right:0; z-index:10011;
+  display:none; position:fixed; bottom:0; left:0; right:0; z-index:10061;
   background:#1a2d42; border-radius:16px 16px 0 0; overflow:hidden;
   transform:translateY(100%); transition:transform .28s cubic-bezier(.32,.72,0,1);
 }
@@ -7319,4 +7516,5 @@ pointer-events:none; /* TANPA CONTROL */
   box-shadow: 0 4px 16px rgba(0,217,255,0.15);
 }
 .zt-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,217,255,0.3); }
+
 

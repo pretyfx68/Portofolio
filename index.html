@@ -1756,6 +1756,10 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
           <div class="czm-vbar"></div><div class="czm-vbar"></div><div class="czm-vbar"></div>
           <div class="czm-vbar"></div><div class="czm-vbar"></div><div class="czm-vbar"></div>
         </div>
+
+        <!-- TENTANG ARTIS: muncul saat scroll ke bawah di full view -->
+        <div class="czm-inline-artist" id="czm-inline-artist"></div>
+
       </div>
     </div>
 
@@ -1771,6 +1775,13 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
       <div class="czm-tab-content czm-tab-hidden" id="czm-tab-content-related">
         <div id="czm-related-box">
           <div style="text-align:center;color:#555;padding:48px 0;font-size:14px;">Memuat rekomendasi...</div>
+        </div>
+      </div>
+
+      <!-- Tab TENTANG ARTIS -->
+      <div class="czm-tab-content czm-tab-hidden" id="czm-tab-content-artist">
+        <div id="czm-artist-box">
+          <div style="text-align:center;color:#555;padding:48px 0;font-size:14px;">Memuat info artis...</div>
         </div>
       </div>
 
@@ -2517,5 +2528,39 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
 
 
 <script src="script.js"></script>
+<div id="czm-artist-page">
+  <div class="czm-ap-hero" id="czm-ap-hero">
+    <img id="czm-ap-hero-img" src="">
+    <div class="czm-ap-hero-overlay"></div>
+    <button class="czm-ap-back" onclick="czmCloseArtistPage()"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="czm-ap-name" id="czm-ap-name"></div>
+    <div class="czm-ap-meta" id="czm-ap-meta"></div>
+  </div>
+  <div class="czm-ap-body">
+    <div class="czm-ap-controls">
+      <div class="czm-ap-ctrl-left">
+        <img class="czm-ap-ctrl-art" id="czm-ap-ctrl-art" src="">
+        <button class="czm-ap-ctrl-btn czm-ap-plus" onclick="czmApAddCurrentToPl()" title="Tambah ke playlist">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <button class="czm-ap-ctrl-btn" onclick="czmApOpenCurrentBs()" title="Opsi lagu">
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+      </div>
+      <div class="czm-ap-ctrl-right">
+        <button class="czm-ap-repeat-btn" id="czm-ap-repeat-btn" onclick="czmToggleLoop();czmApSyncRepeatBtn()">
+          <i class="fa-solid fa-repeat" id="czm-ap-repeat-ico"></i>
+        </button>
+        <button class="czm-ap-play-btn" id="czm-ap-play-btn" onclick="czmArtistPageTogglePlay()">
+          <i class="fa-solid fa-play" id="czm-ap-play-ico"></i>
+        </button>
+      </div>
+    </div>
+    <div class="czm-ap-genre" id="czm-ap-genre"></div>
+    <div class="czm-ap-section-label">LAGU POPULER</div>
+    <div id="czm-ap-songs"></div>
+  </div>
+</div>
+
 </body>
 </html>
