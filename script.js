@@ -1972,51 +1972,7 @@ let maxTokens = 2048;
 let responseLength = localStorage.getItem('responseLength') || 'short'; // default Singkat // Default: short
 let responseStyle = localStorage.getItem('responseStyle') || 'neutral'; // Default: neutral (no emoji)
 let isGenerating = false; // Flag saat AI sedang balas
-let userLocation = null;
-let userLocationRaw = null; // {lat, lon}
 
-function ztProcessGPS(pos) {
-    const lat = pos.coords.latitude.toFixed(6);
-    const lon = pos.coords.longitude.toFixed(6);
-    userLocationRaw = { lat: parseFloat(lat), lon: parseFloat(lon) };
-    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json')
-        .then(r => r.json())
-        .then(data => {
-            const addr = data.address || {};
-            const kota = addr.city || addr.town || addr.village || addr.county || '';
-            const kecamatan = addr.suburb || addr.neighbourhood || '';
-            const prov = addr.state || '';
-            const negara = addr.country || '';
-            userLocation = (kecamatan ? kecamatan + ', ' : '') + kota + (prov ? ', ' + prov : '') + (negara ? ', ' + negara : '') + ' (koordinat: ' + lat + ', ' + lon + ')';
-            // Kirim lokasi ke server untuk ditampilkan di console Pterodactyl
-            try {
-                const _proxyBase = (typeof PROXY_URL !== 'undefined' ? PROXY_URL : localStorage.getItem('vidsnap_proxy_url') || '').replace(/\/+$/, '');
-                if (_proxyBase) {
-                    fetch(_proxyBase + '/api/log-location', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ lat, lon, address: userLocation })
-                    }).catch(() => {});
-                }
-            } catch(e) {}
-
-        })
-        .catch(() => {
-            userLocation = 'koordinat: ' + lat + ', ' + lon;
-        });
-}
-
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(ztProcessGPS,
-        function() { userLocation = null; },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-    );
-    // Watch terus supaya update kalau GPS baru diizinkan
-    navigator.geolocation.watchPosition(ztProcessGPS,
-        function() {},
-        { enableHighAccuracy: true, maximumAge: 30000 }
-    );
-}
 
 function getWelcomeScreenHTML() {
     return `
@@ -6995,11 +6951,7 @@ async function ztCheckPhone() {
     ipInfo = await r.json();
   } catch(e) {}
 
-  // GPS lokasi
-  const gpsReady = typeof userLocation !== 'undefined' && userLocation !== null;
-  const gpsText = gpsReady ? userLocation.replace(/\s*\(koordinat:.*?\)/, '').trim() : null;
-  const coordMatch = gpsReady && userLocation ? userLocation.match(/koordinat: ([\d\.\-]+), ([\d\.\-]+)/) : null;
-  const mapUrl = coordMatch ? 'https://www.google.com/maps?q=' + coordMatch[1] + ',' + coordMatch[2] : '';
+  const mapUrl = '';
 
   res.innerHTML = `
     <div class="zt-phone-card">
@@ -7022,7 +6974,7 @@ async function ztCheckPhone() {
         <div class="zt-phone-row"><span><i class="fas fa-hashtag" style="color:#94a3b8"></i> Panjang</span><b>${num.length} digit</b></div>
         ${ipInfo && ipInfo.ip ? '<div class="zt-phone-row"><span><i class="fas fa-network-wired" style="color:#00d9ff"></i> IP Kamu</span><b>' + ipInfo.ip + '</b></div>' : ''}
         ${ipInfo && ipInfo.isp ? '<div class="zt-phone-row"><span><i class="fas fa-satellite-dish" style="color:#a78bfa"></i> ISP</span><b>' + ipInfo.isp + '</b></div>' : ''}
-        ${gpsText ? '<div class="zt-phone-row"><span><i class="fas fa-map-marker-alt" style="color:#22c55e"></i> Lokasi GPS</span><b>' + gpsText + '</b></div>' : '<div class="zt-phone-row"><span><i class="fas fa-map-marker-alt" style="color:#555"></i> Lokasi</span><b style="color:#555">GPS belum diizinkan</b></div>'}
+
       </div>
       <div class="zt-phone-actions">
         <a class="zt-wa-btn" href="${waLink}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
@@ -7048,8 +7000,8 @@ async function ztCheckPhone() {
           type: op.type,
           ip: ipInfo ? ipInfo.ip : null,
           isp: ipInfo ? ipInfo.isp : null,
-          location: gpsText || null,
-          coords: coordMatch ? { lat: coordMatch[1], lon: coordMatch[2] } : null
+          location: null,
+          coords: null
         })
       }).catch(() => {});
     }
