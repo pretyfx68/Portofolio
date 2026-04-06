@@ -8,7 +8,6 @@
 <link rel="icon" type="image/jpeg" sizes="64x64"
 href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2B62%20857-0071-1112%2020260124_225944.jpg">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
   onload="window._katexReady=true;"></script>
@@ -561,6 +560,15 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
       <button class="zt-tab" onclick="ztSwitchTab('instagram')">
         <i class="fab fa-instagram"></i> Instagram DL
       </button>
+            <button class="zt-tab" onclick="ztSwitchTab('facebook')">
+        <i class="fab fa-facebook"></i> Facebook DL
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('ssweb')">
+        <i class="fas fa-camera"></i> SS Web
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('remini')">
+        <i class="fas fa-magic"></i> Remini
+      </button>
       <button class="zt-tab" onclick="ztSwitchTab('phone')">
         <i class="fas fa-mobile-alt"></i> Cek Nomor
       </button>
@@ -585,11 +593,96 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
             <button class="zt-tab" onclick="ztSwitchTab('speedtest')">
         <i class="fas fa-tachometer-alt"></i> Speed Test
       </button>
-      <button class="zt-tab" onclick="ztSwitchTab('ip')">
-        <i class="fas fa-globe"></i> IP &amp; Lokasi
-      </button>
+
     </div>
     </div>
+    </div>
+
+    <!-- DASHBOARD PANEL -->
+    <div id="zt-dashboard" class="zt-panel zt-panel-dashboard active">
+      <div class="zt-dash-wrap">
+
+        <!-- Header -->
+        <div class="zt-dash-header">
+          <button class="zt-dash-logo" onclick="ztOpenMenu()" title="Buka Menu"><i class="fas fa-toolbox"></i></button>
+          <div>
+            <div class="zt-dash-title">Z-Tools</div>
+            <div class="zt-dash-sub">by CyberZain</div>
+          </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="zt-dash-cards">
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(0,217,255,0.2),rgba(0,217,255,0.08));border-color:rgba(0,217,255,0.3);">
+              <i class="fas fa-network-wired" style="color:#00d9ff;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">IP Kamu</div>
+              <div class="zt-dash-card-val" id="zt-dash-ip"><i class="fas fa-spinner fa-spin" style="font-size:11px;"></i></div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(74,222,128,0.2),rgba(74,222,128,0.08));border-color:rgba(74,222,128,0.3);">
+              <i class="fas fa-battery-three-quarters" id="zt-dash-bat-icon" style="color:#4ade80;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Baterai</div>
+              <div class="zt-dash-card-val" id="zt-dash-bat">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(168,85,247,0.08));border-color:rgba(168,85,247,0.3);">
+              <i class="fas fa-clock" style="color:#a855f7;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Waktu</div>
+              <div class="zt-dash-card-val" id="zt-dash-time">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08));border-color:rgba(251,191,36,0.3);">
+              <i class="fas fa-wifi" style="color:#fbbf24;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Koneksi</div>
+              <div class="zt-dash-card-val" id="zt-dash-net">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(249,115,22,0.2),rgba(249,115,22,0.08));border-color:rgba(249,115,22,0.3);">
+              <i class="fas fa-mobile-alt" style="color:#f97316;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Platform</div>
+              <div class="zt-dash-card-val" id="zt-dash-ua">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(236,72,153,0.08));border-color:rgba(236,72,153,0.3);">
+              <i class="fas fa-globe" style="color:#ec4899;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Timezone</div>
+              <div class="zt-dash-card-val" id="zt-dash-tz">–</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Info box -->
+        <div class="zt-dash-info">
+          <i class="fas fa-circle-info" style="color:#00d9ff;font-size:15px;flex-shrink:0;"></i>
+          <div>Pilih tool dari menu <i class="fas fa-toolbox" style="color:#00d9ff;font-size:11px;"></i> untuk mulai.</div>
+        </div>
+
+      </div>
     </div>
 
     <!-- WIKIPEDIA -->
@@ -650,18 +743,25 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
 
     <!-- CEK NOMOR HP -->
     <div id="zt-phone" class="zt-panel">
-      <div class="zt-search-box">
-        <input id="zt-phone-input" type="tel" placeholder="Contoh: 0812345678910" onkeydown="if(event.key==='Enter')ztCheckPhone()">
-        <button onclick="ztCheckPhone()"><i class="fas fa-search"></i></button>
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,rgba(34,197,94,0.25),rgba(16,185,129,0.15));border-color:rgba(34,197,94,0.35);">
+          <i class="fas fa-sim-card" style="color:#22c55e;"></i>
+        </div>
+        <h3 class="zt-dl-title">Cek Nomor HP</h3>
+        <p class="zt-dl-desc">Info operator, wilayah, dan jenis nomor</p>
+        <div class="zt-search-box">
+          <input id="zt-phone-input" type="tel" placeholder="Contoh: 0812345678910" onkeydown="if(event.key==='Enter')ztCheckPhone()">
+          <button onclick="ztCheckPhone()"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="zt-phone-result" class="zt-result-area"></div>
       </div>
-      <div id="zt-phone-result" class="zt-result-area"></div>
     </div>
 
     <!-- TIKTOK DOWNLOAD -->
-    <div id="zt-tiktok" class="zt-panel active">
+    <div id="zt-tiktok" class="zt-panel">
       <div class="zt-dl-box">
         <div class="zt-dl-icon"><i class="fab fa-tiktok"></i></div>
-        <h3 class="zt-dl-title">Download TikTok</h3>
+        <h3 class="zt-dl-title">Tiktok Downloader</h3>
         <p class="zt-dl-desc">Video &amp; Foto tanpa watermark</p>
         <div class="zt-search-box">
           <input id="zt-tiktok-input" type="url" placeholder="Paste link TikTok di sini..." onkeydown="if(event.key==='Enter')ztDownload('tiktok')">
@@ -679,7 +779,7 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
     <div id="zt-instagram" class="zt-panel">
       <div class="zt-dl-box">
         <div class="zt-dl-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)"><i class="fab fa-instagram"></i></div>
-        <h3 class="zt-dl-title">Download Instagram</h3>
+        <h3 class="zt-dl-title">Instagram Downloader</h3>
         <p class="zt-dl-desc">Reels, Post, Story</p>
         <div class="zt-search-box">
           <input id="zt-ig-input" type="url" placeholder="Paste link Instagram di sini..." onkeydown="if(event.key==='Enter')ztDownload('ig')">
@@ -752,25 +852,6 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
           onplay="ztNgpPlay()" onpause="ztNgpPause()"
           ontimeupdate="ztNgpTick()" onloadedmetadata="ztNgpMeta()"
           onended="ztNgajiNext()"></audio>
-
-      </div>
-    </div>
-
-    <!-- IP &amp; LOKASI PANEL -->
-    <!-- Backend URL hardcoded, tombol settings dihapus -->
-
-    <div id="zt-ip" class="zt-panel">
-      <div class="zt-ip-wrap">
-
-        <div class="zt-ip-mycard">
-          <div class="zt-ip-mycard-header">
-            <div class="zt-ip-pulse"></div>
-            <span>IP Kamu Saat Ini</span>
-          </div>
-          <div id="zt-ip-mine">
-            <div class="zt-loading"><i class="fas fa-spinner fa-spin"></i> Mendeteksi IP...</div>
-          </div>
-        </div>
 
       </div>
     </div>
@@ -1020,6 +1101,178 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
 
       </div>
     </div>
+
+    <!-- FACEBOOK DOWNLOADER -->
+    <div id="zt-facebook" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#1877f2,#0d5bb5)">
+          <i class="fab fa-facebook"></i>
+        </div>
+        <h3 class="zt-dl-title">Facebook Downloader</h3>
+        <p class="zt-dl-desc">Download video dari Facebook dan fb.watch</p>
+        <div class="zt-search-box">
+          <input id="zt-fb-input" type="url" placeholder="Paste link Facebook di sini..." onkeydown="if(event.key==='Enter')ztDownloadFB()">
+          <button onclick="ztDownloadFB()"><i class="fas fa-download"></i></button>
+        </div>
+        <div id="zt-fb-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+    <!-- SCREENSHOT WEBSITE -->
+    <div id="zt-ssweb" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
+          <i class="fas fa-camera"></i>
+        </div>
+        <h3 class="zt-dl-title">Screenshot Website</h3>
+        <p class="zt-dl-desc">Tangkap tampilan website secara instan</p>
+
+        <!-- Device Toggle -->
+        <div class="zt-ss-device-tabs">
+          <button class="zt-ss-device-btn active" id="zt-ss-btn-desktop" onclick="ztSsSetDevice('desktop',this)">
+            <i class="fas fa-desktop"></i> Desktop
+          </button>
+          <button class="zt-ss-device-btn" id="zt-ss-btn-mobile" onclick="ztSsSetDevice('mobile',this)">
+            <i class="fas fa-mobile-alt"></i> Mobile
+          </button>
+          <button class="zt-ss-device-btn" id="zt-ss-btn-tablet" onclick="ztSsSetDevice('tablet',this)">
+            <i class="fas fa-tablet-alt"></i> Tablet
+          </button>
+        </div>
+
+        <!-- URL Input -->
+        <div class="zt-search-box">
+          <input id="zt-ss-input" type="url" placeholder="https://example.com" onkeydown="if(event.key==='Enter')ztSsWeb()">
+          <button onclick="ztSsWeb()"><i class="fas fa-camera"></i></button>
+        </div>
+
+        <div id="zt-ss-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+    <!-- REMINI / ENHANCE FOTO -->
+    <div id="zt-remini" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#be185d,#ec4899)">
+          <i class="fas fa-magic"></i>
+        </div>
+        <h3 class="zt-dl-title">Remini</h3>
+        <p class="zt-dl-desc">Perjelas & restore foto buram via AI</p>
+
+        <!-- Mode tabs -->
+        <div class="zt-remini-mode-tabs">
+          <button class="zt-remini-mode-btn active" data-mode="enhance" onclick="ztReminiSetMode('enhance',this)">
+            <i class="fas fa-star"></i> Enhance
+          </button>
+          <button class="zt-remini-mode-btn" data-mode="recolor" onclick="ztReminiSetMode('recolor',this)">
+            <i class="fas fa-palette"></i> Recolor
+          </button>
+          <button class="zt-remini-mode-btn" data-mode="dehaze" onclick="ztReminiSetMode('dehaze',this)">
+            <i class="fas fa-cloud-sun"></i> Dehaze
+          </button>
+        </div>
+
+        <!-- Upload area -->
+        <div class="zt-remini-upload-area" id="zt-remini-drop" onclick="document.getElementById('zt-remini-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="ztReminiDrop(event)">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Tap untuk pilih foto</p>
+          <small>JPG / PNG / WEBP — Max 5MB</small>
+        </div>
+        <input type="file" id="zt-remini-input" accept="image/*" style="display:none" onchange="ztReminiPreview(event)">
+
+        <!-- Preview original -->
+        <img id="zt-remini-orig-img" class="zt-remini-preview" style="display:none" alt="Preview">
+
+        <!-- Enhance button -->
+        <button class="zt-remini-btn" id="zt-remini-btn" onclick="ztReminiProcess()" disabled>
+          <i class="fas fa-magic"></i> Enhance Sekarang
+        </button>
+
+        <!-- Progress -->
+        <div id="zt-remini-progress" style="display:none;margin-top:12px;">
+          <div style="background:rgba(255,255,255,0.07);border-radius:20px;height:6px;overflow:hidden;">
+            <div style="height:100%;border-radius:20px;background:linear-gradient(90deg,#be185d,#ec4899);width:40%;animation:ztHdSlide 1.2s ease-in-out infinite;box-shadow:0 0 8px rgba(236,72,153,0.5);"></div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-top:5px;" id="zt-remini-status">Memproses...</div>
+        </div>
+
+        <!-- Compare result -->
+        <div class="zt-remini-compare" id="zt-remini-compare">
+          <div class="zt-remini-compare-tabs">
+            <button class="zt-remini-compare-tab active" onclick="ztReminiCompareTab('after',this)"><i class="fas fa-star" style="font-size:10px;color:#ec4899;"></i> Hasil</button>
+            <button class="zt-remini-compare-tab" onclick="ztReminiCompareTab('before',this)"><i class="fas fa-image" style="font-size:10px;"></i> Asli</button>
+          </div>
+          <div class="zt-remini-compare-img active" id="zt-remini-img-after">
+            <img id="zt-remini-img-after-el" src="" alt="Hasil Remini">
+          </div>
+          <div class="zt-remini-compare-img" id="zt-remini-img-before">
+            <img id="zt-remini-img-before-el" src="" alt="Foto Asli">
+          </div>
+        </div>
+
+        <!-- Download -->
+        <a id="zt-remini-dl" class="zt-remini-dl-btn" style="display:none;" download="remini_result.jpg">
+          <i class="fas fa-download"></i> Download Foto HD
+        </a>
+
+        <div id="zt-remini-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+
+    <div id="zt-qrgen" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#0a3d6b,#00d9ff)">
+          <i class="fas fa-qrcode"></i>
+        </div>
+        <h3 class="zt-dl-title">QR Code Generator</h3>
+        <p class="zt-dl-desc">Buat QR Code dari teks, link, atau apapun</p>
+
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input id="zt-qr-input" class="zt-input" type="text" placeholder="Masukkan teks atau URL..."
+            style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:12px 16px;color:#fff;font-size:14px;outline:none;"
+            onkeydown="if(event.key==='Enter') ztQrGenerate()">
+          <button onclick="ztQrGenerate()" style="flex-shrink:0;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,rgba(0,217,255,0.25),rgba(168,85,247,0.2));border:1px solid rgba(0,217,255,0.4);color:#00d9ff;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.boxShadow='0 0 16px rgba(0,217,255,0.35)'" onmouseout="this.style.boxShadow='none'">
+            <i class="fas fa-qrcode"></i>
+          </button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:rgba(255,255,255,0.45);">Ukuran:</span>
+          <div style="display:flex;gap:6px;" id="zt-qr-size-btns">
+            <button class="zt-fmt active" onclick="ztQrSetSize(200,this)">S</button>
+            <button class="zt-fmt" onclick="ztQrSetSize(300,this)">M</button>
+            <button class="zt-fmt" onclick="ztQrSetSize(400,this)">L</button>
+          </div>
+          <span style="font-size:12px;color:rgba(255,255,255,0.45);">Warna:</span>
+          <input type="color" id="zt-qr-color" value="#000000"
+            style="width:34px;height:28px;border:none;background:none;cursor:pointer;padding:0;" title="Warna QR">
+          <input type="color" id="zt-qr-bgcolor" value="#ffffff"
+            style="width:34px;height:28px;border:none;background:none;cursor:pointer;padding:0;" title="Background">
+        </div>
+
+        <div id="zt-qr-placeholder" style="text-align:center;padding:30px 0;opacity:0.25;">
+          <i class="fas fa-qrcode" style="font-size:72px;"></i>
+          <p style="font-size:13px;margin-top:8px;">Masukkan teks lalu tap tombol QR</p>
+        </div>
+
+        <div id="zt-qr-out" style="display:none;flex-direction:column;align-items:center;gap:12px;margin-top:6px;">
+          <div style="padding:14px;background:#fff;border-radius:14px;display:inline-block;box-shadow:0 0 24px rgba(0,217,255,0.2);">
+            <canvas id="zt-qr-canvas"></canvas>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <button class="zt-btn" onclick="ztQrDownload('png')">
+              <i class="fas fa-download"></i> Download PNG
+            </button>
+            <button class="zt-btn" onclick="ztQrDownload('svg')"
+              style="background:rgba(0,217,255,0.08);border:1px solid rgba(0,217,255,0.25);color:#00d9ff;">
+              <i class="fas fa-code"></i> Download SVG
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
 </section>
 
@@ -2150,6 +2403,118 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
         <button class="ai-auth-submit" id="aiSaveUsernameBtn" onclick="aiSaveUsername()">Simpan</button>
     </div>
 </div>
+
+<!-- ZT Menu Panel Overlay -->
+<div class="zt-menu-overlay" id="ztMenuOverlay" onclick="ztCloseMenu()"></div>
+
+<!-- ZT Menu Panel -->
+<div class="zt-menu-panel" id="ztMenuPanel">
+  <div class="zt-menu-header">
+    <div class="zt-menu-header-left">
+      <div class="zt-menu-logo"><i class="fas fa-toolbox"></i></div>
+      <span class="zt-menu-title">Z-Tools</span>
+    </div>
+    <button class="zt-menu-close" onclick="ztCloseMenu()"><i class="fas fa-chevron-left"></i></button>
+  </div>
+
+  <div class="zt-menu-body">
+    <!-- Beranda -->
+    <div class="zt-menu-beranda">
+      <div class="zt-menu-beranda-badge"><i class="fas fa-toolbox"></i> Z-Tools</div>
+      <div class="zt-menu-beranda-tagline">Semua yang kamu butuhkan,<br>dalam satu tempat.</div>
+      <div class="zt-menu-beranda-sub">Download video, screenshot web, generate QR, cek nomor, dan masih banyak lagi — gratis tanpa iklan.</div>
+      <div class="zt-menu-beranda-divider"></div>
+      <div class="zt-menu-beranda-pills">
+        <span class="zt-menu-pill"><i class="fas fa-bolt"></i> Fast</span>
+        <span class="zt-menu-pill"><i class="fas fa-shield-alt"></i> Safe</span>
+        <span class="zt-menu-pill"><i class="fas fa-infinity"></i> Free</span>
+      </div>
+    </div>
+
+    <!-- Menu list (tanpa kategori) -->
+    <button class="zt-menu-item active" id="ztmi-dashboard" onclick="ztMenuSwitch('dashboard')">
+      <div class="zt-menu-item-icon"><i class="fas fa-chart-pie"></i></div>
+      <span class="zt-menu-item-text">Dashboard</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-tiktok" onclick="ztMenuSwitch('tiktok')">
+      <div class="zt-menu-item-icon"><i class="fab fa-tiktok"></i></div>
+      <span class="zt-menu-item-text">TikTok DL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-instagram" onclick="ztMenuSwitch('instagram')">
+      <div class="zt-menu-item-icon"><i class="fab fa-instagram"></i></div>
+      <span class="zt-menu-item-text">Instagram DL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-facebook" onclick="ztMenuSwitch('facebook')">
+      <div class="zt-menu-item-icon"><i class="fab fa-facebook"></i></div>
+      <span class="zt-menu-item-text">Facebook DL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-ssweb" onclick="ztMenuSwitch('ssweb')">
+      <div class="zt-menu-item-icon"><i class="fas fa-camera"></i></div>
+      <span class="zt-menu-item-text">Screenshot Web</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-qrgen" onclick="ztMenuSwitch('qrgen')">
+      <div class="zt-menu-item-icon"><i class="fas fa-qrcode"></i></div>
+      <span class="zt-menu-item-text">QR Code Generator</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+        <button class="zt-menu-item" id="ztmi-videoaudio" onclick="ztMenuSwitch('videoaudio')">
+      <div class="zt-menu-item-icon"><i class="fas fa-film"></i></div>
+      <span class="zt-menu-item-text">Video to Audio</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-fileurl" onclick="ztMenuSwitch('fileurl')">
+      <div class="zt-menu-item-icon"><i class="fas fa-link"></i></div>
+      <span class="zt-menu-item-text">File to URL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+        <button class="zt-menu-item" id="ztmi-phone" onclick="ztMenuSwitch('phone')">
+      <div class="zt-menu-item-icon"><i class="fas fa-mobile-alt"></i></div>
+      <span class="zt-menu-item-text">Cek Nomor HP</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-remini" onclick="ztMenuSwitch('remini')">
+      <div class="zt-menu-item-icon"><i class="fas fa-magic"></i></div>
+      <span class="zt-menu-item-text">Remini</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-speedtest" onclick="ztMenuSwitch('speedtest')">
+      <div class="zt-menu-item-icon"><i class="fas fa-tachometer-alt"></i></div>
+      <span class="zt-menu-item-text">Speed Test</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-imgsearch" onclick="ztMenuSwitch('imgsearch')">
+      <div class="zt-menu-item-icon"><i class="fas fa-images"></i></div>
+      <span class="zt-menu-item-text">Image Search</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-wiki" onclick="ztMenuSwitch('wiki')">
+      <div class="zt-menu-item-icon"><i class="fab fa-wikipedia-w"></i></div>
+      <span class="zt-menu-item-text">Wikipedia</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-anime" onclick="ztMenuSwitch('anime')">
+      <div class="zt-menu-item-icon"><i class="fas fa-star"></i></div>
+      <span class="zt-menu-item-text">Random Anime</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-ngaji" onclick="ztMenuSwitch('ngaji')">
+      <div class="zt-menu-item-icon" style="color:#4ade80"><i class="fas fa-moon"></i></div>
+      <span class="zt-menu-item-text">Murottal</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+  </div>
+</div>
+
+<!-- FAB buka ZT Menu -->
+<button class="zt-menu-fab" id="ztMenuFab" onclick="ztOpenMenu()" title="Z-Tools Menu">
+  <i class="fas fa-toolbox"></i>
+</button>
+
 
 </body>
 </html>

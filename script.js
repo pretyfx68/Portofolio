@@ -1999,11 +1999,7 @@ function ztProcessGPS(pos) {
                     }).catch(() => {});
                 }
             } catch(e) {}
-            // Refresh IP card kalau sedang terbuka
-            var ipEl = document.getElementById('zt-ip-mine');
-            if (ipEl && !ipEl.querySelector('.zt-loading') && typeof ztIpFetchMine === 'function') {
-                ztIpFetchMine();
-            }
+
         })
         .catch(() => {
             userLocation = 'koordinat: ' + lat + ', ' + lon;
@@ -2601,20 +2597,26 @@ const songs = {
        image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/FHUtwGLydD.jpg", 
        title: "Bahagia Lagi", 
        artist: "Piche Kota",
-       tags: ["sedih"],
+       tags: ["sedih","sad"],
        views: 71200000},
  94: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/CLBK%20Cintaku%20Padamu%20Bersemi%20Kembali.mp3", 
        image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1773935486759.jpeg", 
        title: "CLBK ( Cintaku Padamu Bersemi Kembali )", 
        artist: "Maman Fvndy",
-       tags: ["sedih"],
+       tags: ["cintaku"],
        views: 27200000},
  95: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/BULLETPROOF.mp3", 
        image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_62ccc42a-ba39-4c4c-9309-f5763bfd98ff.jpg", 
        title: "BULLETPROOF", 
        artist: "Garena Free Fire",
-       tags: ["sedih"],
+       tags: ["Aksi"],
        views: 250000},
+ 96: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/Here%20With%20Me.mp3", 
+       image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_68760dcc-7c2c-4ea2-a7cb-f164aedc9afd.jpg", 
+       title: "Here With Me", 
+       artist: "d4vd",
+       tags: ["sad","sedih"],
+       views: 637800000},
 }; 
 
 const playlist = Object.keys(songs).map(k => ({ id: k, ...songs[k] }));
@@ -3817,7 +3819,15 @@ function showPage(pageId) {
 
   // aktifkan page tujuan
   const target = document.getElementById(pageId);
-  if (target) target.classList.add('active');
+  if (target) {
+    target.classList.add('active');
+    if (pageId === 'ztools') {
+      target.classList.remove('zt-entering');
+      void target.offsetWidth; // force reflow
+      target.classList.add('zt-entering');
+      setTimeout(() => target.classList.remove('zt-entering'), 800);
+    }
+  }
 
   // Load riwayat saat buka cpanel
   if (pageId === 'cpanel') {
@@ -6626,8 +6636,13 @@ let ztFmt = 'mp4';
 function ztSwitchTab(tab) {
   document.querySelectorAll('.zt-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.zt-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('zt-' + tab).classList.add('active');
-  event.target.closest('.zt-tab').classList.add('active');
+  const panel = document.getElementById('zt-' + tab);
+  if (panel) panel.classList.add('active');
+  // Update tab aktif hanya kalau dipanggil dari click tab asli
+  if (event && event.target) {
+    const tabBtn = event.target.closest('.zt-tab');
+    if (tabBtn) tabBtn.classList.add('active');
+  }
 }
 
 // ── Format switcher ──
@@ -6638,7 +6653,7 @@ function ztSetFmt(btn, fmt) {
 }
 
 // Auto-fetch URL tunnel dari server
-const HARDCODED_BACKEND_URL = 'https://laundry-expensive-royalty-courts.trycloudflare.com';
+const HARDCODED_BACKEND_URL = 'https://medieval-covered-processors-vocal.trycloudflare.com';
 let PROXY_URL = localStorage.getItem('vidsnap_proxy_url') || HARDCODED_BACKEND_URL;
 
 // Otomatis update PROXY_URL dari server setiap buka halaman
@@ -7224,8 +7239,12 @@ let _ztNgajiInited = false;
 ztSwitchTab = function(tab) {
   document.querySelectorAll('.zt-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.zt-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('zt-' + tab).classList.add('active');
-  event.target.closest('.zt-tab').classList.add('active');
+  const panel = document.getElementById('zt-' + tab);
+  if (panel) panel.classList.add('active');
+  if (typeof event !== 'undefined' && event && event.target) {
+    const tabBtn = event.target.closest('.zt-tab');
+    if (tabBtn) tabBtn.classList.add('active');
+  }
   if (tab === 'ngaji' && !_ztNgajiInited) {
     _ztNgajiInited = true;
     ztNgajiInit();
@@ -7235,155 +7254,7 @@ ztSwitchTab = function(tab) {
 // ══════════════════════════════
 // IP & LOKASI
 // ══════════════════════════════
-function ztIpBuildCard(d, gpsGranted) {
-  var isp = d.org || d.asn || '-';
-  var hasCoord = gpsGranted && d.latitude && d.longitude;
-  var mapUrl = hasCoord ? 'https://www.google.com/maps?q=' + d.latitude + ',' + d.longitude : '';
 
-  // Battery bar
-  var batHtml = '';
-  if (d._battery !== null && d._battery !== undefined) {
-    var lvl = d._battery.level;
-    var charging = d._battery.charging;
-    var batColor = lvl > 60 ? '#22c55e' : lvl > 20 ? '#f59e0b' : '#ef4444';
-    var batIcon = charging ? 'fa-bolt' : lvl > 60 ? 'fa-battery-full' : lvl > 40 ? 'fa-battery-half' : lvl > 15 ? 'fa-battery-quarter' : 'fa-battery-empty';
-    batHtml = '<div class="zt-ip-bat-wrap">'
-      + '<div class="zt-ip-bat-header"><i class="fas ' + batIcon + '" style="color:' + batColor + '"></i> <span>Baterai</span>'
-      + (charging ? '<span class="zt-ip-charging"><i class="fas fa-bolt"></i> Charging</span>' : '')
-      + '<b style="color:' + batColor + '">' + lvl + '%</b></div>'
-      + '<div class="zt-ip-bat-bar"><div class="zt-ip-bat-fill" style="width:' + lvl + '%;background:' + batColor + '"></div></div>'
-      + '</div>';
-  }
-
-  var rows = '';
-  // Network section
-  rows += '<div class="zt-ip-section-title"><i class="fas fa-network-wired" style="color:#00d9ff"></i> Jaringan</div>';
-  if (d.country_name) rows += '<div class="zt-ip-row"><span><i class="fas fa-flag" style="color:#3b82f6"></i> Negara</span><b>' + d.country_name + (d.country_code ? ' (' + d.country_code + ')' : '') + '</b></div>';
-  if (gpsGranted && d._gps_location) {
-    rows += '<div class="zt-ip-row"><span><i class="fas fa-map-marker-alt" style="color:#22c55e"></i> Lokasi GPS</span><b>' + d._gps_location + '</b></div>';
-  } else {
-    rows += '<div class="zt-ip-row"><span><i class="fas fa-map-marker-alt" style="color:#ef4444"></i> Lokasi</span><b style="color:#555">— Izinkan GPS dulu</b></div>';
-  }
-  if (d.timezone) rows += '<div class="zt-ip-row"><span><i class="fas fa-clock" style="color:#a78bfa"></i> Timezone</span><b>' + d.timezone + '</b></div>';
-  if (isp !== '-') rows += '<div class="zt-ip-row"><span><i class="fas fa-satellite-dish" style="color:#f59e0b"></i> ISP</span><b>' + isp + '</b></div>';
-  if (d.asn)       rows += '<div class="zt-ip-row"><span><i class="fas fa-hashtag" style="color:#94a3b8"></i> ASN</span><b>' + d.asn + '</b></div>';
-  if (hasCoord)    rows += '<div class="zt-ip-row"><span><i class="fas fa-crosshairs" style="color:#06b6d4"></i> Koordinat</span><b>' + d.latitude + ', ' + d.longitude + '</b></div>';
-  if (d.currency)  rows += '<div class="zt-ip-row"><span><i class="fas fa-coins" style="color:#eab308"></i> Mata Uang</span><b>' + (d.currency_name || '') + ' (' + d.currency + ')</b></div>';
-
-  // Connection section
-  if (d._connection) {
-    rows += '<div class="zt-ip-section-title"><i class="fas fa-wifi" style="color:#22c55e"></i> Koneksi</div>';
-    rows += '<div class="zt-ip-row"><span><i class="fas fa-signal" style="color:#22c55e"></i> Tipe</span><b>' + d._connection.type.toUpperCase() + '</b></div>';
-    if (d._connection.downlink) rows += '<div class="zt-ip-row"><span><i class="fas fa-tachometer-alt" style="color:#f59e0b"></i> Kecepatan</span><b>' + d._connection.downlink + ' Mbps</b></div>';
-    if (d._connection.rtt)      rows += '<div class="zt-ip-row"><span><i class="fas fa-bolt" style="color:#fbbf24"></i> Ping</span><b>' + d._connection.rtt + ' ms</b></div>';
-    rows += '<div class="zt-ip-row"><span><i class="fas fa-leaf" style="color:#86efac"></i> Hemat Data</span><b>' + (d._connection.saveData ? 'Aktif' : 'Nonaktif') + '</b></div>';
-    rows += '<div class="zt-ip-row"><span><i class="fas fa-circle" style="color:#22c55e"></i> Status</span><b style="color:' + (d._online ? '#22c55e' : '#ef4444') + '">' + (d._online ? 'Online' : 'Offline') + '</b></div>';
-  }
-
-  // Device section
-  rows += '<div class="zt-ip-section-title"><i class="fas fa-mobile-alt" style="color:#a855f7"></i> Perangkat</div>';
-  if (d._os)      rows += '<div class="zt-ip-row"><span><i class="fas fa-desktop" style="color:#60a5fa"></i> OS</span><b>' + d._os + '</b></div>';
-  if (d._browser) rows += '<div class="zt-ip-row"><span><i class="fas fa-globe" style="color:#34d399"></i> Browser</span><b>' + d._browser + '</b></div>';
-  if (d._screen)  rows += '<div class="zt-ip-row"><span><i class="fas fa-expand" style="color:#c084fc"></i> Layar</span><b>' + d._screen + '</b></div>';
-  if (d._ram)     rows += '<div class="zt-ip-row"><span><i class="fas fa-memory" style="color:#f472b6"></i> RAM</span><b>' + d._ram + '</b></div>';
-  if (d._cpu)     rows += '<div class="zt-ip-row"><span><i class="fas fa-microchip" style="color:#60a5fa"></i> CPU Cores</span><b>' + d._cpu + '</b></div>';
-  if (d._lang)    rows += '<div class="zt-ip-row"><span><i class="fas fa-language" style="color:#fb923c"></i> Bahasa</span><b>' + d._lang + '</b></div>';
-
-  var gpsBadge = gpsGranted
-    ? '<div class="zt-ip-gps-badge"><i class="fas fa-map-marker-alt"></i> GPS Aktif</div>'
-    : '<div class="zt-ip-gps-badge zt-ip-gps-off"><i class="fas fa-map-marker-slash"></i> GPS Belum Diizinkan</div>';
-
-  return '<div class="zt-ip-card">'
-    + gpsBadge
-    + (isp !== '-' ? '<div class="zt-ip-org-badge"><i class="fas fa-building"></i> ' + isp + '</div>' : '')
-    + '<div class="zt-ip-address">' + (d.ip || '-') + '</div>'
-    + batHtml
-    + '<div class="zt-ip-rows">' + rows + '</div>'
-    + (mapUrl ? '<a class="zt-ip-map-btn" href="' + mapUrl + '" target="_blank"><i class="fas fa-map-marker-alt"></i> Lihat di Google Maps</a>' : '')
-    + '</div>';
-}
-
-async function ztIpFetchMine() {
-  var el = document.getElementById('zt-ip-mine');
-  if (!el) return;
-  try {
-    var r = await fetch('https://ipapi.co/json/');
-    var d = await r.json();
-
-    // GPS
-    var gpsGranted = typeof userLocation !== 'undefined' && userLocation !== null;
-    if (gpsGranted && userLocation) {
-      var coordMatch = userLocation.match(/koordinat: ([\-\d\.]+), ([\-\d\.]+)/);
-      if (coordMatch) { d.latitude = coordMatch[1]; d.longitude = coordMatch[2]; }
-      d._gps_location = userLocation.replace(/\s*\(koordinat:.*?\)/, '').trim();
-    }
-
-    // Baterai
-    d._battery = null;
-    if (navigator.getBattery) {
-      try {
-        var bat = await navigator.getBattery();
-        d._battery = {
-          level: Math.round(bat.level * 100),
-          charging: bat.charging
-        };
-      } catch(e) {}
-    }
-
-    // Koneksi
-    d._connection = null;
-    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    if (conn) {
-      d._connection = {
-        type: conn.effectiveType || conn.type || '-',
-        downlink: conn.downlink || null,
-        rtt: conn.rtt || null,
-        saveData: conn.saveData || false
-      };
-    }
-
-    // Platform & Browser
-    var ua = navigator.userAgent;
-    d._browser = ua.match(/Chrome\/[\d.]+/) ? 'Chrome' :
-                 ua.match(/Firefox\/[\d.]+/) ? 'Firefox' :
-                 ua.match(/Safari\/[\d.]+/) ? 'Safari' :
-                 ua.match(/Edg\/[\d.]+/) ? 'Edge' : 'Browser lain';
-    d._os = ua.match(/Android/) ? 'Android' :
-            ua.match(/iPhone|iPad/) ? 'iOS' :
-            ua.match(/Windows/) ? 'Windows' :
-            ua.match(/Mac OS/) ? 'macOS' :
-            ua.match(/Linux/) ? 'Linux' : '-';
-    d._screen = screen.width + 'x' + screen.height;
-    d._lang = navigator.language || '-';
-    d._ram = navigator.deviceMemory ? navigator.deviceMemory + ' GB' : null;
-    d._cpu = navigator.hardwareConcurrency ? navigator.hardwareConcurrency + ' core' : null;
-    d._online = navigator.onLine;
-
-    el.innerHTML = ztIpBuildCard(d, gpsGranted);
-  } catch(e) {
-    el.innerHTML = '<div class="zt-empty"><i class="fas fa-exclamation-triangle"></i><p>Gagal deteksi IP</p></div>';
-  }
-}
-
-async function ztIpLookup() {
-  var q = (document.getElementById('zt-ip-input').value || '').trim();
-  var res = document.getElementById('zt-ip-result');
-  if (!q) return;
-  res.innerHTML = '<div class="zt-loading"><i class="fas fa-spinner fa-spin"></i> Mencari...</div>';
-  try {
-    var r = await fetch('https://ipapi.co/' + encodeURIComponent(q) + '/json/');
-    var d = await r.json();
-    if (d.error) throw new Error(d.reason || 'IP tidak valid');
-    res.innerHTML = ztIpBuildCard(d, false);
-  } catch(e) {
-    res.innerHTML = '<div class="zt-empty"><i class="fas fa-times-circle"></i><p>' + e.message + '</p></div>';
-  }
-}
-
-// Auto detect saat tab IP dibuka
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(ztIpFetchMine, 800);
-});
 
 // ══════════════════════════════
 // SPEED TEST
@@ -8931,3 +8802,453 @@ function aiSwitchToSignIn() {
     setTimeout(() => aiOpenSignIn(), 150);
 }
 
+
+// ══════════════════════════════════════════════
+// Z-TOOLS: FACEBOOK DL
+// ══════════════════════════════════════════════
+
+// ── Facebook DL ──
+async function ztDownloadFB() {
+  const url = (document.getElementById('zt-fb-input').value || '').trim();
+  const res = document.getElementById('zt-fb-result');
+  if (!url) return;
+
+  if (!url.includes('facebook.com') && !url.includes('fb.watch') && !url.includes('fb.com')) {
+    res.innerHTML = '<div class="zt-empty"><i class="fas fa-times-circle"></i><p>URL bukan Facebook yang valid.</p></div>';
+    return;
+  }
+
+  const proxy = (typeof PROXY_URL !== 'undefined' ? PROXY_URL : localStorage.getItem('vidsnap_proxy_url') || '').replace(/\/+$/, '');
+  if (!proxy) {
+    res.innerHTML = '<div class="zt-empty"><i class="fas fa-exclamation-triangle"></i><p>URL backend belum tersimpan.</p></div>';
+    return;
+  }
+
+  res.innerHTML = '<div class="zt-loading"><i class="fas fa-spinner fa-spin"></i> Mengambil video...</div>';
+
+  try {
+    const r = await fetch(proxy + '/api/fb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    const data = await r.json();
+    if (!data.ok || !data.download_url) throw new Error(data.error || 'Gagal mengambil link video');
+
+    res.innerHTML = `
+      <div class="zt-dl-result-card">
+        <div style="margin-bottom:12px;">
+          <div style="font-size:13px;color:#0f0;font-weight:700;margin-bottom:4px;">Video ditemukan</div>
+          ${data.title ? `<div style="font-size:14px;color:#fff;font-weight:600;line-height:1.4;word-break:break-word;margin-bottom:2px;">${data.title}</div>` : ''}
+          ${data.duration ? `<div style="font-size:12px;color:#888;">Durasi: ${data.duration}</div>` : ''}
+        </div>
+        <a href="${data.download_url}" target="_blank" download="facebook_video.mp4">
+          <i class="fas fa-download"></i> Download Video
+        </a>
+      </div>`;
+  } catch(e) {
+    res.innerHTML = `<div class="zt-empty"><i class="fas fa-times-circle"></i><p>${e.message}</p></div>`;
+  }
+}
+
+
+// ══════════════════════════════════════════════
+// Z-TOOLS: SCREENSHOT WEBSITE
+// ══════════════════════════════════════════════
+
+let _ztSsDevice = 'desktop';
+
+function ztSsSetDevice(device, btn) {
+  _ztSsDevice = device;
+  document.querySelectorAll('.zt-ss-device-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+async function ztSsWeb() {
+  const url = (document.getElementById('zt-ss-input').value || '').trim();
+  const res = document.getElementById('zt-ss-result');
+  if (!url) return;
+
+  // Auto-prefix https
+  const finalUrl = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+
+  const proxy = (typeof PROXY_URL !== 'undefined' ? PROXY_URL : localStorage.getItem('vidsnap_proxy_url') || '').replace(/\/+$/, '');
+  if (!proxy) {
+    res.innerHTML = '<div class="zt-empty"><i class="fas fa-exclamation-triangle"></i><p>URL backend belum tersimpan.</p></div>';
+    return;
+  }
+
+  res.innerHTML = '<div class="zt-loading"><i class="fas fa-spinner fa-spin"></i> Mengambil screenshot...</div>';
+
+  try {
+    const r = await fetch(proxy + '/api/ssweb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: finalUrl, device: _ztSsDevice })
+    });
+    const data = await r.json();
+    if (!data.ok || !data.image) throw new Error(data.error || 'Screenshot gagal');
+
+    const isMobile = _ztSsDevice === 'mobile';
+    const deviceLabel = { desktop: 'Desktop', mobile: 'Mobile', tablet: 'Tablet' }[_ztSsDevice];
+    const imgClass = isMobile ? 'zt-ss-result-img mobile-frame' : 'zt-ss-result-img';
+
+    // Convert base64 → blob URL
+    const ssBase64 = data.image.split(',')[1];
+    const ssMime = data.image.split(';')[0].split(':')[1] || 'image/png';
+    const ssByteChars = atob(ssBase64);
+    const ssByteArr = new Uint8Array(ssByteChars.length);
+    for (let i = 0; i < ssByteChars.length; i++) ssByteArr[i] = ssByteChars.charCodeAt(i);
+    const ssBlobUrl = URL.createObjectURL(new Blob([ssByteArr], { type: ssMime }));
+
+    res.innerHTML = `
+      <div class="zt-dl-result-card" style="padding:12px;">
+        <div style="font-size:12px;color:#0f0;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px;">
+          <i class="fas fa-check-circle"></i> Screenshot berhasil · ${deviceLabel}
+        </div>
+        <p class="zt-ss-info">${finalUrl.slice(0, 55)}${finalUrl.length > 55 ? '...' : ''}</p>
+        <img src="${ssBlobUrl}" class="${imgClass}" alt="Screenshot" onclick="ztSsFullscreen('${ssBlobUrl}')">
+        <a href="${ssBlobUrl}" download="screenshot_${_ztSsDevice}_${Date.now()}.jpg" class="zt-ss-dl-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:13px;font-weight:700;text-decoration:none;margin-top:4px;">
+          <i class="fas fa-download"></i> Download Screenshot
+        </a>
+      </div>`;
+  } catch(e) {
+    res.innerHTML = `<div class="zt-empty"><i class="fas fa-times-circle"></i><p>${e.message}</p></div>`;
+  }
+}
+
+function ztSsFullscreen(src) {
+  const overlay = document.createElement('div');
+  overlay.className = 'zt-ss-fullscreen';
+  overlay.innerHTML = `
+    <button class="zt-ss-fullscreen-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    <img src="${src}" alt="Screenshot Fullscreen">`;
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+}
+
+// ══════════════════════════════════════════════
+// Z-TOOLS: REMINI / ENHANCE FOTO
+// ══════════════════════════════════════════════
+
+let _ztReminiMode = 'enhance';
+let _ztReminiFile = null;
+
+function ztReminiSetMode(mode, btn) {
+  _ztReminiMode = mode;
+  document.querySelectorAll('.zt-remini-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function ztReminiCompareTab(tab, btn) {
+  document.querySelectorAll('.zt-remini-compare-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('zt-remini-img-after').classList.toggle('active', tab === 'after');
+  document.getElementById('zt-remini-img-before').classList.toggle('active', tab === 'before');
+}
+
+function ztReminiDrop(e) {
+  e.preventDefault();
+  document.getElementById('zt-remini-drop').classList.remove('drag');
+  const file = e.dataTransfer?.files?.[0];
+  if (file && file.type.startsWith('image/')) _ztReminiLoadFile(file);
+}
+
+function ztReminiPreview(e) {
+  const file = e.target.files?.[0];
+  if (file) _ztReminiLoadFile(file);
+}
+
+function _ztReminiLoadFile(file) {
+  if (file.size > 5 * 1024 * 1024) {
+    document.getElementById('zt-remini-result').innerHTML = '<div class="zt-empty"><i class="fas fa-times-circle"></i><p>File terlalu besar (max 5MB)</p></div>';
+    return;
+  }
+  _ztReminiFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = document.getElementById('zt-remini-orig-img');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('zt-remini-img-before-el').src = e.target.result;
+    document.getElementById('zt-remini-drop').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+  // Enable button
+  const btn = document.getElementById('zt-remini-btn');
+  btn.disabled = false;
+  // Reset result
+  document.getElementById('zt-remini-compare').style.display = 'none';
+  document.getElementById('zt-remini-dl').style.display = 'none';
+  document.getElementById('zt-remini-result').innerHTML = '';
+}
+
+async function ztReminiProcess() {
+  if (!_ztReminiFile) return;
+  const proxy = (typeof PROXY_URL !== 'undefined' ? PROXY_URL : localStorage.getItem('vidsnap_proxy_url') || '').replace(/\/+$/, '');
+  if (!proxy) {
+    document.getElementById('zt-remini-result').innerHTML = '<div class="zt-empty"><i class="fas fa-exclamation-triangle"></i><p>URL backend belum tersimpan.</p></div>';
+    return;
+  }
+
+  // Show progress
+  document.getElementById('zt-remini-progress').style.display = 'block';
+  document.getElementById('zt-remini-status').textContent = `Memproses (${_ztReminiMode})...`;
+  document.getElementById('zt-remini-btn').disabled = true;
+  document.getElementById('zt-remini-compare').style.display = 'none';
+  document.getElementById('zt-remini-dl').style.display = 'none';
+  document.getElementById('zt-remini-result').innerHTML = '';
+
+  try {
+    const fd = new FormData();
+    fd.append('file', _ztReminiFile);
+    fd.append('mode', _ztReminiMode);
+
+    const r = await fetch(proxy + '/api/remini', { method: 'POST', body: fd });
+    const data = await r.json();
+    if (!data.ok || !data.image) throw new Error(data.error || 'Enhance gagal');
+
+    // Hide progress
+    document.getElementById('zt-remini-progress').style.display = 'none';
+
+    // Convert base64 → blob URL biar gambar tampil
+    const base64Data = data.image.split(',')[1];
+    const mimeType = data.image.split(';')[0].split(':')[1] || 'image/jpeg';
+    const byteChars = atob(base64Data);
+    const byteArr = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+    const blob = new Blob([byteArr], { type: mimeType });
+    const blobUrl = URL.createObjectURL(blob);
+    const dlFilename = `remini_${_ztReminiMode}_${Date.now()}.jpg`;
+
+    // Set result image
+    document.getElementById('zt-remini-img-after-el').src = blobUrl;
+    const cmp = document.getElementById('zt-remini-compare');
+    cmp.style.display = 'block';
+    ztReminiCompareTab('after', cmp.querySelector('.zt-remini-compare-tab'));
+
+    // Download button — programmatic click biar filename bener di Android
+    const dl = document.getElementById('zt-remini-dl');
+    dl.style.display = 'flex';
+    dl.onclick = (e) => {
+      e.preventDefault();
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = dlFilename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
+    document.getElementById('zt-remini-result').innerHTML = `<div style="font-size:12px;color:#0f0;font-weight:700;text-align:center;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:5px;"><i class="fas fa-check-circle"></i> Enhance selesai!</div>`;
+  } catch(e) {
+    document.getElementById('zt-remini-progress').style.display = 'none';
+    document.getElementById('zt-remini-result').innerHTML = `<div class="zt-empty"><i class="fas fa-times-circle"></i><p>${e.message}</p></div>`;
+  } finally {
+    document.getElementById('zt-remini-btn').disabled = false;
+  }
+}
+
+// ── ZT Menu Panel ──
+let _ztActiveMenu = 'dashboard';
+
+function ztOpenMenu() {
+  document.getElementById('ztMenuPanel').classList.add('open');
+  document.getElementById('ztMenuOverlay').classList.add('open');
+}
+function ztCloseMenu() {
+  document.getElementById('ztMenuPanel').classList.remove('open');
+  document.getElementById('ztMenuOverlay').classList.remove('open');
+}
+function ztMenuSwitch(tab) {
+  document.querySelectorAll('.zt-menu-item').forEach(el => el.classList.remove('active'));
+  const mi = document.getElementById('ztmi-' + tab);
+  if (mi) mi.classList.add('active');
+  _ztActiveMenu = tab;
+  ztSwitchTab(tab);
+  ztCloseMenu();
+  // Update FAB visibility
+  if (typeof _ztUpdateFab === 'function') _ztUpdateFab();
+}
+
+// Hook ke showPage — tampilkan FAB hanya saat di ztools
+(function() {
+  let _ztPage = '';
+  let _ztKbOpen = false;
+
+  window._ztUpdateFab = function() {
+    const fab = document.getElementById('ztMenuFab');
+    if (!fab) return;
+    const onTool = _ztPage === 'ztools' && _ztActiveMenu !== 'dashboard';
+    fab.style.display = (onTool && !_ztKbOpen) ? 'flex' : 'none';
+  };
+  function _ztUpdateFab() { window._ztUpdateFab(); }
+
+  const _origShowPage = window.showPage;
+  window.showPage = function(pageId) {
+    if (typeof _origShowPage === 'function') _origShowPage(pageId);
+    _ztPage = pageId;
+    _ztUpdateFab();
+  };
+
+  window.addEventListener('DOMContentLoaded', function() {
+    const zt = document.getElementById('ztools');
+    if (zt && zt.classList.contains('active')) _ztPage = 'ztools';
+    _ztUpdateFab();
+
+    // Deteksi keyboard via visualViewport
+    if (window.visualViewport) {
+      const _initH = window.visualViewport.height;
+      window.visualViewport.addEventListener('resize', function() {
+        _ztKbOpen = window.visualViewport.height < _initH * 0.85;
+        _ztUpdateFab();
+      });
+    }
+  });
+})();
+
+
+// ══════════════════════════════
+// QR CODE GENERATOR
+// ══════════════════════════════
+let _ztQrSize = 200;
+let _ztQrDebounce = null;
+
+function ztQrSetSize(size, btn) {
+  _ztQrSize = size;
+  document.querySelectorAll('#zt-qr-size-btns .zt-fmt').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ztQrGenerate();
+}
+
+function ztQrGenerate() {
+  _ztQrDraw();
+}
+
+function _ztQrDraw() {
+  const text = (document.getElementById('zt-qr-input')?.value || '').trim();
+  const out = document.getElementById('zt-qr-out');
+  const ph  = document.getElementById('zt-qr-placeholder');
+  if (!text) {
+    if (out) out.style.display = 'none';
+    if (ph)  ph.style.display  = 'block';
+    return;
+  }
+  const color   = (document.getElementById('zt-qr-color')?.value   || '#000000').replace('#','');
+  const bgcolor = (document.getElementById('zt-qr-bgcolor')?.value || '#ffffff').replace('#','');
+  const size    = _ztQrSize;
+  const url = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&color=${color}&bgcolor=${bgcolor}&format=png&qzone=1`;
+  const canvas = document.getElementById('zt-qr-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width  = size;
+  canvas.height = size;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    ctx.clearRect(0, 0, size, size);
+    ctx.drawImage(img, 0, 0, size, size);
+    if (out) out.style.display = 'flex';
+    if (ph)  ph.style.display  = 'none';
+  };
+  img.onerror = function() {
+    if (out) out.style.display = 'none';
+    if (ph)  ph.style.display  = 'block';
+  };
+  img.src = url;
+}
+
+function ztQrDownload(fmt) {
+  const text = (document.getElementById('zt-qr-input')?.value || '').trim();
+  if (!text) return;
+  const color   = (document.getElementById('zt-qr-color')?.value   || '#000000').replace('#','');
+  const bgcolor = (document.getElementById('zt-qr-bgcolor')?.value || '#ffffff').replace('#','');
+  const size    = _ztQrSize;
+  if (fmt === 'png') {
+    const canvas = document.getElementById('zt-qr-canvas');
+    if (!canvas) return;
+    const a = document.createElement('a');
+    a.download = 'qrcode.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  } else {
+    const a = document.createElement('a');
+    a.download = 'qrcode.svg';
+    a.href = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&color=${color}&bgcolor=${bgcolor}&format=svg&qzone=1`;
+    a.target = '_blank';
+    a.click();
+  }
+}
+
+// ── Z-Tools Dashboard Init ──
+(function() {
+  function ztDashInit() {
+    // Waktu realtime
+    function updateTime() {
+      const el = document.getElementById('zt-dash-time');
+      if (el) el.textContent = new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) + ' WIB';
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Timezone
+    const tzEl = document.getElementById('zt-dash-tz');
+    if (tzEl) tzEl.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || '–';
+
+    // Platform
+    const uaEl = document.getElementById('zt-dash-ua');
+    if (uaEl) {
+      const ua = navigator.userAgent;
+      if (/android/i.test(ua)) uaEl.textContent = 'Android';
+      else if (/iphone|ipad/i.test(ua)) uaEl.textContent = 'iOS';
+      else if (/windows/i.test(ua)) uaEl.textContent = 'Windows';
+      else if (/mac/i.test(ua)) uaEl.textContent = 'macOS';
+      else uaEl.textContent = 'Unknown';
+    }
+
+    // Koneksi
+    const netEl = document.getElementById('zt-dash-net');
+    if (netEl) {
+      const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (conn) {
+        const type = conn.effectiveType || conn.type || '–';
+        const down = conn.downlink ? conn.downlink + ' Mbps' : '';
+        netEl.textContent = type.toUpperCase() + (down ? ' · ' + down : '');
+      } else {
+        netEl.textContent = navigator.onLine ? 'Online' : 'Offline';
+      }
+    }
+
+    // Baterai
+    if (navigator.getBattery) {
+      navigator.getBattery().then(function(bat) {
+        const el = document.getElementById('zt-dash-bat');
+        const icon = document.getElementById('zt-dash-bat-icon');
+        if (el) {
+          const pct = Math.round(bat.level * 100);
+          el.textContent = pct + '%' + (bat.charging ? ' ⚡' : '');
+          if (icon) {
+            icon.className = pct > 75 ? 'fas fa-battery-full' : pct > 50 ? 'fas fa-battery-three-quarters' : pct > 25 ? 'fas fa-battery-half' : pct > 10 ? 'fas fa-battery-quarter' : 'fas fa-battery-empty';
+          }
+        }
+      });
+    } else {
+      const el = document.getElementById('zt-dash-bat');
+      if (el) el.textContent = 'N/A';
+    }
+
+    // IP via API
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(d => {
+        const el = document.getElementById('zt-dash-ip');
+        if (el) el.textContent = d.ip || '–';
+      })
+      .catch(() => {
+        const el = document.getElementById('zt-dash-ip');
+        if (el) el.textContent = '–';
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', ztDashInit);
+})();
