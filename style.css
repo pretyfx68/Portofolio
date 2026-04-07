@@ -3838,6 +3838,7 @@ pointer-events:none; /* TANPA CONTROL */
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   padding: 4px 14px 12px;
+  align-items: start;
 }
 
 .czm-ap-song {
@@ -3846,12 +3847,14 @@ pointer-events:none; /* TANPA CONTROL */
   align-items: flex-start;
   gap: 0;
   width: 100%;
+  min-width: 0;
   cursor: pointer;
   border-bottom: none;
   padding: 0;
   border-radius: 10px;
   transition: opacity .15s;
   position: relative;
+  box-sizing: border-box;
 }
 .czm-ap-song:active { opacity: 0.7; }
 

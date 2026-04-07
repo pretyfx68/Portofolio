@@ -1501,7 +1501,7 @@ window.czmOpenArtistPage = function(artistKey){
 
   const songsBox = document.getElementById('czm-ap-songs');
   if(songsBox){
-    const maxShow = 6;
+    const maxShow = 9;
     const showSongs = artistSongs.slice(0, maxShow);
     songsBox.innerHTML = artistSongs.length
       ? showSongs.map((song,i)=>{
@@ -1530,8 +1530,8 @@ window.czmOpenArtistPage = function(artistKey){
       moreBtn.textContent = 'Lihat Lagu Selanjutnya';
       let shown = maxShow;
       moreBtn.onclick = function(){
-        const nextBatch = artistSongs.slice(shown, shown + 6);
-        shown += 6;
+        const nextBatch = artistSongs.slice(shown, shown + 9);
+        shown += 9;
         nextBatch.forEach(song => {
           const isAct = String(song.id) === curId;
           const div = document.createElement('div');
