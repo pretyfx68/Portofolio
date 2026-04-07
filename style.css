@@ -3834,20 +3834,25 @@ pointer-events:none; /* TANPA CONTROL */
 .czm-ap-play-btn:active { transform: scale(0.93); }
 /* === Artist page — grid 3 kolom (YouTube Music style) === */
 #czm-ap-songs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-direction: row;
   gap: 10px;
   padding: 4px 14px 12px;
-  align-items: start;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+#czm-ap-songs::-webkit-scrollbar { display: none; }
 
 .czm-ap-song {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  width: 100%;
-  min-width: 0;
+  flex: 0 0 28vw;
+  max-width: 120px;
+  min-width: 90px;
   cursor: pointer;
   border-bottom: none;
   padding: 0;
@@ -3855,6 +3860,7 @@ pointer-events:none; /* TANPA CONTROL */
   transition: opacity .15s;
   position: relative;
   box-sizing: border-box;
+  scroll-snap-align: start;
 }
 .czm-ap-song:active { opacity: 0.7; }
 
@@ -3934,6 +3940,50 @@ pointer-events:none; /* TANPA CONTROL */
   transition: background .15s;
 }
 .czm-ap-more-btn:active { background: rgba(0,217,255,0.15); }
+
+/* ── Artis Lainnya ── */
+.czm-ap-other-artists {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  padding: 4px 14px 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.czm-ap-other-artists::-webkit-scrollbar { display: none; }
+.czm-ap-other-artist {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 22vw;
+  max-width: 90px;
+  min-width: 72px;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: opacity .15s;
+}
+.czm-ap-other-artist:active { opacity: 0.7; }
+.czm-ap-other-artist img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.czm-ap-other-artist-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
 /* Animated bars icon (like Spotify "now playing" indicator) */
 .czm-ap-bars {
   display: flex; align-items: flex-end; gap: 2px;

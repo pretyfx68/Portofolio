@@ -1501,10 +1501,8 @@ window.czmOpenArtistPage = function(artistKey){
 
   const songsBox = document.getElementById('czm-ap-songs');
   if(songsBox){
-    const maxShow = 9;
-    const showSongs = artistSongs.slice(0, maxShow);
     songsBox.innerHTML = artistSongs.length
-      ? showSongs.map((song,i)=>{
+      ? artistSongs.map((song)=>{
           const isActive = String(song.id) === curId;
           return `
           <div class="czm-ap-song${isActive?' czm-ap-active':''}" onclick="czmPlayById('${song.id}',true)">
@@ -1519,39 +1517,20 @@ window.czmOpenArtistPage = function(artistKey){
           </div>`;
         }).join('')
       : '<div style="color:#555;padding:20px 14px;font-size:13px;">Tidak ada lagu dari artis ini.</div>';
+  }
 
-    // Tombol lihat lagu selanjutnya (jika ada lebih dari 6)
-    const existingBtn = document.getElementById('czm-ap-more-songs-btn');
-    if(existingBtn) existingBtn.remove();
-    if(artistSongs.length > maxShow){
-      const moreBtn = document.createElement('button');
-      moreBtn.className = 'czm-ap-more-btn';
-      moreBtn.id = 'czm-ap-more-songs-btn';
-      moreBtn.textContent = 'Lihat Lagu Selanjutnya';
-      let shown = maxShow;
-      moreBtn.onclick = function(){
-        const nextBatch = artistSongs.slice(shown, shown + 9);
-        shown += 9;
-        nextBatch.forEach(song => {
-          const isAct = String(song.id) === curId;
-          const div = document.createElement('div');
-          div.className = 'czm-ap-song' + (isAct?' czm-ap-active':'');
-          div.onclick = () => window.czmPlayById(song.id, true);
-          div.innerHTML = `
-            <div class="czm-ap-song-img-wrap">
-              <img src="${song.image}" loading="lazy">
-              ${isAct ? `<div class="czm-ap-bars-overlay${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>` : ''}
-            </div>
-            <div class="czm-ap-song-info">
-              <div class="czm-ap-song-title">${song.title}</div>
-              <div class="czm-ap-song-views">${fv2(song.views)} pemutaran</div>
-            </div>`;
-          songsBox.appendChild(div);
-        });
-        if(shown >= artistSongs.length) moreBtn.remove();
-      };
-      songsBox.parentNode.insertBefore(moreBtn, songsBox.nextSibling);
-    }
+  // Render Artis Lainnya
+  const otherBox = document.getElementById('czm-ap-other-artists');
+  if(otherBox){
+    const otherArtists = Object.keys(artists).filter(k => k.toLowerCase() !== artistKey.toLowerCase());
+    otherBox.innerHTML = otherArtists.map(k => {
+      const ar = artists[k];
+      return `
+        <div class="czm-ap-other-artist" onclick="czmOpenArtistPage('${k}')">
+          <img src="${ar.image}" loading="lazy" onerror="this.style.opacity='0.3'">
+          <div class="czm-ap-other-artist-name">${ar.name}</div>
+        </div>`;
+    }).join('');
   }
 
   // Sync play button state
