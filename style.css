@@ -3,7 +3,8 @@ body, html {
   font-family:'Arial',sans-serif;
   background:#0a1628;
   color:#fff;
-  overflow-x:hidden;
+  overflow-x:clip;
+  overflow-y:auto;
   scroll-behavior: smooth;
 }
 /* ===== Rainbow / Neon Text Animation ===== */
