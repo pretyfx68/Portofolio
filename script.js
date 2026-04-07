@@ -692,7 +692,7 @@ function czmSyncPlayState(){
       const hasActive=artistSongs.some(s=>String(s.id)===curId);
       apIco.className=(hasActive&&playing)?'fa-solid fa-pause':'fa-solid fa-play';
       // Sync bars
-      const bars=apPage.querySelector('.czm-ap-bars');
+      const bars=apPage.querySelector('.czm-ap-bars-overlay');
       if(bars){playing?bars.classList.remove('czm-paused'):bars.classList.add('czm-paused');}
     }
   }
@@ -1506,18 +1506,14 @@ window.czmOpenArtistPage = function(artistKey){
           const isActive = String(song.id) === curId;
           return `
           <div class="czm-ap-song${isActive?' czm-ap-active':''}" onclick="czmPlayById('${song.id}',true)">
-            ${isActive
-              ? `<div class="czm-ap-bars${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>`
-              : `<span class="czm-ap-song-num">${i+1}</span>`
-            }
-            <img src="${song.image}" loading="lazy">
-            <div style="flex:1;min-width:0;overflow:hidden;" class="czm-ap-song-info">
+            <div class="czm-ap-song-img-wrap">
+              <img src="${song.image}" loading="lazy">
+              ${isActive ? `<div class="czm-ap-bars-overlay${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>` : ''}
+            </div>
+            <div class="czm-ap-song-info">
               <div class="czm-ap-song-title">${song.title}</div>
               <div class="czm-ap-song-views">${fv2(song.views)} pemutaran</div>
             </div>
-            <button class="czm-ap-song-more" onclick="event.stopPropagation();czmOpenBs('${song.id}',event)">
-              <i class="fa-solid fa-ellipsis-vertical"></i>
-            </button>
           </div>`;
         }).join('')
       : '<div style="color:#555;padding:20px 0;font-size:13px;">Tidak ada lagu dari artis ini.</div>';
@@ -1527,30 +1523,10 @@ window.czmOpenArtistPage = function(artistKey){
   czmApSyncPlayBtn(artistHasActiveSong);
   czmApSyncRepeatBtn();
 
-  // Set marquee untuk lagu aktif (sama kayak czm-pl-t)
+  // Scroll active card into view
   requestAnimationFrame(()=>{
-    const activeRow = document.querySelector('#czm-ap-songs .czm-ap-song.czm-ap-active');
-    if(!activeRow) return;
-    const titleEl  = activeRow.querySelector('.czm-ap-song-title');
-    const wrapEl   = activeRow.querySelector('.czm-ap-song-info');
-    if(!titleEl) return;
-    // Ukur wrap width
-    const wrapW = (wrapEl ? wrapEl.getBoundingClientRect().width : titleEl.parentElement.getBoundingClientRect().width);
-    const textW = titleEl.scrollWidth;
-    if(textW > wrapW + 2){
-      const gap = 50;
-      if(!titleEl.dataset.apMarqueeSet){
-        const orig = titleEl.textContent;
-        titleEl.dataset.apMarqueeSet = '1';
-        titleEl.innerHTML = `${orig}<span style="display:inline-block;width:${gap}px;"></span>${orig}<span style="display:inline-block;width:${gap}px;"></span>`;
-      }
-      const fullW = titleEl.scrollWidth / 2;
-      const dur   = Math.max(4, fullW / 60) + 's';
-      titleEl.style.setProperty('--ap-ex', -fullW + 'px');
-      titleEl.style.setProperty('--ap-dur', dur);
-    } else {
-      titleEl.style.animation = 'none';
-    }
+    const activeCard = document.querySelector('#czm-ap-songs .czm-ap-song.czm-ap-active');
+    if(activeCard) activeCard.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
   });
 
   const page = document.getElementById('czm-artist-page');
