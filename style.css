@@ -7518,5 +7518,5 @@ pointer-events:none; /* TANPA CONTROL */
 .zt-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,217,255,0.3); }
 
 html, body {
-  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
 }
