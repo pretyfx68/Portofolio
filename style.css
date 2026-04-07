@@ -4422,7 +4422,7 @@ pointer-events:none; /* TANPA CONTROL */
 .zt-menu-overlay {
   position: fixed; inset: 0; z-index: 10004;
   background: rgba(0,0,0,0.5);
-  display: none; backdrop-filter: blur(2px);
+  display: none;
 }
 .zt-menu-overlay.open { display: block; }
 .zt-menu-panel {
@@ -4435,6 +4435,8 @@ pointer-events:none; /* TANPA CONTROL */
   transition: transform 0.32s cubic-bezier(.22,1,.36,1);
   box-shadow: 4px 0 40px rgba(0,0,0,0.6);
   border-right: 1px solid rgba(0,217,255,0.1);
+  will-change: transform;
+  contain: layout style;
 }
 .zt-menu-panel.open { transform: translateX(0); }
 
@@ -4465,7 +4467,7 @@ pointer-events:none; /* TANPA CONTROL */
 .zt-menu-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
 
 /* Scrollable body */
-.zt-menu-body { flex: 1; overflow-y: auto; padding: 12px 10px 20px; scrollbar-width: none; }
+.zt-menu-body { flex: 1; overflow-y: auto; padding: 12px 10px 20px; scrollbar-width: none; -webkit-overflow-scrolling: touch; will-change: scroll-position; }
 .zt-menu-body::-webkit-scrollbar { display: none; }
 
 /* Beranda card */
@@ -4513,7 +4515,7 @@ pointer-events:none; /* TANPA CONTROL */
 .zt-menu-item {
   display: flex; align-items: center; gap: 12px;
   padding: 11px 12px; border-radius: 12px;
-  cursor: pointer; transition: all 0.2s;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
   border: 1px solid transparent; margin-bottom: 2px;
   background: transparent;
   width: 100%; text-align: left;
@@ -4528,7 +4530,6 @@ pointer-events:none; /* TANPA CONTROL */
   display: flex; align-items: center; justify-content: center;
   font-size: 15px; background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.08);
-  transition: all 0.2s;
 }
 .zt-menu-item.active .zt-menu-item-icon {
   background: rgba(0,217,255,0.15); border-color: rgba(0,217,255,0.3); color: #00d9ff;
