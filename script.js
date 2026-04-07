@@ -1501,8 +1501,10 @@ window.czmOpenArtistPage = function(artistKey){
 
   const songsBox = document.getElementById('czm-ap-songs');
   if(songsBox){
+    const maxShow = 6;
+    const showSongs = artistSongs.slice(0, maxShow);
     songsBox.innerHTML = artistSongs.length
-      ? artistSongs.map((song,i)=>{
+      ? showSongs.map((song,i)=>{
           const isActive = String(song.id) === curId;
           return `
           <div class="czm-ap-song${isActive?' czm-ap-active':''}" onclick="czmPlayById('${song.id}',true)">
@@ -1516,7 +1518,40 @@ window.czmOpenArtistPage = function(artistKey){
             </div>
           </div>`;
         }).join('')
-      : '<div style="color:#555;padding:20px 0;font-size:13px;">Tidak ada lagu dari artis ini.</div>';
+      : '<div style="color:#555;padding:20px 14px;font-size:13px;">Tidak ada lagu dari artis ini.</div>';
+
+    // Tombol lihat lagu selanjutnya (jika ada lebih dari 6)
+    const existingBtn = document.getElementById('czm-ap-more-songs-btn');
+    if(existingBtn) existingBtn.remove();
+    if(artistSongs.length > maxShow){
+      const moreBtn = document.createElement('button');
+      moreBtn.className = 'czm-ap-more-btn';
+      moreBtn.id = 'czm-ap-more-songs-btn';
+      moreBtn.textContent = 'Lihat Lagu Selanjutnya';
+      let shown = maxShow;
+      moreBtn.onclick = function(){
+        const nextBatch = artistSongs.slice(shown, shown + 6);
+        shown += 6;
+        nextBatch.forEach(song => {
+          const isAct = String(song.id) === curId;
+          const div = document.createElement('div');
+          div.className = 'czm-ap-song' + (isAct?' czm-ap-active':'');
+          div.onclick = () => window.czmPlayById(song.id, true);
+          div.innerHTML = `
+            <div class="czm-ap-song-img-wrap">
+              <img src="${song.image}" loading="lazy">
+              ${isAct ? `<div class="czm-ap-bars-overlay${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>` : ''}
+            </div>
+            <div class="czm-ap-song-info">
+              <div class="czm-ap-song-title">${song.title}</div>
+              <div class="czm-ap-song-views">${fv2(song.views)} pemutaran</div>
+            </div>`;
+          songsBox.appendChild(div);
+        });
+        if(shown >= artistSongs.length) moreBtn.remove();
+      };
+      songsBox.parentNode.insertBefore(moreBtn, songsBox.nextSibling);
+    }
   }
 
   // Sync play button state

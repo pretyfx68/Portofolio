@@ -3781,15 +3781,16 @@ pointer-events:none; /* TANPA CONTROL */
   position: absolute; bottom: 10px; left: 16px;
   font-size: 13px; color: rgba(255,255,255,0.75);
 }
-.czm-ap-body { padding: 0 16px 40px; }
+.czm-ap-body { padding: 0 0 40px; }
 /* Controls row: repeat kiri, play kanan */
 .czm-ap-section-label {
   font-size: 12px; font-weight: 700; color: #aaa;
   letter-spacing: 1px; margin: 14px 0 6px;
+  padding: 0 14px;
 }
 .czm-ap-controls {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 14px; padding: 12px 0 8px;
+  gap: 14px; padding: 12px 14px 8px;
 }
 .czm-ap-ctrl-left { display: flex; align-items: center; gap: 10px; }
 .czm-ap-ctrl-right { display: flex; align-items: center; gap: 14px; }
@@ -3831,31 +3832,21 @@ pointer-events:none; /* TANPA CONTROL */
   transition: transform .15s;
 }
 .czm-ap-play-btn:active { transform: scale(0.93); }
-/* === Artist page — horizontal card slider (YouTube Music style) === */
+/* === Artist page — grid 3 kolom (YouTube Music style) === */
 #czm-ap-songs {
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding: 4px 0 12px;
-  /* hide scrollbar */
-  scrollbar-width: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 4px 14px 12px;
 }
-#czm-ap-songs::-webkit-scrollbar { display: none; }
 
 .czm-ap-song {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  width: 116px;
-  min-width: 116px;
-  flex-shrink: 0;
+  width: 100%;
   cursor: pointer;
-  scroll-snap-align: start;
   border-bottom: none;
   padding: 0;
   border-radius: 10px;
@@ -3866,8 +3857,8 @@ pointer-events:none; /* TANPA CONTROL */
 
 .czm-ap-song-img-wrap {
   position: relative;
-  width: 116px;
-  height: 116px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 10px;
   overflow: hidden;
   flex-shrink: 0;
@@ -3923,6 +3914,23 @@ pointer-events:none; /* TANPA CONTROL */
 .czm-ap-song-more {
   display: none; /* hidden in card mode, tap card = play */
 }
+/* Tombol lihat lagu selanjutnya */
+.czm-ap-more-btn {
+  display: block;
+  width: calc(100% - 28px);
+  margin: 4px 14px 0;
+  padding: 12px 0;
+  background: rgba(0,217,255,0.07);
+  border: 1px solid rgba(0,217,255,0.2);
+  border-radius: 12px;
+  color: #00d9ff;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: background .15s;
+}
+.czm-ap-more-btn:active { background: rgba(0,217,255,0.15); }
 /* Animated bars icon (like Spotify "now playing" indicator) */
 .czm-ap-bars {
   display: flex; align-items: flex-end; gap: 2px;
