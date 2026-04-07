@@ -1527,9 +1527,11 @@ window.czmOpenArtistPage = function(artistKey){
     }
   }
 
-  // Render Artis Lainnya — 5 random
+  // Render Artis Lainnya — 5 random, hanya saat artis berbeda
   const otherBox = document.getElementById('czm-ap-other-artists');
-  if(otherBox){
+  const page = document.getElementById('czm-artist-page');
+  const prevArtistKey = page ? page.dataset.artistKey : null;
+  if(otherBox && artistKey !== prevArtistKey){
     const otherKeys = Object.keys(artists).filter(k => k.toLowerCase() !== artistKey.toLowerCase());
     // shuffle & ambil 5
     const shuffled = otherKeys.sort(() => Math.random() - 0.5).slice(0, 5);
@@ -1553,7 +1555,6 @@ window.czmOpenArtistPage = function(artistKey){
     if(activeCard) activeCard.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
   });
 
-  const page = document.getElementById('czm-artist-page');
   if(page){
     page.dataset.artistKey = artistKey;
     const wasAlreadyOpen = page.classList.contains('open');
