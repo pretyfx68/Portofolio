@@ -538,12 +538,11 @@ let _lastNpMarqueeTitle = null;
 function czmRunNpMarquee(){
   const el = document.getElementById('czm-np-title');
   if(!el) return;
-  const currentTitle = el.textContent;
+  const currentTitle = el.textContent.split('\u00a0\u00a0\u00a0')[0].trim() || el.textContent.trim();
   const clip = el.closest('.czm-np-title-clip') || el.parentElement;
   const clipW = clip.offsetWidth || clip.getBoundingClientRect().width;
-  const textW = el.scrollWidth;
 
-  if(clipW === 0 || textW === 0){
+  if(clipW === 0){
     setTimeout(czmRunNpMarquee, 300);
     return;
   }
@@ -552,29 +551,32 @@ function czmRunNpMarquee(){
   if(currentTitle === _lastNpMarqueeTitle && el.classList.contains('czm-np-scroll')) return;
   _lastNpMarqueeTitle = currentTitle;
 
-  // Reset hanya saat judul baru
+  // Reset animasi
   el.classList.remove('czm-np-scroll');
-  el.style.removeProperty('--np-start');
   el.style.removeProperty('--np-ex');
+  el.style.removeProperty('--np-dur');
   el.style.animation = 'none';
+  // Reset teks ke aslinya (hapus duplikat lama)
+  el.textContent = currentTitle;
+  el.dataset.marqueeSet = '';
   void el.offsetWidth;
   el.style.animation = '';
 
+  const textW = el.scrollWidth;
   if(textW > clipW + 2){
-    // Seamless loop: duplikat teks
-    const gap=50;
-    if(!el.dataset.marqueeSet){
-      const orig=el.textContent;
-      el.dataset.marqueeSet='1';
-      el.innerHTML=`${orig}<span style="display:inline-block;width:${gap}px;"></span>${orig}<span style="display:inline-block;width:${gap}px;"></span>`;
-    }
-    const fullW=el.scrollWidth/2;
-    const dur=Math.max(4,fullW/60)+'s';
-    el.style.setProperty('--np-ex',-fullW+'px');
-    el.style.setProperty('--np-dur',dur);
+    // Seamless loop: duplikat teks dengan gap
+    const gap = 60;
+    el.dataset.marqueeSet = '1';
+    el.innerHTML = `${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>`;
+    void el.offsetWidth;
+    const fullW = el.scrollWidth / 2;
+    const speed = 50; // px per second
+    const dur = Math.max(4, fullW / speed) + 's';
+    el.style.setProperty('--np-ex', -( fullW + gap) + 'px');
+    el.style.setProperty('--np-dur', dur);
+    // Pause 1.5 detik di awal sebelum mulai scroll
+    el.style.animationDelay = '1.5s';
     el.classList.add('czm-np-scroll');
-  } else {
-    el.dataset.marqueeSet='';
   }
 }
 
