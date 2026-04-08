@@ -510,6 +510,11 @@ function czmSyncUI(idx, skipPlaylist){
   }
   if(tmar) tmar.textContent=s.artist||'—';
   if(!skipPlaylist) czmRenderPlBox(null);
+  // Selalu update active dot & highlight di playlist list (czm-pl-box)
+  if(s) czmMoveDot(String(s.id));
+  // Selalu update playlist detail modal kalau lagi terbuka
+  const _plDetail = document.getElementById('czm-pl-detail');
+  if(_plDetail && _plDetail.style.display !== 'none') czmRenderPlDetail();
   // player-pl-box HANYA dirender dari czmPlayPl, bukan tiap sync
 }
 
