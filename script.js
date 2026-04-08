@@ -545,71 +545,7 @@ function czmVideoSyncBar(){
 }
 
 /* ---------- marquee npbar (now playing bar) ---------- */
-let _lastNpMarqueeTitle = null;
-function czmRunNpMarquee(){
-  const el = document.getElementById('czm-np-title');
-  if(!el) return;
-  const currentTitle = el.textContent.split('\u00a0\u00a0\u00a0')[0].trim() || el.textContent.trim();
-  const clip = el.closest('.czm-np-title-clip') || el.parentElement;
-  const clipW = clip.offsetWidth || clip.getBoundingClientRect().width;
-
-  if(clipW === 0){
-    setTimeout(czmRunNpMarquee, 300);
-    return;
-  }
-
-  // Kalau judul sama dan animasi sudah jalan → biarkan terus
-  if(currentTitle === _lastNpMarqueeTitle && el.classList.contains('czm-np-scroll')) return;
-  _lastNpMarqueeTitle = currentTitle;
-
-  // Reset animasi
-  el.classList.remove('czm-np-scroll');
-  el.style.removeProperty('--np-ex');
-  el.style.removeProperty('--np-dur');
-  el.style.animation = 'none';
-  // Reset teks ke aslinya (hapus duplikat lama)
-  el.textContent = currentTitle;
-  el.dataset.marqueeSet = '';
-  void el.offsetWidth;
-  el.style.animation = '';
-
-  const textW = el.scrollWidth;
-  if(textW > clipW + 2){
-    // Seamless loop: duplikat teks dengan gap
-    const gap = 60;
-    el.dataset.marqueeSet = '1';
-    el.innerHTML = `${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>`;
-    void el.offsetWidth;
-    const fullW = el.scrollWidth / 2;
-    const dur = Math.max(4, fullW / 60) + 's';
-    el.style.setProperty('--np-ex', -fullW + 'px');
-    el.style.setProperty('--np-dur', dur);
-    el.style.animationDelay = '0s';
-    el.classList.add('czm-np-scroll');
-  }
-}
-
-/* ---------- marquee terpusat ---------- */
-let _lastMarqueeTitle = null;
-function czmRunMarquee(){
-  const el = document.getElementById('czm-stitle');
-  if(!el) return;
-
-  // Ambil judul asli
-  const currentTitle = el.dataset.origText || el.textContent.trim();
-  const clip = el.closest('.czm-title-clip') || el.parentElement;
-  const clipW = clip.getBoundingClientRect().width;
-  if(clipW === 0) return; // belum visible
-
-  // Kalau judul sama dan animasi benar-benar sedang jalan → biarkan terus
-  const animRunning = el.classList.contains('czm-scroll') &&
-    getComputedStyle(el).animationPlayState !== 'paused' &&
-    el.getAnimations && el.getAnimations().length > 0;
-  if(currentTitle === _lastMarqueeTitle && animRunning) return;
-  _lastMarqueeTitle = currentTitle;
-
-  // Reset
-  el.classList.remove('czm-scroll');
+el.classList.remove('czm-scroll');
   el.style.animation = 'none';
   el.dataset.marqueeSet = '';
   el.dataset.origText = currentTitle;
@@ -628,6 +564,48 @@ function czmRunMarquee(){
     el.style.setProperty('--czm-ex', -fullW + 'px');
     el.style.setProperty('--czm-dur', dur);
     el.classList.add('czm-scroll');
+  }
+}
+
+/* ---------- marquee terpusat ---------- */
+let _lastMarqueeTitle = null;
+function czmRunMarquee(){
+  const el = document.getElementById('czm-np-title');
+  if(!el) return;
+
+  // Ambil judul asli
+  const currentTitle = el.dataset.origText || el.textContent.trim();
+  const clip = el.closest('.czm-np-title-clip') || el.parentElement;
+  const clipW = clip.getBoundingClientRect().width;
+  if(clipW === 0) return; // belum visible
+
+  // Kalau judul sama dan animasi benar-benar sedang jalan → biarkan terus
+  const animRunning = el.classList.contains('czm-np-scroll') &&
+    getComputedStyle(el).animationPlayState !== 'paused' &&
+    el.getAnimations && el.getAnimations().length > 0;
+  if(currentTitle === _lastMarqueeTitle && animRunning) return;
+  _lastMarqueeTitle = currentTitle;
+
+  // Reset
+  el.classList.remove('czm-np-scroll');
+  el.style.animation = 'none';
+  el.dataset.marqueeSet = '';
+  el.dataset.origText = currentTitle;
+  el.textContent = currentTitle;
+  void el.offsetWidth;
+  el.style.animation = '';
+
+  const textW = el.scrollWidth;
+  if(textW > clipW + 2){
+    const gap = 60;
+    el.dataset.marqueeSet = '1';
+    el.innerHTML = `${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>`;
+    void el.offsetWidth;
+    const fullW = el.scrollWidth / 2;
+    const dur = Math.max(4, fullW / 60) + 's';
+    el.style.setProperty('--np-ex', -fullW + 'px');
+    el.style.setProperty('--czm-dur', dur);
+    el.classList.add('czm-np-scroll');
   }
 }
 
