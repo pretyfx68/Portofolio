@@ -1522,8 +1522,25 @@ window.czmOpenArtistPage = function(artistKey){
             </div>`;
           }).join('')}
         </div>`).join('');
+
+      // Arrow indicator — tampil kalau ada >1 halaman
+      const arrow = document.getElementById('czm-ap-songs-arrow');
+      if(arrow){
+        if(pages.length > 1){
+          arrow.classList.add('visible');
+          // Sembunyikan arrow saat sudah di halaman terakhir
+          songsBox.addEventListener('scroll', function onScroll(){
+            const atEnd = songsBox.scrollLeft + songsBox.clientWidth >= songsBox.scrollWidth - 10;
+            arrow.classList.toggle('visible', !atEnd);
+          }, { passive: true });
+        } else {
+          arrow.classList.remove('visible');
+        }
+      }
     } else {
       songsBox.innerHTML = '<div style="color:#555;padding:20px 14px;font-size:13px;">Tidak ada lagu dari artis ini.</div>';
+      const arrow = document.getElementById('czm-ap-songs-arrow');
+      if(arrow) arrow.classList.remove('visible');
     }
   }
 

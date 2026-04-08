@@ -3787,7 +3787,22 @@ pointer-events:none; /* TANPA CONTROL */
   font-size: 12px; font-weight: 700; color: #aaa;
   letter-spacing: 1px; margin: 14px 0 6px;
   padding: 0 14px;
+  display: flex; align-items: center; gap: 6px;
 }
+.czm-ap-songs-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.czm-ap-songs-arrow.visible { opacity: 1; }
 .czm-ap-controls {
   display: flex; align-items: center; justify-content: space-between;
   gap: 14px; padding: 12px 14px 8px;
