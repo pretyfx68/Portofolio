@@ -4194,8 +4194,37 @@ pointer-events:none; /* TANPA CONTROL */
 #music .czm-playbtn:active { transform: scale(0.93); }
 
 /* Playlist items */
+#music .czm-pl-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(0,217,255,0.1);
+  margin-bottom: 4px;
+}
+#music .czm-pl-header-left {
+  display: flex; align-items: center; gap: 10px;
+}
+#music .czm-pl-header-ico {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: rgba(0,217,255,0.12);
+  border: 1px solid rgba(0,217,255,0.25);
+  color: #00d9ff; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+#music .czm-pl-header-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #aaa;
+}
+#music .czm-pl-header-name {
+  font-size: 14px; font-weight: 700; color: #fff; margin-top: 1px;
+}
+#music .czm-pl-header-count {
+  font-size: 12px; color: #555;
+  background: rgba(255,255,255,0.06);
+  border-radius: 99px; padding: 3px 10px;
+}
+#music .czm-pl-list { padding: 0 0 8px; }
 #music .czm-plitem {
-  display: flex; align-items: center; gap: 12px; padding: 10px 0;
+  display: flex; align-items: center; gap: 12px; padding: 10px 16px;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
 #music .czm-plitem:active { opacity: .7; }
@@ -4219,6 +4248,12 @@ pointer-events:none; /* TANPA CONTROL */
 }
 #music .czm-pl-s   { font-size: 12px; color: #aaa; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #music .czm-dot    { display: inline-block; width: 8px; height: 8px; background: #00fff6; border-radius: 50%; animation: czm-pulse 1s ease-in-out infinite; }
+#music .czm-pl-playing-badge {
+  flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(0,217,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  color: #00d9ff; font-size: 11px;
+}
 @keyframes czm-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
 
 /* Visualizer */

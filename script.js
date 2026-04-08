@@ -647,8 +647,13 @@ window.czmNext=function(){
   if(czmShuffleOn){
     const pl = czmGetPlaylist(); if(!pl) return;
     const curSong = pl[czmCurIdx];
-    const curArtist = (curSong?.artist||'').toLowerCase();
-    const artistSongs = pl.slice(1).filter(s => (s.artist||'').toLowerCase().includes(curArtist) && String(s.id) !== String(curSong?.id));
+    // Ambil nama artis pertama saja (sebelum koma/&) biar match kolaborasi
+    const curArtistFull = (curSong?.artist||'').toLowerCase();
+    const curArtistMain = curArtistFull.split(/[,&]/)[0].trim();
+    const artistSongs = pl.slice(1).filter(s => {
+      const sa = (s.artist||'').toLowerCase();
+      return (sa.includes(curArtistMain) || curArtistFull.includes(sa.split(/[,&]/)[0].trim())) && String(s.id) !== String(curSong?.id);
+    });
     if(artistSongs.length > 0){
       const pick = artistSongs[Math.floor(Math.random()*artistSongs.length)];
       czmPlayById(pick.id, true);
@@ -1081,16 +1086,28 @@ function czmRenderPlayerPlBox(){
   const cur = pl[czmCurIdx];
   box.style.display = 'block';
   box.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:#aaa;letter-spacing:1px;padding:12px 16px 8px;">DARI PLAYLIST · ${userPl.name||'Playlist'}</div>
+    <div class="czm-pl-header">
+      <div class="czm-pl-header-left">
+        <i class="fa-solid fa-music czm-pl-header-ico"></i>
+        <div>
+          <div class="czm-pl-header-label">DARI PLAYLIST</div>
+          <div class="czm-pl-header-name">${userPl.name||'Playlist'}</div>
+        </div>
+      </div>
+      <div class="czm-pl-header-count">${list.length} lagu</div>
+    </div>
+    <div class="czm-pl-list">
     ${list.map((s,i)=>`
-    <div class="czm-plitem ${cur&&String(s.id)===String(cur.id)?'czm-cur':''}" onclick="czmPlayById('${s.id}',true);setTimeout(czmRenderPlayerPlBox,80);" style="padding:8px 16px;">
+    <div class="czm-plitem ${cur&&String(s.id)===String(cur.id)?'czm-cur':''}" onclick="czmPlayById('${s.id}',true);setTimeout(czmRenderPlayerPlBox,80);">
       <span class="czm-pl-num">${cur&&String(s.id)===String(cur.id)?'<span class="czm-dot"></span>':(i+1)}</span>
       <img class="czm-pl-img" src="${s.image}" loading="lazy">
       <div class="czm-pl-t-wrap">
         <div class="czm-pl-t" style="${cur&&String(s.id)===String(cur.id)?'color:#00d9ff;':''}">${s.title}</div>
         <div class="czm-pl-s">${s.artist}</div>
       </div>
-    </div>`).join('')}`;
+      ${cur&&String(s.id)===String(cur.id)?'<div class="czm-pl-playing-badge"><i class="fa-solid fa-volume-high"></i></div>':''}
+    </div>`).join('')}
+    </div>`;
 }
 
 /* ---------- more menu ---------- */
