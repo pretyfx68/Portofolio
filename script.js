@@ -579,27 +579,27 @@ function czmRunNpMarquee(){
   }
 }
 
-/* ---------- marquee terpusat ---------- */
+/* ---------- marquee terpusat (full player) ---------- */
 let _lastMarqueeTitle = null;
 function czmRunMarquee(){
-  const el = document.getElementById('czm-np-title');
+  const el = document.getElementById('czm-stitle');
   if(!el) return;
 
   // Ambil judul asli
   const currentTitle = el.dataset.origText || el.textContent.trim();
-  const clip = el.closest('.czm-np-title-clip') || el.parentElement;
+  const clip = el.closest('.czm-title-clip') || el.parentElement;
   const clipW = clip.getBoundingClientRect().width;
   if(clipW === 0) return; // belum visible
 
   // Kalau judul sama dan animasi benar-benar sedang jalan → biarkan terus
-  const animRunning = el.classList.contains('czm-np-scroll') &&
+  const animRunning = el.classList.contains('czm-scroll') &&
     getComputedStyle(el).animationPlayState !== 'paused' &&
     el.getAnimations && el.getAnimations().length > 0;
   if(currentTitle === _lastMarqueeTitle && animRunning) return;
   _lastMarqueeTitle = currentTitle;
 
   // Reset
-  el.classList.remove('czm-np-scroll');
+  el.classList.remove('czm-scroll');
   el.style.animation = 'none';
   el.dataset.marqueeSet = '';
   el.dataset.origText = currentTitle;
@@ -615,9 +615,9 @@ function czmRunMarquee(){
     void el.offsetWidth;
     const fullW = el.scrollWidth / 2;
     const dur = Math.max(4, fullW / 60) + 's';
-    el.style.setProperty('--np-ex', -fullW + 'px');
-    el.style.setProperty('--np-dur', dur);
-    el.classList.add('czm-np-scroll');
+    el.style.setProperty('--czm-ex', -fullW + 'px');
+    el.style.setProperty('--czm-dur', dur);
+    el.classList.add('czm-scroll');
   }
 }
 
