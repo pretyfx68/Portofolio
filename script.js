@@ -897,10 +897,16 @@ window.czmGoHome=function(){
 
   // Kalau ada playlist aktif yang sedang dipilih, buka kembali playlist detail
   if(czmCurPlId){
-    const plDetail = document.getElementById('czm-plm-detail');
-    if(plDetail){ plDetail.style.display = 'flex'; czmRenderPlDetail(); }
-    const npbar = document.getElementById('czm-npbar');
-    if(npbar){ npbar.classList.remove('czm-vis'); npbar.style.setProperty('display','none','important'); }
+    // Harus aktifkan home dulu sebagai background, baru overlay playlist detail di atasnya
+    document.getElementById('czm-home').classList.add('czm-on');
+    const topBar = document.querySelector('.top-bar');
+    if(topBar) topBar.style.display = '';
+    setTimeout(()=>{
+      const plDetail = document.getElementById('czm-plm-detail');
+      if(plDetail){ plDetail.style.display = 'flex'; czmRenderPlDetail(); }
+      const npbar = document.getElementById('czm-npbar');
+      if(npbar){ npbar.classList.remove('czm-vis'); npbar.style.removeProperty('display'); npbar.style.setProperty('display','none','important'); }
+    }, 30);
     return;
   }
 
