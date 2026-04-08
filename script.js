@@ -370,7 +370,7 @@ window.czmPlayById=function(id, fromUser){
   czmSyncUI(idx, true);
   // Refresh active indicator di playlist detail kalau sedang terbuka
   setTimeout(()=>{
-    const plDetail = document.getElementById('czm-pl-detail');
+    const plDetail = document.getElementById('czm-plm-detail');
     if(plDetail && plDetail.style.display !== 'none') czmRenderPlDetail();
   }, 100);
   if(fromUser && czmActivePlId !== '__all__'){
@@ -513,7 +513,7 @@ function czmSyncUI(idx, skipPlaylist){
   // Selalu update active dot & highlight di playlist list (czm-pl-box)
   if(s) czmMoveDot(String(s.id));
   // Selalu update playlist detail modal kalau lagi terbuka
-  const _plDetail = document.getElementById('czm-pl-detail');
+  const _plDetail = document.getElementById('czm-plm-detail');
   if(_plDetail && _plDetail.style.display !== 'none') czmRenderPlDetail();
   // player-pl-box HANYA dirender dari czmPlayPl, bukan tiap sync
 }
