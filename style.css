@@ -4219,7 +4219,7 @@ pointer-events:none; /* TANPA CONTROL */
 }
 .czm-pld-hero {
   position: relative;
-  padding: 0 0 24px;
+  padding: 70px 0 24px;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -4234,9 +4234,12 @@ pointer-events:none; /* TANPA CONTROL */
   background: linear-gradient(to bottom, rgba(10,22,40,0.3) 0%, #0a1628 100%);
 }
 .czm-pld-hero-top {
-  position: relative;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10028;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 52px 16px 0;
+  padding: 14px 16px;
+  background: transparent;
 }
 .czm-pld-back, .czm-pld-delete {
   background: rgba(255,255,255,0.08);

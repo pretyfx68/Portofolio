@@ -890,10 +890,20 @@ window.czmGoHome=function(){
     setTimeout(czmRunMarquee, 350);
     return; // jangan lanjut ke home
   }
-  // Tab tidak terbuka → kembali ke halaman utama
+  // Tab tidak terbuka → kembali ke halaman utama atau playlist detail
   playerEl.classList.remove('czm-on');
   const m = document.getElementById('czm-more-menu');
   if(m) m.classList.remove('open');
+
+  // Kalau ada playlist aktif yang sedang dipilih, buka kembali playlist detail
+  if(czmCurPlId){
+    const plDetail = document.getElementById('czm-plm-detail');
+    if(plDetail){ plDetail.style.display = 'flex'; czmRenderPlDetail(); }
+    const npbar = document.getElementById('czm-npbar');
+    if(npbar){ npbar.classList.remove('czm-vis'); npbar.style.setProperty('display','none','important'); }
+    return;
+  }
+
   setTimeout(()=>{
     document.getElementById('czm-home').classList.add('czm-on');
   }, 50);
@@ -2133,7 +2143,7 @@ function czmRenderPlDetail(){
       ${isActive
         ? `<div class="czm-pld-bars${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>`
         : `<span class="czm-pld-num">${i+1}</span>`}
-      <img class="czm-pld-thumb" src="${s.image}" loading="lazy">
+      <img class="czm-pld-thumb" src="${s.image}" loading="lazy" style="cursor:pointer;" onclick="event.stopPropagation();czmPlayFromPlaylist('${p.id}','${s.id}');czmOpenPlayerFromPlaylist();">
       <div class="czm-pld-info">
         <div class="czm-pld-title">${s.title}</div>
         <div class="czm-pld-artist">${s.artist}</div>
@@ -2200,7 +2210,7 @@ window.czmPlayFromPlaylist=function(plId, songId){
   setTimeout(czmRenderPlDetail, 120);
 };
 
-/* Klik cover art di playlist detail → buka full player */
+/* Klik thumbnail lagu → buka full player tanpa tutup playlist detail */
 window.czmOpenPlayerFromPlaylist = function(){
   const p = czmPls.find(x => String(x.id) === String(czmCurPlId));
   if(p && p.songs.length){
@@ -2222,7 +2232,9 @@ window.czmOpenPlayerFromPlaylist = function(){
       }
     }
   }
-  czmClosePlDetail();
+  // Sembunyikan playlist detail tapi JANGAN set czmCurPlId ke null
+  const plDetail = document.getElementById('czm-plm-detail');
+  if(plDetail) plDetail.style.display = 'none';
   setTimeout(czmOpenPlayer, 50);
 };
 
