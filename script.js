@@ -505,6 +505,7 @@ function czmSyncUI(idx, skipPlaylist){
   }
   if(tmar) tmar.textContent=s.artist||'—';
   if(!skipPlaylist) czmRenderPlBox(null);
+  if(!skipPlaylist && czmActivePlId !== '__all__') setTimeout(czmRenderPlayerPlBox, 80);
 }
 
 let _czmVideoMode = false;
@@ -641,6 +642,18 @@ window.czmNext=function(){
       : czmDisplayOrder[0]; // wrap ke awal
     czmPlayById(nextId);
     return;
+  }
+  // Kalau shuffle nyala, random ke lagu dari artis yang sedang diputar
+  if(czmShuffleOn){
+    const pl = czmGetPlaylist(); if(!pl) return;
+    const curSong = pl[czmCurIdx];
+    const curArtist = (curSong?.artist||'').toLowerCase();
+    const artistSongs = pl.slice(1).filter(s => (s.artist||'').toLowerCase().includes(curArtist) && String(s.id) !== String(curSong?.id));
+    if(artistSongs.length > 0){
+      const pick = artistSongs[Math.floor(Math.random()*artistSongs.length)];
+      czmPlayById(pick.id, true);
+      return;
+    }
   }
   // Default: semua lagu
   const nb=document.getElementById('nextBtn');if(nb)nb.click();
@@ -1056,6 +1069,30 @@ function czmRenderPlBox(q){
 }
 window.czmSearchPl=function(v){czmRenderPlBox(v.trim()||null);};
 
+// Render daftar lagu playlist di bawah player (full view)
+function czmRenderPlayerPlBox(){
+  const box = document.getElementById('czm-player-pl-box');
+  if(!box) return;
+  const pl = czmGetPlaylist(); if(!pl) return;
+  if(czmActivePlId === '__all__'){ box.style.display='none'; box.innerHTML=''; return; }
+  const userPl = czmPls.find(p => String(p.id) === String(czmActivePlId));
+  if(!userPl || !userPl.songs.length){ box.style.display='none'; return; }
+  const list = userPl.songs.map(sid => pl.find(s => String(s.id)===String(sid))).filter(Boolean);
+  const cur = pl[czmCurIdx];
+  box.style.display = 'block';
+  box.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:#aaa;letter-spacing:1px;padding:12px 16px 8px;">DARI PLAYLIST · ${userPl.name||'Playlist'}</div>
+    ${list.map((s,i)=>`
+    <div class="czm-plitem ${cur&&String(s.id)===String(cur.id)?'czm-cur':''}" onclick="czmPlayById('${s.id}',true);setTimeout(czmRenderPlayerPlBox,80);" style="padding:8px 16px;">
+      <span class="czm-pl-num">${cur&&String(s.id)===String(cur.id)?'<span class="czm-dot"></span>':(i+1)}</span>
+      <img class="czm-pl-img" src="${s.image}" loading="lazy">
+      <div class="czm-pl-t-wrap">
+        <div class="czm-pl-t" style="${cur&&String(s.id)===String(cur.id)?'color:#00d9ff;':''}">${s.title}</div>
+        <div class="czm-pl-s">${s.artist}</div>
+      </div>
+    </div>`).join('')}`;
+}
+
 /* ---------- more menu ---------- */
 window.czmToggleMore=function(){
   const menu = document.getElementById('czm-more-menu');
@@ -1465,6 +1502,12 @@ function czmRenderInlineArtist(){
 
 /* ===== Artist Page (fullscreen) ===== */
 window.czmOpenArtistPage = function(artistKey){
+  // Otomatis nyalakan shuffle saat masuk artist page
+  if(!czmShuffleOn){
+    czmShuffleOn = true;
+    const btn2 = document.getElementById('czm-shuffle-btn');
+    if(btn2){ btn2.classList.add('active'); btn2.style.color='#00d9ff'; }
+  }
   const pl = czmGetPlaylist();
   const a  = artists[artistKey];
   const artistName = a ? a.name : artistKey;
@@ -1611,7 +1654,17 @@ window.czmApSyncPlayBtn = function(artistHasActiveSong){
 window.czmApSyncRepeatBtn = function(){
   const btn = document.getElementById('czm-ap-repeat-btn');
   if(!btn) return;
-  btn.classList.toggle('active', !!czmLoop);
+  btn.classList.toggle('active', !!czmShuffleOn);
+  btn.style.color = czmShuffleOn ? '#00d9ff' : '';
+};
+
+// Toggle shuffle dari artist page
+window.czmApToggleShuffle = function(){
+  czmShuffleOn = !czmShuffleOn;
+  const btn = document.getElementById('czm-ap-repeat-btn');
+  if(btn){ btn.classList.toggle('active', czmShuffleOn); btn.style.color = czmShuffleOn?'#00d9ff':''; }
+  const btn2 = document.getElementById('czm-shuffle-btn');
+  if(btn2){ btn2.classList.toggle('active', czmShuffleOn); btn2.style.color = czmShuffleOn?'#00d9ff':''; }
 };
 
 // Toggle play/pause dari artist page
@@ -2052,9 +2105,14 @@ window.czmRemoveFromPl=function(plId,songId){
 window.czmPlayFromPlaylist=function(plId, songId){
   // Tutup modal playlist detail
   czmClosePlDetail();
+  // Matikan shuffle saat dari playlist
+  czmShuffleOn = false;
+  const sbtn = document.getElementById('czm-shuffle-btn');
+  if(sbtn){ sbtn.classList.remove('active'); sbtn.style.color=''; }
+  const abtn = document.getElementById('czm-ap-repeat-btn');
+  if(abtn){ abtn.classList.remove('active'); abtn.style.color=''; }
   // Set playlist aktif ke playlist yang dipilih
   czmActivePlId = String(plId);
-  // Update selector dropdown
   // Render ulang display order dari playlist ini
   const pl = czmGetPlaylist()||[];
   const userPl = czmPls.find(p => String(p.id) === String(plId));
@@ -2066,6 +2124,8 @@ window.czmPlayFromPlaylist=function(plId, songId){
   }
   // Play lagu yang diklik
   czmPlayById(songId);
+  // Tampilkan daftar playlist di bawah player
+  setTimeout(czmRenderPlayerPlBox, 150);
 };
 window.czmDeletePl=function(){
   if(!confirm('Hapus playlist ini?'))return;

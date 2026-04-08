@@ -1760,6 +1760,9 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
         <!-- TENTANG ARTIS: muncul saat scroll ke bawah di full view -->
         <div class="czm-inline-artist" id="czm-inline-artist"></div>
 
+        <!-- PLAYLIST BOX: muncul di bawah saat lagu dari playlist -->
+        <div id="czm-player-pl-box" style="display:none; padding: 0 0 16px;"></div>
+
       </div>
     </div>
 
@@ -1789,11 +1792,7 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
 
   </div><!-- end czm-scroll-area -->
 
-  <!-- TAB BAR: pinned di bawah player (flex child, bukan fixed) -->
-  <div class="czm-tab-bar" id="czm-tab-bar">
-    <button class="czm-tab" id="czm-tab-next" onclick="czmSwitchTab('next')">BERIKUTNYA</button>
-    <button class="czm-tab" id="czm-tab-related" onclick="czmSwitchTab('related')">TERKAIT <i class="fa-solid fa-magnifying-glass" id="czm-related-search-icon" style="font-size:11px;margin-left:4px;opacity:0.6;display:none;" onclick="event.stopPropagation();czmOpenRelatedSearch()"></i></button>
-  </div>
+  <!-- Tab bar dihapus -->
 
 </div>
 
@@ -2548,8 +2547,8 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
         </button>
       </div>
       <div class="czm-ap-ctrl-right">
-        <button class="czm-ap-repeat-btn" id="czm-ap-repeat-btn" onclick="czmToggleLoop();czmApSyncRepeatBtn()">
-          <i class="fa-solid fa-repeat" id="czm-ap-repeat-ico"></i>
+        <button class="czm-ap-repeat-btn" id="czm-ap-repeat-btn" onclick="czmApToggleShuffle()">
+          <i class="fa-solid fa-shuffle" id="czm-ap-repeat-ico"></i>
         </button>
         <button class="czm-ap-play-btn" id="czm-ap-play-btn" onclick="czmArtistPageTogglePlay()">
           <i class="fa-solid fa-play" id="czm-ap-play-ico"></i>
