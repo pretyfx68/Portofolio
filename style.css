@@ -3888,6 +3888,20 @@ pointer-events:none; /* TANPA CONTROL */
   box-sizing: border-box;
 }
 .czm-ap-song:active { opacity: 0.7; }
+/* Nomor lagu di sudut gambar */
+.czm-ap-song-num-badge {
+  position: absolute;
+  top: 5px; left: 5px;
+  background: rgba(10,22,40,0.75);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+  line-height: 1;
+}
+.czm-ap-song.czm-ap-active .czm-ap-song-num-badge { color: #00d9ff; }
 
 .czm-ap-song-img-wrap {
   position: relative;

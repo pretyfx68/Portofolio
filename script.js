@@ -505,7 +505,7 @@ function czmSyncUI(idx, skipPlaylist){
   }
   if(tmar) tmar.textContent=s.artist||'—';
   if(!skipPlaylist) czmRenderPlBox(null);
-  if(!skipPlaylist && czmActivePlId !== '__all__') setTimeout(czmRenderPlayerPlBox, 80);
+  // player-pl-box HANYA dirender dari czmPlayPl, bukan tiap sync
 }
 
 let _czmVideoMode = false;
@@ -1565,15 +1565,18 @@ window.czmOpenArtistPage = function(artistKey){
       // Bagi per 6 lagu (2 baris × 3 kolom) = 1 halaman
       const pages = [];
       for(let i = 0; i < artistSongs.length; i += 6) pages.push(artistSongs.slice(i, i+6));
+      let _globalIdx = 0;
       songsBox.innerHTML = pages.map(page => `
         <div class="czm-ap-song-page">
           ${page.map(song => {
+            _globalIdx++;
             const isActive = String(song.id) === curId;
             return `
             <div class="czm-ap-song${isActive?' czm-ap-active':''}" onclick="czmPlayById('${song.id}',true)">
               <div class="czm-ap-song-img-wrap">
                 <img src="${song.image}" loading="lazy">
                 ${isActive ? `<div class="czm-ap-bars-overlay${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>` : ''}
+                <div class="czm-ap-song-num-badge">${_globalIdx}</div>
               </div>
               <div class="czm-ap-song-info">
                 <div class="czm-ap-song-title">${song.title}</div>
@@ -3853,6 +3856,10 @@ audio.addEventListener("ended", () => {
     return;
   }
 
+  // Sembunyikan playlist box kalau bukan dari playlist
+  const _plBox = document.getElementById('czm-player-pl-box');
+  if(_plBox && czmActivePlId === '__all__') { _plBox.style.display='none'; _plBox.innerHTML=''; }
+
   // Kalau ada playlist aktif, WAJIB pakai czmDisplayOrder
   if(czmActivePlId !== '__all__' && czmDisplayOrder.length > 0){
     const curSong = playlist[currentRealIndex];
@@ -3870,6 +3877,31 @@ audio.addEventListener("ended", () => {
       if(typeof czmSyncUI === 'function') setTimeout(()=>czmSyncUI(nextIdx, true), 50);
     }
     return;
+  }
+
+  // Kalau shuffle nyala — random ke lagu artis yang sama
+  if(typeof czmShuffleOn !== 'undefined' && czmShuffleOn){
+    const curSong = playlist[currentRealIndex];
+    if(curSong){
+      const curArtistFull = (curSong.artist||'').toLowerCase();
+      const curArtistMain = curArtistFull.split(/[,&]/)[0].trim();
+      const artistSongs = playlist.slice(1).filter(s => {
+        const sa = (s.artist||'').toLowerCase();
+        return (sa.includes(curArtistMain) || curArtistFull.includes(sa.split(/[,&]/)[0].trim())) && String(s.id) !== String(curSong.id);
+      });
+      if(artistSongs.length > 0){
+        const pick = artistSongs[Math.floor(Math.random()*artistSongs.length)];
+        const idx = playlist.findIndex(s => String(s.id) === String(pick.id));
+        if(idx >= 0){
+          currentRealIndex = idx;
+          loadSongByIndex(idx);
+          playAudio();
+          if(typeof czmCurIdx !== 'undefined') czmCurIdx = idx;
+          if(typeof czmSyncUI === 'function') setTimeout(()=>czmSyncUI(idx, true), 50);
+        }
+        return;
+      }
+    }
   }
 
   // Mode semua lagu — lanjut ke lagu berikutnya
