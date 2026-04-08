@@ -643,21 +643,27 @@ window.czmNext=function(){
     czmPlayById(nextId);
     return;
   }
-  // Kalau shuffle nyala, random ke lagu dari artis yang sedang diputar
-  if(window.czmShuffleOn){
-    const pl = czmGetPlaylist(); if(!pl) return;
-    const curSong = pl[czmCurIdx];
-    // Ambil nama artis pertama saja (sebelum koma/&) biar match kolaborasi
-    const curArtistFull = (curSong?.artist||'').toLowerCase();
-    const curArtistMain = curArtistFull.split(/[,&]/)[0].trim();
-    const artistSongs = pl.slice(1).filter(s => {
-      const sa = (s.artist||'').toLowerCase();
-      return (sa.includes(curArtistMain) || curArtistFull.includes(sa.split(/[,&]/)[0].trim())) && String(s.id) !== String(curSong?.id);
-    });
-    if(artistSongs.length > 0){
-      const pick = artistSongs[Math.floor(Math.random()*artistSongs.length)];
-      czmPlayById(pick.id, true);
-      return;
+  // Kalau artist page sedang terbuka — next dalam artis yang sama
+  const _apEl = document.getElementById('czm-artist-page');
+  if(_apEl && _apEl.classList.contains('open')){
+    const _apKey = (_apEl.dataset.artistKey || '').toLowerCase();
+    if(_apKey){
+      const pl = czmGetPlaylist(); if(!pl) return;
+      const curSong = pl[czmCurIdx];
+      const curId = curSong ? String(curSong.id) : null;
+      const apSongs = pl.slice(1).filter(s => (s.artist||'').toLowerCase().includes(_apKey));
+      if(apSongs.length > 0){
+        const curPos = apSongs.findIndex(s => String(s.id) === curId);
+        let nextSong;
+        if(window.czmShuffleOn){
+          const others = apSongs.filter(s => String(s.id) !== curId);
+          nextSong = others.length > 0 ? others[Math.floor(Math.random()*others.length)] : apSongs[0];
+        } else {
+          nextSong = apSongs[(curPos + 1) % apSongs.length];
+        }
+        czmPlayById(nextSong.id, true);
+        return;
+      }
     }
   }
   // Default: semua lagu
@@ -3879,25 +3885,33 @@ audio.addEventListener("ended", () => {
     return;
   }
 
-  // Kalau shuffle nyala — random ke lagu artis yang sama
-  if(window.czmShuffleOn){
-    const curSong = playlist[currentRealIndex];
-    if(curSong){
-      const curArtistFull = (curSong.artist||'').toLowerCase();
-      const curArtistMain = curArtistFull.split(/[,&]/)[0].trim();
-      const artistSongs = playlist.slice(1).filter(s => {
-        const sa = (s.artist||'').toLowerCase();
-        return (sa.includes(curArtistMain) || curArtistFull.includes(sa.split(/[,&]/)[0].trim())) && String(s.id) !== String(curSong.id);
-      });
-      if(artistSongs.length > 0){
-        const pick = artistSongs[Math.floor(Math.random()*artistSongs.length)];
-        const idx = playlist.findIndex(s => String(s.id) === String(pick.id));
-        if(idx >= 0){
-          currentRealIndex = idx;
-          loadSongByIndex(idx);
+  // Kalau artist page sedang terbuka — next ke lagu artis yang sama (urutan grid)
+  const _apPageEl = document.getElementById('czm-artist-page');
+  if(_apPageEl && _apPageEl.classList.contains('open')){
+    const _apKey = (_apPageEl.dataset.artistKey || '').toLowerCase();
+    if(_apKey){
+      const curSong = playlist[currentRealIndex];
+      const curId = curSong ? String(curSong.id) : null;
+      // Ambil semua lagu artis ini (sama seperti yang tampil di grid)
+      const apSongs = playlist.slice(1).filter(s => (s.artist||'').toLowerCase().includes(_apKey));
+      if(apSongs.length > 0){
+        const curPos = apSongs.findIndex(s => String(s.id) === curId);
+        let nextSong;
+        if(window.czmShuffleOn){
+          // Shuffle dalam artis yang sama
+          const others = apSongs.filter(s => String(s.id) !== curId);
+          nextSong = others.length > 0 ? others[Math.floor(Math.random()*others.length)] : apSongs[0];
+        } else {
+          // Urutan berikutnya, wrap ke awal
+          nextSong = apSongs[(curPos + 1) % apSongs.length];
+        }
+        const nextIdx = playlist.findIndex(s => String(s.id) === String(nextSong.id));
+        if(nextIdx >= 0){
+          currentRealIndex = nextIdx;
+          loadSongByIndex(nextIdx);
           playAudio();
-          if(typeof czmCurIdx !== 'undefined') czmCurIdx = idx;
-          if(typeof czmSyncUI === 'function') setTimeout(()=>czmSyncUI(idx, true), 50);
+          if(typeof czmCurIdx !== 'undefined') czmCurIdx = nextIdx;
+          if(typeof czmSyncUI === 'function') setTimeout(()=>czmSyncUI(nextIdx, true), 50);
         }
         return;
       }
