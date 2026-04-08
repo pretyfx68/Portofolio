@@ -581,12 +581,10 @@ function czmRunNpMarquee(){
     el.innerHTML = `${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>${currentTitle}<span style="display:inline-block;width:${gap}px;"></span>`;
     void el.offsetWidth;
     const fullW = el.scrollWidth / 2;
-    const speed = 50; // px per second
-    const dur = Math.max(4, fullW / speed) + 's';
-    el.style.setProperty('--np-ex', -( fullW + gap) + 'px');
+    const dur = Math.max(4, fullW / 60) + 's';
+    el.style.setProperty('--np-ex', -fullW + 'px');
     el.style.setProperty('--np-dur', dur);
-    // Pause 1.5 detik di awal sebelum mulai scroll
-    el.style.animationDelay = '1.5s';
+    el.style.animationDelay = '0s';
     el.classList.add('czm-np-scroll');
   }
 }
