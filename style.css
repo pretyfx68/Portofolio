@@ -4246,7 +4246,7 @@ pointer-events:none; /* TANPA CONTROL */
   cursor: pointer; font-size: 15px;
 }
 .czm-pld-back { color: #fff; }
-.czm-pld-delete { color: #ff4d4d; }
+.czm-pld-delete { color: #aaa; }
 .czm-pld-hero-art {
   position: relative;
   width: 130px; height: 130px;
@@ -4333,12 +4333,12 @@ pointer-events:none; /* TANPA CONTROL */
   font-size: 12px; color: #777; margin-top: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.czm-pld-remove {
+.czm-pld-more-btn {
   background: none; border: none; color: #555;
-  font-size: 14px; cursor: pointer; padding: 6px 8px;
+  font-size: 16px; cursor: pointer; padding: 6px 8px;
   flex-shrink: 0;
 }
-.czm-pld-remove:active { color: #ff4d4d; }
+.czm-pld-more-btn:active { color: #aaa; }
 /* Bars animasi untuk lagu aktif */
 .czm-pld-bars {
   display: flex; align-items: flex-end; gap: 2px;

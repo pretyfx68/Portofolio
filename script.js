@@ -1085,7 +1085,7 @@ function czmRenderPlayerPlBox(){
   const box = document.getElementById('czm-player-pl-box');
   if(!box) return;
   const pl = czmGetPlaylist(); if(!pl) return;
-  if(czmActivePlId === '__all__'){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='none'; box.innerHTML=''; return; // player-pl-box disembunyikan
   const userPl = czmPls.find(p => String(p.id) === String(czmActivePlId));
   if(!userPl || !userPl.songs.length){ box.style.display='none'; return; }
   const list = userPl.songs.map(sid => pl.find(s => String(s.id)===String(sid))).filter(Boolean);
@@ -2138,10 +2138,34 @@ function czmRenderPlDetail(){
         <div class="czm-pld-title">${s.title}</div>
         <div class="czm-pld-artist">${s.artist}</div>
       </div>
-      <button class="czm-pld-remove" onclick="event.stopPropagation();czmRemoveFromPl(${czmCurPlId},'${sid}')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="czm-pld-more-btn" onclick="event.stopPropagation();czmPlItemMore(${czmCurPlId},'${sid}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   }).join('');
 }
+window.czmPlItemMore=function(plId, songId){
+  // Bottom sheet opsi lagu di playlist
+  const existing = document.getElementById('czm-pl-item-bs');
+  if(existing) existing.remove();
+  const pl = czmGetPlaylist()||[];
+  const s = pl.find(x=>String(x.id)===String(songId));
+  const sheet = document.createElement('div');
+  sheet.id = 'czm-pl-item-bs';
+  sheet.style.cssText = 'position:fixed;inset:0;z-index:10050;';
+  sheet.innerHTML = `
+    <div onclick="document.getElementById('czm-pl-item-bs').remove()" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;background:#1a2d42;border-radius:16px 16px 0 0;padding:0 0 32px;">
+      <div style="display:flex;justify-content:center;padding:10px 0 6px;"><div style="width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;"></div></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07);">
+        <img src="${s?.image||''}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;">
+        <div><div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;">${s?.title||''}</div><div style="font-size:12px;color:#aaa;margin-top:2px;">${s?.artist||''}</div></div>
+      </div>
+      <div onclick="document.getElementById('czm-pl-item-bs').remove();czmRemoveFromPl(${plId},'${songId}')" style="display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;color:#ff4d4d;">
+        <i class="fa-solid fa-trash" style="width:20px;text-align:center;"></i>
+        <span style="font-size:14px;font-weight:500;">Hapus dari playlist</span>
+      </div>
+    </div>`;
+  document.body.appendChild(sheet);
+};
 window.czmRemoveFromPl=function(plId,songId){
   const p=czmPls.find(x=>x.id===plId);if(!p)return;
   p.songs=p.songs.filter(s=>String(s)!==String(songId));czmSavePls();czmRenderPlDetail();
@@ -2184,6 +2208,24 @@ window.czmShuffleFromDetail=function(){
   const sbtn=document.getElementById('czm-shuffle-btn');
   if(sbtn){sbtn.classList.add('active');sbtn.style.color='#00d9ff';}
   czmPlayFromPlaylist(p.id, rand);
+};
+window.czmPlDetailMore=function(){
+  const existing=document.getElementById('czm-pld-more-bs');if(existing)existing.remove();
+  const p=czmPls.find(x=>String(x.id)===String(czmCurPlId));
+  const sheet=document.createElement('div');
+  sheet.id='czm-pld-more-bs';
+  sheet.style.cssText='position:fixed;inset:0;z-index:10055;';
+  sheet.innerHTML=`
+    <div onclick="document.getElementById('czm-pld-more-bs').remove()" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;background:#1a2d42;border-radius:16px 16px 0 0;padding:0 0 32px;">
+      <div style="display:flex;justify-content:center;padding:10px 0 6px;"><div style="width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;"></div></div>
+      <div style="padding:12px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07);font-size:15px;font-weight:700;color:#fff;">${p?.name||'Playlist'}</div>
+      <div onclick="document.getElementById('czm-pld-more-bs').remove();czmDeletePl()" style="display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;color:#ff4d4d;">
+        <i class="fa-solid fa-trash" style="width:20px;text-align:center;"></i>
+        <span style="font-size:14px;font-weight:500;">Hapus playlist</span>
+      </div>
+    </div>`;
+  document.body.appendChild(sheet);
 };
 window.czmDeletePl=function(){
   if(!confirm('Hapus playlist ini?'))return;
