@@ -4017,6 +4017,11 @@ audio.addEventListener("ended", () => {
       playAudio();
       if(typeof czmCurIdx !== 'undefined') czmCurIdx = nextIdx;
       if(typeof czmSyncUI === 'function') setTimeout(()=>czmSyncUI(nextIdx, true), 50);
+      // Refresh active indicator di playlist detail
+      setTimeout(()=>{
+        const plDetail = document.getElementById('czm-pl-detail');
+        if(plDetail && plDetail.style.display !== 'none') czmRenderPlDetail();
+      }, 120);
     }
     return;
   }
