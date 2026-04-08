@@ -1940,13 +1940,34 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
   </div>
   <div id="czm-plm-list" style="overflow-y:auto;flex:1;padding:6px 0;"></div>
 </div>
-<div id="czm-plm-detail" style="display:none;position:fixed;inset:0;z-index:10027;background:#0f2035;flex-direction:column;">
-  <div style="display:flex;align-items:center;gap:12px;padding:14px 14px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;background:#0f2035;">
-    <button onclick="czmClosePlDetail()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;padding:4px;"><i class="fa-solid fa-arrow-left"></i></button>
-    <span id="czm-plm-dname" style="font-size:16px;font-weight:700;flex:1;color:#fff;"></span>
-    <button onclick="czmDeletePl()" style="background:none;border:none;color:#ff4444;font-size:14px;cursor:pointer;padding:4px 8px;"><i class="fa-solid fa-trash"></i></button>
+<div id="czm-plm-detail" class="czm-pld-page">
+  <!-- Hero header -->
+  <div class="czm-pld-hero">
+    <div class="czm-pld-hero-bg" id="czm-pld-hero-bg"></div>
+    <div class="czm-pld-hero-overlay"></div>
+    <div class="czm-pld-hero-top">
+      <button class="czm-pld-back" onclick="czmClosePlDetail()"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="czm-pld-delete" onclick="czmDeletePl()"><i class="fa-solid fa-trash"></i></button>
+    </div>
+    <div class="czm-pld-hero-art" id="czm-pld-hero-art">
+      <i class="fa-solid fa-music"></i>
+    </div>
+    <div class="czm-pld-hero-info">
+      <div class="czm-pld-label">PLAYLIST</div>
+      <div class="czm-pld-name" id="czm-plm-dname"></div>
+      <div class="czm-pld-count" id="czm-pld-count"></div>
+    </div>
+    <div class="czm-pld-hero-actions">
+      <button class="czm-pld-play-all" onclick="czmPlayAllFromDetail()">
+        <i class="fa-solid fa-play"></i> Putar Semua
+      </button>
+      <button class="czm-pld-shuffle-btn" onclick="czmShuffleFromDetail()">
+        <i class="fa-solid fa-shuffle"></i>
+      </button>
+    </div>
   </div>
-  <div id="czm-plm-dsongs" style="flex:1;overflow-y:auto;padding:6px 0;"></div>
+  <!-- Song list -->
+  <div id="czm-plm-dsongs" class="czm-pld-songs"></div>
 </div>
 
 <div id="czm-plpick-ov" onclick="czmClosePlPick()" style="display:none;position:fixed;inset:0;background:rgba(7,15,26,0.65);z-index:10030;backdrop-filter:blur(3px);"></div>

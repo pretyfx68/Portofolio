@@ -2090,6 +2090,19 @@ window.czmOpenPlDetail=function(id){
   setTimeout(()=>{
     const modal=document.getElementById('czm-plm-detail');
     document.getElementById('czm-plm-dname').textContent=p.name;
+    // Update count
+    const countEl=document.getElementById('czm-pld-count');
+    if(countEl) countEl.textContent=p.songs.length+' lagu';
+    // Update hero art (pakai cover lagu pertama)
+    const pl=czmGetPlaylist()||[];
+    const firstSong=p.songs.length?pl.find(s=>String(s.id)===String(p.songs[0])):null;
+    const heroArt=document.getElementById('czm-pld-hero-art');
+    const heroBg=document.getElementById('czm-pld-hero-bg');
+    if(heroArt){
+      if(firstSong?.image){ heroArt.innerHTML=`<img src="${firstSong.image}">`; }
+      else { heroArt.innerHTML='<i class="fa-solid fa-music"></i>'; }
+    }
+    if(heroBg && firstSong?.image) heroBg.style.backgroundImage=`url(${firstSong.image})`;
     modal.style.display='flex';czmRenderPlDetail();
     // Sembunyikan now playing bar
     const npbar=document.getElementById('czm-npbar');
@@ -2107,19 +2120,25 @@ function czmRenderPlDetail(){
   const p=czmPls.find(x=>x.id===czmCurPlId);
   const box=document.getElementById('czm-plm-dsongs');if(!box)return;
   if(!p||!p.songs.length){
-    box.innerHTML='<div style="text-align:center;color:#555;padding:48px 0;font-size:14px;">Playlist kosong.<br>Tambah lagu dari menu ⋮</div>';return;
+    box.innerHTML='<div style="text-align:center;color:#555;padding:60px 0;font-size:14px;"><i class="fa-solid fa-music" style="font-size:36px;margin-bottom:12px;display:block;opacity:.3;"></i>Playlist kosong.<br><span style="font-size:12px;color:#444;margin-top:6px;display:block;">Tambah lagu dari menu ⋮</span></div>';
+    return;
   }
   const pl=czmGetPlaylist()||[];
+  const cur=pl[typeof czmCurIdx!=='undefined'?czmCurIdx:0];
+  const curId=cur?String(cur.id):null;
   box.innerHTML=p.songs.map((sid,i)=>{
     const s=pl.find(x=>String(x.id)===String(sid));if(!s)return'';
-    return`<div style="display:flex;align-items:center;gap:12px;padding:9px 16px;cursor:pointer;transition:background .13s;" onclick="czmPlayFromPlaylist('${p.id}','${s.id}')" onmouseover="this.style.background='rgba(255,255,255,.05)'" onmouseout="this.style.background=''">
-      <span style="font-size:12px;color:#555;width:20px;text-align:center;">${i+1}</span>
-      <img src="${s.image}" style="width:42px;height:42px;border-radius:4px;object-fit:cover;flex-shrink:0;background:#242424;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;">${s.title}</div>
-        <div style="font-size:11px;color:#aaa;">${s.artist}</div>
+    const isActive=String(sid)===curId;
+    return`<div class="czm-pld-item${isActive?' czm-pld-active':''}" onclick="czmPlayFromPlaylist('${p.id}','${s.id}')">
+      ${isActive
+        ? `<div class="czm-pld-bars${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>`
+        : `<span class="czm-pld-num">${i+1}</span>`}
+      <img class="czm-pld-thumb" src="${s.image}" loading="lazy">
+      <div class="czm-pld-info">
+        <div class="czm-pld-title">${s.title}</div>
+        <div class="czm-pld-artist">${s.artist}</div>
       </div>
-      <button onclick="event.stopPropagation();czmRemoveFromPl(${czmCurPlId},'${sid}')" style="background:none;border:none;color:#ff4444;font-size:16px;cursor:pointer;padding:4px 8px;"><i class="fa-solid fa-xmark"></i></button>
+      <button class="czm-pld-remove" onclick="event.stopPropagation();czmRemoveFromPl(${czmCurPlId},'${sid}')"><i class="fa-solid fa-xmark"></i></button>
     </div>`;
   }).join('');
 }
@@ -2152,6 +2171,19 @@ window.czmPlayFromPlaylist=function(plId, songId){
   czmPlayById(songId);
   // Tampilkan daftar playlist di bawah player
   setTimeout(czmRenderPlayerPlBox, 150);
+};
+
+window.czmPlayAllFromDetail=function(){
+  const p=czmPls.find(x=>x.id===czmCurPlId);if(!p||!p.songs.length)return;
+  czmPlayFromPlaylist(p.id, p.songs[0]);
+};
+window.czmShuffleFromDetail=function(){
+  const p=czmPls.find(x=>x.id===czmCurPlId);if(!p||!p.songs.length)return;
+  const rand=p.songs[Math.floor(Math.random()*p.songs.length)];
+  window.czmShuffleOn=true;
+  const sbtn=document.getElementById('czm-shuffle-btn');
+  if(sbtn){sbtn.classList.add('active');sbtn.style.color='#00d9ff';}
+  czmPlayFromPlaylist(p.id, rand);
 };
 window.czmDeletePl=function(){
   if(!confirm('Hapus playlist ini?'))return;
