@@ -2170,19 +2170,16 @@ window.czmRemoveFromPl=function(plId,songId){
   const p=czmPls.find(x=>x.id===plId);if(!p)return;
   p.songs=p.songs.filter(s=>String(s)!==String(songId));czmSavePls();czmRenderPlDetail();
 };
-/* Putar lagu dari playlist detail — otomatis lock ke playlist itu */
+/* Putar lagu dari playlist detail — TANPA buka full player */
 window.czmPlayFromPlaylist=function(plId, songId){
-  // Tutup modal playlist detail
-  czmClosePlDetail();
-  // Matikan shuffle saat dari playlist
+  // Matikan shuffle
   window.czmShuffleOn = false;
   const sbtn = document.getElementById('czm-shuffle-btn');
   if(sbtn){ sbtn.classList.remove('active'); sbtn.style.color=''; }
   const abtn = document.getElementById('czm-ap-repeat-btn');
   if(abtn){ abtn.classList.remove('active'); abtn.style.color=''; }
-  // Set playlist aktif ke playlist yang dipilih
+  // Set playlist aktif
   czmActivePlId = String(plId);
-  // Render ulang display order dari playlist ini
   const pl = czmGetPlaylist()||[];
   const userPl = czmPls.find(p => String(p.id) === String(plId));
   if(userPl){
@@ -2191,10 +2188,49 @@ window.czmPlayFromPlaylist=function(plId, songId){
       .filter(Boolean)
       .map(s => String(s.id));
   }
-  // Play lagu yang diklik
-  czmPlayById(songId);
-  // Tampilkan daftar playlist di bawah player
-  setTimeout(czmRenderPlayerPlBox, 150);
+  // Play lagu — JANGAN tutup detail, JANGAN buka full player
+  const idx = pl.findIndex(s => String(s.id) === String(songId));
+  if(idx < 0) return;
+  czmCurIdx = idx;
+  if(typeof loadSongByIndex === 'function') loadSongByIndex(idx);
+  const _npbar = document.getElementById('czm-npbar');
+  if(_npbar){ _npbar.dataset.hasTrack = '1'; }
+  setTimeout(()=>{ if(typeof playAudio === 'function') playAudio(); }, 80);
+  czmSyncUI(idx, false);
+  setTimeout(czmRenderPlDetail, 120);
+};
+
+/* Klik cover art di playlist detail → buka full player */
+window.czmOpenPlayerFromPlaylist = function(){
+  const p = czmPls.find(x => String(x.id) === String(czmCurPlId));
+  if(p && p.songs.length){
+    const pl = czmGetPlaylist()||[];
+    const cur = pl[czmCurIdx];
+    const inPl = cur && p.songs.some(sid => String(sid) === String(cur.id));
+    if(!inPl){
+      czmActivePlId = String(p.id);
+      czmDisplayOrder = p.songs.map(sid => {
+        const s = pl.find(x => String(x.id) === String(sid));
+        return s ? String(s.id) : null;
+      }).filter(Boolean);
+      const firstIdx = pl.findIndex(s => String(s.id) === String(p.songs[0]));
+      if(firstIdx >= 0){
+        czmCurIdx = firstIdx;
+        if(typeof loadSongByIndex === 'function') loadSongByIndex(firstIdx);
+        setTimeout(()=>{ if(typeof playAudio === 'function') playAudio(); }, 80);
+        czmSyncUI(firstIdx, false);
+      }
+    }
+  }
+  czmClosePlDetail();
+  setTimeout(czmOpenPlayer, 50);
+};
+
+/* Toggle repeat dari playlist detail */
+window.czmToggleLoopFromDetail = function(){
+  czmToggleLoop();
+  const btn = document.getElementById('czm-pld-repeat-btn');
+  if(btn) btn.classList.toggle('active', czmLoop);
 };
 
 window.czmPlayAllFromDetail=function(){
