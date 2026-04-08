@@ -2085,7 +2085,7 @@ function czmRenderPlmList(){
     </div>`;}).join('');
 }
 window.czmOpenPlDetail=function(id){
-  czmCurPlId=id;const p=czmPls.find(x=>x.id===id);if(!p)return;
+  czmCurPlId=id;const p=czmPls.find(x=>String(x.id)===String(id));if(!p)return;
   czmClosePlm();
   setTimeout(()=>{
     const modal=document.getElementById('czm-plm-detail');
