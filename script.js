@@ -604,7 +604,7 @@ function czmRunMarquee(){
     const fullW = el.scrollWidth / 2;
     const dur = Math.max(4, fullW / 60) + 's';
     el.style.setProperty('--np-ex', -fullW + 'px');
-    el.style.setProperty('--czm-dur', dur);
+    el.style.setProperty('--np-dur', dur);
     el.classList.add('czm-np-scroll');
   }
 }
