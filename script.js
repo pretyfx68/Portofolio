@@ -368,6 +368,11 @@ window.czmPlayById=function(id, fromUser){
   // Delay sedikit agar video/audio src sudah siap sebelum play
   setTimeout(()=>{ if(typeof playAudio==='function') playAudio(); }, 80);
   czmSyncUI(idx, true);
+  // Refresh active indicator di playlist detail kalau sedang terbuka
+  setTimeout(()=>{
+    const plDetail = document.getElementById('czm-pl-detail');
+    if(plDetail && plDetail.style.display !== 'none') czmRenderPlDetail();
+  }, 100);
   if(fromUser && czmActivePlId !== '__all__'){
     const userPl = czmPls.find(p => String(p.id) === String(czmActivePlId));
     const isInPl = userPl && userPl.songs.some(sid => String(sid) === String(id));
@@ -1101,8 +1106,7 @@ function czmRenderPlayerPlBox(){
   const box = document.getElementById('czm-player-pl-box');
   if(!box) return;
   const pl = czmGetPlaylist(); if(!pl) return;
-  box.style.display='none'; box.innerHTML=''; return; // player-pl-box disembunyikan
-  const userPl = czmPls.find(p => String(p.id) === String(czmActivePlId));
+  if(czmActivePlId === '__all__'){ box.style.display='none'; box.innerHTML=''; return; }
   if(!userPl || !userPl.songs.length){ box.style.display='none'; return; }
   const list = userPl.songs.map(sid => pl.find(s => String(s.id)===String(sid))).filter(Boolean);
   const cur = pl[czmCurIdx];
@@ -2207,11 +2211,15 @@ window.czmPlayFromPlaylist=function(plId, songId){
   // Play lagu — JANGAN tutup detail, JANGAN buka full player
   const idx = pl.findIndex(s => String(s.id) === String(songId));
   if(idx < 0) return;
+  // Kalau lagu yang diklik sudah aktif, jangan restart
+  const alreadyActive = czmCurIdx === idx;
   czmCurIdx = idx;
-  if(typeof loadSongByIndex === 'function') loadSongByIndex(idx);
-  const _npbar = document.getElementById('czm-npbar');
-  if(_npbar){ _npbar.dataset.hasTrack = '1'; }
-  setTimeout(()=>{ if(typeof playAudio === 'function') playAudio(); }, 80);
+  if(!alreadyActive){
+    if(typeof loadSongByIndex === 'function') loadSongByIndex(idx);
+    const _npbar = document.getElementById('czm-npbar');
+    if(_npbar){ _npbar.dataset.hasTrack = '1'; }
+    setTimeout(()=>{ if(typeof playAudio === 'function') playAudio(); }, 80);
+  }
   czmSyncUI(idx, false);
   setTimeout(czmRenderPlDetail, 120);
 };
