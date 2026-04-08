@@ -644,7 +644,7 @@ window.czmNext=function(){
     return;
   }
   // Kalau shuffle nyala, random ke lagu dari artis yang sedang diputar
-  if(czmShuffleOn){
+  if(window.czmShuffleOn){
     const pl = czmGetPlaylist(); if(!pl) return;
     const curSong = pl[czmCurIdx];
     // Ambil nama artis pertama saja (sebelum koma/&) biar match kolaborasi
@@ -1380,13 +1380,13 @@ window.czmToggleDislike=function(){
     if(lb){ lb.classList.remove('liked'); lb.innerHTML='<i class="fa-regular fa-thumbs-up"></i> Suka'; }
   }
 };
-let czmShuffleOn = false;
+window.czmShuffleOn = false;
 window.czmToggleShuffle=function(){
-  czmShuffleOn = !czmShuffleOn;
+  window.czmShuffleOn = !window.czmShuffleOn;
   const btn=document.getElementById('czm-shuffle-btn');
   if(btn){
-    btn.classList.toggle('active', czmShuffleOn);
-    btn.style.color=czmShuffleOn?'#00d9ff':'';
+    btn.classList.toggle('active', window.czmShuffleOn);
+    btn.style.color=window.czmShuffleOn?'#00d9ff':'';
   }
 };
 /* Tab switch: next / related — klik lagi untuk sembunyikan */
@@ -1520,8 +1520,8 @@ function czmRenderInlineArtist(){
 /* ===== Artist Page (fullscreen) ===== */
 window.czmOpenArtistPage = function(artistKey){
   // Otomatis nyalakan shuffle saat masuk artist page
-  if(!czmShuffleOn){
-    czmShuffleOn = true;
+  if(!window.czmShuffleOn){
+    window.czmShuffleOn = true;
     const btn2 = document.getElementById('czm-shuffle-btn');
     if(btn2){ btn2.classList.add('active'); btn2.style.color='#00d9ff'; }
   }
@@ -1674,17 +1674,17 @@ window.czmApSyncPlayBtn = function(artistHasActiveSong){
 window.czmApSyncRepeatBtn = function(){
   const btn = document.getElementById('czm-ap-repeat-btn');
   if(!btn) return;
-  btn.classList.toggle('active', !!czmShuffleOn);
-  btn.style.color = czmShuffleOn ? '#00d9ff' : '';
+  btn.classList.toggle('active', !!window.czmShuffleOn);
+  btn.style.color = window.czmShuffleOn ? '#00d9ff' : '';
 };
 
 // Toggle shuffle dari artist page
 window.czmApToggleShuffle = function(){
-  czmShuffleOn = !czmShuffleOn;
+  window.czmShuffleOn = !window.czmShuffleOn;
   const btn = document.getElementById('czm-ap-repeat-btn');
-  if(btn){ btn.classList.toggle('active', czmShuffleOn); btn.style.color = czmShuffleOn?'#00d9ff':''; }
+  if(btn){ btn.classList.toggle('active', window.czmShuffleOn); btn.style.color = window.czmShuffleOn?'#00d9ff':''; }
   const btn2 = document.getElementById('czm-shuffle-btn');
-  if(btn2){ btn2.classList.toggle('active', czmShuffleOn); btn2.style.color = czmShuffleOn?'#00d9ff':''; }
+  if(btn2){ btn2.classList.toggle('active', window.czmShuffleOn); btn2.style.color = window.czmShuffleOn?'#00d9ff':''; }
 };
 
 // Toggle play/pause dari artist page
@@ -2126,7 +2126,7 @@ window.czmPlayFromPlaylist=function(plId, songId){
   // Tutup modal playlist detail
   czmClosePlDetail();
   // Matikan shuffle saat dari playlist
-  czmShuffleOn = false;
+  window.czmShuffleOn = false;
   const sbtn = document.getElementById('czm-shuffle-btn');
   if(sbtn){ sbtn.classList.remove('active'); sbtn.style.color=''; }
   const abtn = document.getElementById('czm-ap-repeat-btn');
@@ -3880,7 +3880,7 @@ audio.addEventListener("ended", () => {
   }
 
   // Kalau shuffle nyala — random ke lagu artis yang sama
-  if(typeof czmShuffleOn !== 'undefined' && czmShuffleOn){
+  if(window.czmShuffleOn){
     const curSong = playlist[currentRealIndex];
     if(curSong){
       const curArtistFull = (curSong.artist||'').toLowerCase();
