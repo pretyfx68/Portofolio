@@ -6950,10 +6950,15 @@ function updateFloatChatBtn(pageId) {
         btn.classList.remove('visible');
     }
 }
-// Pastikan float btn tersembunyi saat pertama load
+// Saat pertama load, cek apakah AI section sudah active (default)
 document.addEventListener('DOMContentLoaded', () => {
+    const aiPage = document.getElementById('ai');
     const btn = document.getElementById('aiFloatChatBtn');
-    if (btn) {
+    if (!btn) return;
+    if (aiPage && aiPage.classList.contains('active')) {
+        // AI udah active dari load → langsung tampilkan float btn
+        updateFloatChatBtn('ai');
+    } else {
         btn.style.display = 'none';
         btn.style.visibility = 'hidden';
         btn.classList.remove('visible');
