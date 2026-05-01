@@ -452,11 +452,23 @@ function czmSyncUI(idx, skipPlaylist){
   const tEl=document.getElementById('czm-np-thumb');
   if(tEl)tEl.src=s.image||'';
   const ntEl=document.getElementById('czm-np-title');
-  if(ntEl)ntEl.textContent=s.title||'—';
+  if(ntEl){
+    const _newNpTitle=s.title||'—';
+    // Reset dulu sebelum set judul baru — biar marquee lama gak nyangkut
+    ntEl.dataset.origText='';
+    ntEl.dataset.marqueeSet='';
+    ntEl.classList.remove('czm-np-scroll');
+    ntEl.style.animation='none';
+    void ntEl.offsetWidth; // force reflow
+    ntEl.style.animation='';
+    ntEl.textContent=_newNpTitle;
+    _lastNpMarqueeTitle=null; // paksa czmRunNpMarquee hitung ulang
+  }
   const naEl=document.getElementById('czm-np-artist');
   if(naEl)naEl.textContent=s.artist||'—';
   // marquee npbar
-  setTimeout(czmRunNpMarquee, 500);
+  setTimeout(czmRunNpMarquee, 400);
+  setTimeout(czmRunNpMarquee, 800);
   // like (thumbs-up style)
   const lb=document.getElementById('czm-like-btn');
   if(lb){
