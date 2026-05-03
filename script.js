@@ -7363,7 +7363,7 @@ function ztSetFmt(btn, fmt) {
 }
 
 // Auto-fetch URL tunnel dari server
-const HARDCODED_BACKEND_URL = 'https://man-flower-clarity-suggested.trycloudflare.com';
+const HARDCODED_BACKEND_URL = 'https://satisfied-merger-cancel-photographs.trycloudflare.com';
 let PROXY_URL = localStorage.getItem('vidsnap_proxy_url') || HARDCODED_BACKEND_URL;
 
 // Otomatis update PROXY_URL dari server setiap buka halaman
