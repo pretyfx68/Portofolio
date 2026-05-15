@@ -3978,9 +3978,9 @@ pointer-events:none; /* TANPA CONTROL */
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 0 0 32vw;
-  max-width: 130px;
-  min-width: 100px;
+  flex: 0 0 40vw;
+  max-width: 160px;
+  min-width: 125px;
   cursor: pointer;
   transition: opacity .15s;
 }
