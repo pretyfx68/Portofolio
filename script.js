@@ -2560,18 +2560,18 @@ function kirimPesan() {
 const artists = {
   "Tenxi": {
     name: "Tenxi",
-    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Bintang5.jpg",
-    pendengar: "12.4 juta"
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1778858317800.jpeg",
+    pendengar: "33.6 juta"
     },
   "Nadhif Basalamah": {
     name: "Nadhif Basalamah",
-    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/nadhif.jpg",
-    pendengar: "8.1 juta"
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1778858549438.jpeg",
+    pendengar: "30.6 juta"
   },
   "Virgoun": {
     name: "Virgoun",
-    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Virgoun.png",
-    pendengar: "9.7 juta"
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1778858812920.jpeg",
+    pendengar: "21.6 juta"
   },
   "Naykilla": {
     name: "Naykilla",
@@ -2625,8 +2625,8 @@ const artists = {
   },
   "The Weeknd": {
     name: "The Weeknd",
-    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/starboy.jpg",
-    pendengar: "111.3 juta"
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/Save%20your%20Tears.jpg",
+    pendengar: "255 juta"
   },
   "Kendrick Lamar": {
     name: "Kendrick Lamar",
@@ -3279,6 +3279,12 @@ const songs = {
        artist: "d4vd",
        tags: ["sad","sedih"],
        views: 637800000},
+ 97: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/Happiness.mp3", 
+       image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/artworks-897VbaCODT1e-0-t500x500.jpg", 
+       title: "Happiness", 
+       artist: "Rex Orange County",
+       tags: ["sad","sedih"],
+       views: 98500000},
 }; 
 
 const playlist = Object.keys(songs).map(k => ({ id: k, ...songs[k] }));
@@ -5734,9 +5740,9 @@ async function sendMessage() {
         } else if (error.message && (error.message.includes('413') || error.message.includes('too large') || error.message.includes('payload'))) {
             showNotification('Gambar terlalu besar, coba foto dengan resolusi lebih kecil.', 'error');
         } else if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('network'))) {
-            showNotification('Koneksi bermasalah, periksa internet kamu.', 'error');
+            showNotification('Sepertinya server sedang ada kendala.', 'error');
         } else {
-            showNotification('Server lagi maintenance, coba lagi nanti ya!', 'error');
+            showNotification('Sepertinya server sedang ada kendala.', 'error');
         }
         isGenerating = false;
         updateSendButton();
