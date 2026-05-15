@@ -1645,7 +1645,7 @@ window.czmOpenArtistPage = function(artistKey){
   if(otherBox && artistKey !== prevArtistKey){
     const otherKeys = Object.keys(artists).filter(k => k.toLowerCase() !== artistKey.toLowerCase());
     // shuffle & ambil 5
-    const shuffled = otherKeys.sort(() => Math.random() - 0.5).slice(0, 5);
+    const shuffled = otherKeys.sort(() => Math.random() - 0.5).slice(0, 12);
     otherBox.innerHTML = shuffled.map(k => {
       const ar = artists[k];
       return `
