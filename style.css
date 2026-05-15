@@ -7816,3 +7816,6 @@ pointer-events:none; /* TANPA CONTROL */
   box-shadow: 0 4px 16px rgba(0,217,255,0.15);
 }
 .zt-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,217,255,0.3); }
+#czm-artist-page {
+  overscroll-behavior-y: contain;
+}
