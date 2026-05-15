@@ -4060,7 +4060,7 @@ pointer-events:none; /* TANPA CONTROL */
   width: min(340px, 90vw); height: min(340px, 90vw);
   border-radius: 8px; overflow: hidden;
   box-shadow: 0 20px 60px rgba(15,32,53,0.7);
-  margin: 32px 0 26px; flex-shrink: 0;
+  margin: 24px 0 26px; flex-shrink: 0;
   position: relative;
   transition: height 0.4s cubic-bezier(.4,0,.2,1);
 }
