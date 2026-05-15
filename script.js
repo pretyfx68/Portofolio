@@ -9959,4 +9959,11 @@ function ztQrDownload(fmt) {
 
   document.addEventListener('DOMContentLoaded', ztDashInit);
 })();
-
+document.addEventListener('DOMContentLoaded', () => {
+  const apPage = document.getElementById('czm-artist-page');
+  if (apPage) {
+    apPage.addEventListener('touchmove', function(e) {
+      if (this.scrollTop === 0) e.preventDefault();
+    }, { passive: false });
+  }
+});
