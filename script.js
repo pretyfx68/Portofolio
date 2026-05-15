@@ -9961,9 +9961,14 @@ function ztQrDownload(fmt) {
 })();
 document.addEventListener('DOMContentLoaded', () => {
   const apPage = document.getElementById('czm-artist-page');
-  if (apPage) {
-    apPage.addEventListener('touchmove', function(e) {
-      if (this.scrollTop === 0) e.preventDefault();
-    }, { passive: false });
-  }
+  if (!apPage) return;
+
+  apPage.addEventListener('touchstart', function(e) {
+    this._startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  apPage.addEventListener('touchmove', function(e) {
+    const dy = e.touches[0].clientY - this._startY;
+    if (this.scrollTop === 0 && dy > 0) e.preventDefault();
+  }, { passive: false });
 });
