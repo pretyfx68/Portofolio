@@ -2411,7 +2411,8 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 }
 
 #ai .input-container.focused {
-    box-shadow: 0 0 6px rgba(0, 217, 255, 0.2);border-color: var(--primary-cyan);
+  box-shadow: 0 0 6px rgba(0, 217, 255, 0.2);
+  border-color: rgba(0, 217, 255, 0.25);
 }
 
 #ai.angry-theme .input-container.focused {
