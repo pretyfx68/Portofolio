@@ -9885,13 +9885,13 @@ function ztMenuSwitch(tab) {
   };
   function _ztUpdateFab() { window._ztUpdateFab(); }
 
-  const _origShowPage = window.showPage;
+const _origShowPage = window.showPage;
   window.showPage = function(pageId) {
     if (typeof _origShowPage === 'function') _origShowPage(pageId);
     _ztPage = pageId;
     _ztUpdateFab();
+    window.location.hash = pageId;
   };
-
   window.addEventListener('DOMContentLoaded', function() {
     const zt = document.getElementById('ztools');
     if (zt && zt.classList.contains('active')) _ztPage = 'ztools';
@@ -10067,20 +10067,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (this.scrollTop === 0 && dy > 0) e.preventDefault();
   }, { passive: false });
 });
-// Simpan section aktif
-const _origShowPage2 = window.showPage;
-window.showPage = function(pageId) {
-  localStorage.setItem('czm_last_page', pageId);
-  _origShowPage2(pageId);
-};
-
 // Restore section saat refresh
 document.addEventListener('DOMContentLoaded', () => {
-  const lastPage = localStorage.getItem('czm_last_page');
-  if (lastPage && document.getElementById(lastPage)) {
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById(hash)) {
     document.body.classList.add('czm-restoring');
     requestAnimationFrame(() => {
-      showPage(lastPage);
+      showPage(hash);
       document.body.classList.remove('czm-restoring');
     });
   }
