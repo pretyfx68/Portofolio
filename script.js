@@ -10078,6 +10078,10 @@ window.showPage = function(pageId) {
 document.addEventListener('DOMContentLoaded', () => {
   const lastPage = localStorage.getItem('czm_last_page');
   if (lastPage && document.getElementById(lastPage)) {
-    setTimeout(() => showPage(lastPage), 300);
+    document.body.classList.add('czm-restoring');
+    requestAnimationFrame(() => {
+      showPage(lastPage);
+      document.body.classList.remove('czm-restoring');
+    });
   }
 });
