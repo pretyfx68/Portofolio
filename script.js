@@ -10068,7 +10068,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: false });
 });
 // Restore section saat refresh
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   const hash = window.location.hash.replace('#', '');
   if (hash && document.getElementById(hash)) {
     document.body.classList.add('czm-restoring');
