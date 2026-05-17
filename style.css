@@ -2429,8 +2429,8 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 }
 
 #ai .gear-btn.visible.focused {
-    border-color: var(--primary-cyan);
-    box-shadow: 0 0 12px rgba(0, 217, 255, 0.6), 0 0 24px rgba(0, 217, 255, 0.3);
+  border-color: rgba(0, 217, 255, 0.25);
+  box-shadow: none;
 }
 
 #ai.angry-theme .gear-btn.visible.focused {
