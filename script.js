@@ -10067,3 +10067,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (this.scrollTop === 0 && dy > 0) e.preventDefault();
   }, { passive: false });
 });
+// Simpan section aktif
+const _origShowPage2 = window.showPage;
+window.showPage = function(pageId) {
+  localStorage.setItem('czm_last_page', pageId);
+  _origShowPage2(pageId);
+};
+
+// Restore section saat refresh
+document.addEventListener('DOMContentLoaded', () => {
+  const lastPage = localStorage.getItem('czm_last_page');
+  if (lastPage && document.getElementById(lastPage)) {
+    setTimeout(() => showPage(lastPage), 300);
+  }
+});
