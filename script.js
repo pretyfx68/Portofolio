@@ -10068,13 +10068,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: false });
 });
 // Restore section saat refresh
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const hash = window.location.hash.replace('#', '');
   if (hash && document.getElementById(hash)) {
-    document.body.classList.add('czm-restoring');
     requestAnimationFrame(() => {
       showPage(hash);
-      document.body.classList.remove('czm-restoring');
+      document.documentElement.style.visibility = 'visible';
     });
+  } else {
+    document.documentElement.style.visibility = 'visible';
   }
 });
