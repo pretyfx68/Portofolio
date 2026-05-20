@@ -2623,6 +2623,11 @@ const artists = {
     image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1778858317800.jpeg",
     pendengar: "33.6 juta"
     },
+    "Jemsii": {
+  name: "Jemsii",
+  image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_cb0dfee2-7619-46c5-a50e-c63a7eda37a4.jpg",
+  pendengar: "6.1 juta"
+},
   "Nadhif Basalamah": {
     name: "Nadhif Basalamah",
     image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1778858549438.jpeg",
