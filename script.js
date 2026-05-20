@@ -3439,6 +3439,12 @@ const songs = {
        artist: "Ndarboy Genk, Banditoz Yaow 86 & BoyCord",
        tags: ["kicau","senang","dj"],
        views: 38900000},
+ 112: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/Curi%20Curi%20Pandang.mp3", 
+       image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1779279141277.jpeg", 
+       title: "Curi Curi Pandang", 
+       artist: "Maman Fvndy",
+       tags: ["curi","mman","dj","fendi"],
+       views: 10000000},
 }; 
 
 const playlist = Object.keys(songs).map(k => ({ id: k, ...songs[k] }));
