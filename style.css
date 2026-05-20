@@ -3673,7 +3673,7 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-inline-artist {
   width: 100%;
   margin-top: 28px;
-  padding-bottom: 40px;
+  padding-bottom: 8px;
 }
 #music .czm-inline-artist:empty { display: none; }
 
