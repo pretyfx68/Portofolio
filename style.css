@@ -3719,7 +3719,29 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-ia-genre {
   display: none;
 }
-
+/* Multi-artist slider */
+#music .czm-ia-slider-wrap {
+  position: relative; width: 100%;
+}
+#music .czm-ia-slider {
+  display: flex; overflow-x: scroll; scroll-snap-type: x mandatory;
+  scrollbar-width: none; gap: 0;
+}
+#music .czm-ia-slider::-webkit-scrollbar { display: none; }
+#music .czm-ia-slider .czm-ia-card {
+  flex-shrink: 0; width: 100%; scroll-snap-align: start;
+}
+#music .czm-ia-dots {
+  display: flex; justify-content: center; gap: 6px;
+  margin-top: 10px;
+}
+#music .czm-ia-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.3); transition: all 0.3s;
+}
+#music .czm-ia-dot.active {
+  width: 20px; border-radius: 3px; background: #00fff6;
+}
 /* === ARTIST PAGE (fullscreen overlay) === */
 #czm-artist-page {
   position: fixed; inset: 0;

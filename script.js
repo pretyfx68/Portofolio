@@ -1519,7 +1519,6 @@ window.czmSwitchTab=function(tab){
   if(_sa) _sa.scrollTop = 0;
   setTimeout(()=>{ if(_sa) _sa.scrollTop=0; }, 80);
 };
-/* ===== Inline Artist Card (scroll ke bawah di full view) ===== */
 function czmRenderInlineArtist(){
   const box = document.getElementById('czm-inline-artist');
   if(!box) return;
@@ -1527,25 +1526,86 @@ function czmRenderInlineArtist(){
   const s  = pl?.[czmCurIdx];
   if(!s){ box.innerHTML=''; return; }
 
-  const songArtist = (s.artist||'').toLowerCase();
-  const matchKey   = Object.keys(artists).find(k => songArtist.includes(k.toLowerCase()));
-  const a          = matchKey ? artists[matchKey] : null;
+  // Split semua artis dari lagu
+  const rawArtist = s.artist || '';
+  const parts = rawArtist.split(/[&,]|\bfeat\.?\b|\bft\.?\b/i).map(p => p.trim()).filter(Boolean);
 
-  const artistImg  = a ? a.image : s.image;
-  const artistName = a ? a.name : s.artist;
-  const listeners  = a ? a.pendengar+' pendengar bulanan' : '';
-  const genre      = a ? a.genre : '';
+  // Cari artis yang ada di database
+  const foundArtists = [];
+  const usedKeys = new Set();
+  for(const part of parts){
+    const key = Object.keys(artists).find(k => part.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(part.toLowerCase()));
+    if(key && !usedKeys.has(key)){
+      usedKeys.add(key);
+      foundArtists.push({ key, data: artists[key] });
+    }
+  }
 
-  box.innerHTML = `
-    <div class="czm-ia-card" onclick="czmOpenArtistPage('${(matchKey||s.artist).replace(/'/g,"\\'")}')">
-      <img class="czm-ia-bg" src="${artistImg}">
+  // Fallback ke 1 artis kalau tidak ada yang cocok
+  if(foundArtists.length === 0){
+    const matchKey = Object.keys(artists).find(k => rawArtist.toLowerCase().includes(k.toLowerCase()));
+    if(matchKey) foundArtists.push({ key: matchKey, data: artists[matchKey] });
+  }
+
+  if(foundArtists.length === 0){ box.innerHTML=''; return; }
+
+  if(foundArtists.length === 1){
+    const {key, data: a} = foundArtists[0];
+    box.innerHTML = `
+      <div class="czm-ia-card" onclick="czmOpenArtistPage('${key.replace(/'/g,"\\'")}')">
+        <img class="czm-ia-bg" src="${a.image}">
+        <div class="czm-ia-banner-overlay"></div>
+        <div class="czm-ia-card-label">TENTANG ARTIS</div>
+        <div class="czm-ia-banner-info">
+          <div class="czm-ia-name">${a.name}</div>
+          ${a.pendengar ? `<div class="czm-ia-listeners">${a.pendengar} pendengar bulanan</div>` : ''}
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Multiple artis — buat slider
+  const cards = foundArtists.map(({key, data: a}) => `
+    <div class="czm-ia-card" onclick="czmOpenArtistPage('${key.replace(/'/g,"\\'")}')">
+      <img class="czm-ia-bg" src="${a.image}">
       <div class="czm-ia-banner-overlay"></div>
       <div class="czm-ia-card-label">TENTANG ARTIS</div>
       <div class="czm-ia-banner-info">
-        <div class="czm-ia-name">${artistName}</div>
-        ${listeners ? `<div class="czm-ia-listeners">${listeners}</div>` : ''}
+        <div class="czm-ia-name">${a.name}</div>
+        ${a.pendengar ? `<div class="czm-ia-listeners">${a.pendengar} pendengar bulanan</div>` : ''}
       </div>
+    </div>`).join('');
+
+  const dots = foundArtists.map((_,i) => `<div class="czm-ia-dot${i===0?' active':''}"></div>`).join('');
+
+  box.innerHTML = `
+    <div class="czm-ia-slider-wrap">
+      <div class="czm-ia-slider" id="czm-ia-slider">${cards}</div>
+      <div class="czm-ia-dots" id="czm-ia-dots">${dots}</div>
     </div>`;
+
+  // Auto scroll + dots
+  const slider = document.getElementById('czm-ia-slider');
+  const dotEls = document.querySelectorAll('#czm-ia-dots .czm-ia-dot');
+  let curDot = 0;
+  const total = foundArtists.length;
+
+  slider.addEventListener('scroll', () => {
+    const idx = Math.round(slider.scrollLeft / slider.offsetWidth);
+    if(idx !== curDot){
+      dotEls[curDot].classList.remove('active');
+      curDot = idx;
+      dotEls[curDot].classList.add('active');
+    }
+  });
+
+  // Auto-scroll tiap 3 detik
+  let autoTimer = setInterval(() => {
+    const next = (curDot + 1) % total;
+    slider.scrollTo({ left: next * slider.offsetWidth, behavior: 'smooth' });
+  }, 3000);
+
+  slider.addEventListener('touchstart', () => clearInterval(autoTimer), { passive: true });
 }
 
 /* ===== Artist Page (fullscreen) ===== */
