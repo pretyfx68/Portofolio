@@ -855,10 +855,8 @@ setInterval(czmTickProgress,500);
 
 /* ---------- navigation ---------- */
 window.czmOpenPlayer=function(){
-  // Tandai apakah search sedang terbuka saat ini
+  // Sembunyikan search overlay saat player terbuka (flag sudah di-set di czmCloseSearch)
   const searchOv = document.getElementById('czm-search-ov');
-  czmSearchWasOpen = !!(searchOv && searchOv.classList.contains('czm-on'));
-  // Sembunyikan search overlay saat player terbuka
   if(searchOv) searchOv.classList.remove('czm-on');
 
   document.getElementById('czm-home').classList.remove('czm-on');
@@ -1129,6 +1127,10 @@ window.czmOpenSearch = function(){
 };
 
 window.czmCloseSearch=function(){
+  // Tandai bahwa search sedang aktif sebelum ditutup
+  const ov=document.getElementById('czm-search-ov');
+  czmSearchWasOpen = !!(ov && ov.classList.contains('czm-on'));
+
   // Simpan query sebelum close
   const inp=document.getElementById('czm-search-inp');
   czmLastSearchQuery=(inp&&inp.value)||'';
