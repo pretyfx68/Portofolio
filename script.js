@@ -855,8 +855,10 @@ setInterval(czmTickProgress,500);
 
 /* ---------- navigation ---------- */
 window.czmOpenPlayer=function(){
-  // Sembunyikan search overlay saat player terbuka (flag sudah di-set di czmCloseSearch)
+  // Tandai apakah search sedang terbuka saat ini
   const searchOv = document.getElementById('czm-search-ov');
+  czmSearchWasOpen = !!(searchOv && searchOv.classList.contains('czm-on'));
+  // Sembunyikan search overlay saat player terbuka
   if(searchOv) searchOv.classList.remove('czm-on');
 
   document.getElementById('czm-home').classList.remove('czm-on');
@@ -917,7 +919,7 @@ window.czmGoHome=function(){
   const m = document.getElementById('czm-more-menu');
   if(m) m.classList.remove('open');
 
-  // Kalau search sedang terbuka sebelum player → balik ke search
+  // Kalau search sedang terbuka sebelum player → balik ke search langsung
   if(czmSearchWasOpen){
     czmSearchWasOpen = false;
     const searchOv = document.getElementById('czm-search-ov');
@@ -1019,7 +1021,7 @@ function czmRenderRecentSearches() {
     html += `<div class="czm-srch-section-lbl">Penelusuran terbaru</div>
     <div class="czm-recent-grid">`;
     recentPlayedSongs.slice(0,8).forEach(s=>{
-      html += `<div class="czm-recent-grid-item" onclick="czmCloseSearch();czmPlayById('${s.id}',true)">
+      html += `<div class="czm-recent-grid-item" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
         <img src="${s.image}" loading="lazy">
         <div class="czm-recent-grid-lbl">${s.title}</div>
       </div>`;
@@ -1030,7 +1032,7 @@ function czmRenderRecentSearches() {
   // Artis dari histori
   artistItems.forEach(({key, a})=>{
     const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    html += `<div class="czm-qitem" onclick="czmCloseSearch();czmOpenArtistPage('${safeKey}')">
+    html += `<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
       <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
       <div class="czm-q-info">
         <div class="czm-q-title">${a.name}</div>
@@ -1086,7 +1088,7 @@ window.czmSearchTyping = function(val){
 
   // Hanya daftar lagu, tanpa card artis
   r.innerHTML=`<div class="czm-srch-section-lbl">Lagu</div>`+found.map(s=>`
-    <div class="czm-qitem" onclick="czmCloseSearch();czmPlayById('${s.id}',true)">
+    <div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
       <img class="czm-q-thumb" src="${s.image}" loading="lazy">
       <div class="czm-q-info">
         <div class="czm-q-title">${s.title}</div>
@@ -1127,13 +1129,10 @@ window.czmOpenSearch = function(){
 };
 
 window.czmCloseSearch=function(){
-  // Tandai bahwa search sedang aktif sebelum ditutup
-  const ov=document.getElementById('czm-search-ov');
-  czmSearchWasOpen = !!(ov && ov.classList.contains('czm-on'));
-
   // Simpan query sebelum close
   const inp=document.getElementById('czm-search-inp');
   czmLastSearchQuery=(inp&&inp.value)||'';
+  czmSearchWasOpen = false; // tombol ← = tutup search beneran
 
   const ov=document.getElementById('czm-search-ov');
   if(ov){
@@ -1141,7 +1140,14 @@ window.czmCloseSearch=function(){
     ov.style.setProperty('display','none','important');
     setTimeout(function(){ ov.style.removeProperty('display'); }, 500);
   }
-  // TIDAK reset input & hasil — disimpan di czmLastSearchQuery
+};
+
+/* Hanya sembunyikan search sementara (saat putar lagu/buka artis dari search)
+   → state tetap ada, saat balik dari player langsung muncul lagi */
+window.czmHideSearch=function(){
+  czmSearchWasOpen = true; // tandai: search harus muncul lagi saat balik
+  const ov=document.getElementById('czm-search-ov');
+  if(ov) ov.classList.remove('czm-on');
 };
 
 window.czmSrchChip=function(chip,el){
@@ -1237,7 +1243,7 @@ window.czmDoSearch=function(q){
 
       html+=`
       <div class="czm-artist-card">
-        <div class="czm-ac-header" onclick="czmCloseSearch();czmOpenArtistPage('${safeKey}')">
+        <div class="czm-ac-header" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
           <div class="czm-ac-avatar"><img src="${a.image}" loading="lazy" onerror="this.style.display='none'"></div>
           <div class="czm-ac-info">
             <div class="czm-ac-name">${a.name}</div>
@@ -1246,16 +1252,16 @@ window.czmDoSearch=function(q){
           <i class="fa-solid fa-chevron-right czm-ac-arrow"></i>
         </div>
         <div class="czm-ac-btns">
-          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmCloseSearch();czmShuffleArtist('${safeKey}')">
+          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmHideSearch();czmShuffleArtist('${safeKey}')">
             <i class="fa-solid fa-shuffle"></i> Acak
           </button>
-          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmCloseSearch();czmPlayArtistFirst('${safeKey}')">
+          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmHideSearch();czmPlayArtistFirst('${safeKey}')">
             <i class="fa-solid fa-circle-dot"></i> Radio
           </button>
         </div>
         <div class="czm-ac-songs">
           ${cardSongs.map(s=>`
-          <div class="czm-ac-song" onclick="event.stopPropagation();czmCloseSearch();czmPlayById('${s.id}',true)">
+          <div class="czm-ac-song" onclick="event.stopPropagation();czmHideSearch();czmPlayById('${s.id}',true)">
             <img class="czm-ac-song-img" src="${s.image}" loading="lazy">
             <div class="czm-ac-song-info">
               <div class="czm-ac-song-title">${s.title}</div>
@@ -1270,7 +1276,7 @@ window.czmDoSearch=function(q){
     // --- BAGIAN 2: Daftar Lagu di BAWAH card artis ---
     html+=`<div class="czm-srch-section-lbl" style="margin-top:12px;">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="czmCloseSearch();czmPlayById('${s.id}',true)">
+      <div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
@@ -1284,7 +1290,7 @@ window.czmDoSearch=function(q){
   if(czmSrchChipActive==='lagu' || czmSrchChipActive==='trend' || czmSrchChipActive==='sad'){
     html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="czmCloseSearch();czmPlayById('${s.id}',true)">
+      <div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
