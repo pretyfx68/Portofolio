@@ -1040,39 +1040,56 @@ window.czmDoSearch=function(q){
     return;
   }
 
-  /* ── Kelompokkan per artistKey dari const artists ── */
-  // Tiap lagu dipetakan ke 1 artistKey saja → tidak akan muncul 2 card
-  const artistKeyMap = {}; // artistKey → {data, songs[]}
-  found.forEach(s=>{
-    const key = czmFindArtistKey(s.artist||'') || (s.artist||'Unknown');
-    if(!artistKeyMap[key]){
-      const aData = (typeof artists!=='undefined') ? artists[key] : null;
-      const allOfArtist = allSongs.filter(x=>czmFindArtistKey(x.artist||'')===key || x.artist===key);
-      const totalViews = allOfArtist.reduce((sum,x)=>sum+(x.views||0),0);
-      artistKeyMap[key]={
-        key,
-        name: aData ? aData.name : key,
-        img:  aData ? aData.image : s.image,
-        pendengar: aData ? aData.pendengar : null,
-        songs: allOfArtist,
-        totalViews
-      };
-    }
-  });
-  const artistList = Object.values(artistKeyMap).sort((a,b)=>b.totalViews-a.totalViews);
-
   let html='';
 
-  /* ── CHIP: SEMUA → card artis + lagu di dalam card ── */
+  /* ── CHIP: SEMUA → tampilkan LAGU dulu, lalu card artis (hanya jika query cocok nama artis) ── */
   if(czmSrchChipActive==='semua'){
-    artistList.forEach(a=>{
-      const cardSongs = a.songs.slice(0,3);
-      const safeKey   = a.key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      const metaText  = a.pendengar ? `${a.pendengar} pendengar bulanan` : `${fv(a.totalViews)} pemutaran`;
+    // --- BAGIAN 1: Daftar Lagu ---
+    html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
+    html+=found.map(s=>`
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},50)">
+        <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+        <div class="czm-q-info">
+          <div class="czm-q-title">${s.title}</div>
+          <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
+        </div>
+        <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </div>`).join('');
+
+    // --- BAGIAN 2: Card Artis (hanya 1, artis yang paling relevan dengan query) ---
+    // Cari artis yang namanya cocok langsung dengan query
+    let matchedArtistKey = null;
+    if(typeof artists !== 'undefined'){
+      const artistKeys = Object.keys(artists);
+      // Cari exact atau partial match di nama artis
+      for(const k of artistKeys){
+        if(artists[k].name.toLowerCase().includes(query) || query.includes(k.toLowerCase())){
+          matchedArtistKey = k;
+          break;
+        }
+      }
+      // Fallback: cari dari artis lagu yang ditemukan
+      if(!matchedArtistKey){
+        const firstSongArtist = found[0]?.artist || '';
+        matchedArtistKey = czmFindArtistKey(firstSongArtist);
+      }
+    }
+
+    if(matchedArtistKey && artists[matchedArtistKey]){
+      const a = artists[matchedArtistKey];
+      const key = matchedArtistKey;
+      // Encode key untuk onclick - gunakan encodeURIComponent untuk menghindari masalah quote
+      const encodedKey = encodeURIComponent(key);
+      const allOfArtist = allSongs.filter(x=>czmFindArtistKey(x.artist||'')===key || x.artist===key);
+      const totalViews = allOfArtist.reduce((sum,x)=>sum+(x.views||0),0);
+      const metaText = a.pendengar ? `${a.pendengar} pendengar bulanan` : `${fv(totalViews)} pemutaran`;
+      const cardSongs = allOfArtist.slice(0,3);
+
+      html+=`<div class="czm-srch-section-lbl" style="margin-top:16px;">Artis</div>`;
       html+=`
       <div class="czm-artist-card">
-        <div class="czm-ac-header" onclick="czmCloseSearch();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));if(typeof czmOpenArtistPage==='function')czmOpenArtistPage('${safeKey}')">
-          <div class="czm-ac-avatar"><img src="${a.img}" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="czm-ac-header" onclick="czmCloseSearch();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){if(typeof czmOpenArtistPage==='function')czmOpenArtistPage(decodeURIComponent('${encodedKey}'));},50)">
+          <div class="czm-ac-avatar"><img src="${a.image}" loading="lazy" onerror="this.style.display='none'"></div>
           <div class="czm-ac-info">
             <div class="czm-ac-name">${a.name}</div>
             <div class="czm-ac-meta">${metaText}</div>
@@ -1080,16 +1097,16 @@ window.czmDoSearch=function(q){
           <i class="fa-solid fa-chevron-right czm-ac-arrow"></i>
         </div>
         <div class="czm-ac-btns">
-          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmShuffleArtist('${safeKey}')">
+          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmShuffleArtist(decodeURIComponent('${encodedKey}'));},50)">
             <i class="fa-solid fa-shuffle"></i> Acak
           </button>
-          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmPlayArtistFirst('${safeKey}')">
+          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayArtistFirst(decodeURIComponent('${encodedKey}'));},50)">
             <i class="fa-solid fa-circle-dot"></i> Radio
           </button>
         </div>
         <div class="czm-ac-songs">
           ${cardSongs.map(s=>`
-          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmPlayById('${s.id}',true)">
+          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},50)">
             <img class="czm-ac-song-img" src="${s.image}" loading="lazy">
             <div class="czm-ac-song-info">
               <div class="czm-ac-song-title">${s.title}</div>
@@ -1099,14 +1116,14 @@ window.czmDoSearch=function(q){
           </div>`).join('')}
         </div>
       </div>`;
-    });
+    }
   }
 
   /* ── CHIP: LAGU → daftar lagu saja, tanpa card artis ── */
   if(czmSrchChipActive==='lagu' || czmSrchChipActive==='trend' || czmSrchChipActive==='sad'){
     html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmPlayById('${s.id}',true)">
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},50)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
@@ -1132,11 +1149,9 @@ window.czmShuffleArtist=function(key){
   const songs=pl.slice(1).filter(x=>czmFindArtistKey(x.artist||'')===key||x.artist===key);
   if(!songs.length)return;
   // aktifkan shuffle global
-  if(!window.czmShuffleOn){
-    window.czmShuffleOn=true;
-    const btn=document.getElementById('czm-shuffle-btn');
-    if(btn){btn.classList.add('active');btn.style.color='#00d9ff';}
-  }
+  window.czmShuffleOn=true;
+  const btn=document.getElementById('czm-shuffle-btn');
+  if(btn){btn.classList.add('active');btn.style.color='#00d9ff';}
   const s=songs[Math.floor(Math.random()*songs.length)];
   czmPlayById(s.id,true);
 };
