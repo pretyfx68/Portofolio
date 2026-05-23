@@ -80,7 +80,7 @@ function czmGetList(f){
   if(!pl)return[];
   const real=pl.slice(1); // skip index 0 (not found)
   if(f==='all')    return real;
-const trendingIds = [112,111,110,109,108,107,106,105,104,103]; // ganti nomornya sesuai index lagu yang mau ditampilin
+const trendingIds = [111,110,109,108,107,106,105,104,103,102,101,100]; // ganti nomornya sesuai index lagu yang mau ditampilin
 if(f==='trending')return trendingIds.map(i=>real[i]).filter(Boolean);
   if(f==='baru')   return[...real].slice(-15).reverse();
   if(f==='sad')    return real.filter(s=>(s.tags||[]).includes('sad'));
