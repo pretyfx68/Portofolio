@@ -3483,7 +3483,7 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-sec-head {
   padding:22px 16px 10px; display:flex; align-items:center; justify-content:space-between;
 }
-#music .czm-sec-title { font-size:16px; font-weight:700; color:#fff; }
+#music .czm-sec-title { font-size:26px; font-weight:700; color:#fff; }
 #music .czm-sec-link  { font-size:13px; color:#666; cursor:pointer; transition:color .2s; }
 #music .czm-sec-link:hover { color:#aaa; }
 #music .czm-play-all {
