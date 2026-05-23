@@ -1099,7 +1099,7 @@ window.czmDoSearch=function(q){
 
       html+=`
       <div class="czm-artist-card">
-        <div class="czm-ac-header" onclick="czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){if(typeof czmOpenArtistPage==='function')czmOpenArtistPage(decodeURIComponent('${encodedKey}'));},200)">
+        <div class="czm-ac-header" onclick="czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));if(typeof czmOpenArtistPage==='function')czmOpenArtistPage(decodeURIComponent('${encodedKey}'));setTimeout(czmCloseSearch,50)">
           <div class="czm-ac-avatar"><img src="${a.image}" loading="lazy" onerror="this.style.display='none'"></div>
           <div class="czm-ac-info">
             <div class="czm-ac-name">${a.name}</div>
@@ -1108,16 +1108,16 @@ window.czmDoSearch=function(q){
           <i class="fa-solid fa-chevron-right czm-ac-arrow"></i>
         </div>
         <div class="czm-ac-btns">
-          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmShuffleArtist(decodeURIComponent('${encodedKey}'));},200)">
+          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmShuffleArtist(decodeURIComponent('${encodedKey}'));setTimeout(czmCloseSearch,50)">
             <i class="fa-solid fa-shuffle"></i> Acak
           </button>
-          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayArtistFirst(decodeURIComponent('${encodedKey}'));},200)">
+          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmPlayArtistFirst(decodeURIComponent('${encodedKey}'));setTimeout(czmCloseSearch,50)">
             <i class="fa-solid fa-circle-dot"></i> Radio
           </button>
         </div>
         <div class="czm-ac-songs">
           ${cardSongs.map(s=>`
-          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){czmCloseSearch();czmPlayById('${s.id}',true);},50)">
+          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmPlayById('${s.id}',true);setTimeout(czmCloseSearch,50)">
             <img class="czm-ac-song-img" src="${s.image}" loading="lazy">
             <div class="czm-ac-song-info">
               <div class="czm-ac-song-title">${s.title}</div>
@@ -1132,7 +1132,7 @@ window.czmDoSearch=function(q){
     // --- BAGIAN 2: Daftar Lagu di BAWAH card artis ---
     html+=`<div class="czm-srch-section-lbl" style="margin-top:12px;">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){czmCloseSearch();czmPlayById('${s.id}',true);},50)">
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmPlayById('${s.id}',true);setTimeout(czmCloseSearch,50)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
@@ -1146,7 +1146,7 @@ window.czmDoSearch=function(q){
   if(czmSrchChipActive==='lagu' || czmSrchChipActive==='trend' || czmSrchChipActive==='sad'){
     html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){czmCloseSearch();czmPlayById('${s.id}',true);},50)">
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmPlayById('${s.id}',true);setTimeout(czmCloseSearch,50)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
