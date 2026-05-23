@@ -2638,6 +2638,11 @@ const artists = {
     image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1778858812920.jpeg",
     pendengar: "21.6 juta"
   },
+  "Justin Bieber": {
+    name: "Justin Bieber",
+    image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_a2fee337-ff36-417f-8af3-5f1b18bf78a0.jpg",
+    pendengar: "482 juta"
+  },
   "Naykilla": {
     name: "Naykilla",
     image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/SO%20ASU.png",
@@ -3437,14 +3442,20 @@ const songs = {
        image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_8da33346-225c-4c28-9e76-b5cd8aa3c52a.jpg", 
        title: "Kicau Mania", 
        artist: "Ndarboy Genk, Banditoz Yaow 86 & BoyCord",
-       tags: ["kicau","senang","dj"],
+       tags: ["kicau","senang","dj","trend"],
        views: 38900000},
  112: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/Curi%20Curi%20Pandang.mp3", 
        image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/WA_1779279141277.jpeg", 
        title: "Curi Curi Pandang", 
        artist: "Maman Fvndy",
-       tags: ["curi","mman","dj","fendi"],
+       tags: ["curi","mman","dj","fendi","trend"],
        views: 10000000},
+ 113: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/That%20Should%20Be%20Me.mp3", 
+       image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_00912028-eddb-4830-a8b1-2649bacd9929.jpg", 
+       title: "That Should Be Me", 
+       artist: "Justin Bieber",
+       tags: ["ded soul bi mi","jastin biber","trend"],
+       views: 194800000},
 }; 
 
 const playlist = Object.keys(songs).map(k => ({ id: k, ...songs[k] }));
