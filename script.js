@@ -80,8 +80,7 @@ function czmGetList(f){
   if(!pl)return[];
   const real=pl.slice(1);
   if(f==='all') return real;
-  const trendingIds = [111,110,109,108,107,106,105,104,103,102,101,100];
-  if(f==='trending')return trendingIds.map(i=>real[i]).filter(Boolean);
+if(f==='trending')return real.filter(s=>(s.tags||[]).includes('trend'));
   if(f==='baru')   return[...real].slice(-15).reverse();
   if(f==='sad')    return real.filter(s=>(s.tags||[]).includes('sad'));
   if(f==='senang') return real.filter(s=>(s.tags||[]).includes('😝🤙🏻'));
@@ -166,7 +165,7 @@ function czmRenderHome(f){
     <!-- Trending -->
     <div>
       <div class="czm-sec-head">
-        <span class="czm-sec-title">🔥 Sedang Trending</span>
+        <span class="czm-sec-title">Sedang Trending</span>
         <span class="czm-sec-link" onclick="czmMood(document.querySelector('.czm-pill[data-f=trending]'),'trending')">Semua ›</span>
       </div>
       <div class="czm-hrow">
