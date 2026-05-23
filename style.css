@@ -4626,16 +4626,9 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-srch-ico { color:#666; font-size:14px; flex-shrink:0; }
 #music #czm-search-inp { flex:1; background:none; border:none; color:#fff; font-size:15px; outline:none; font-family:inherit; }
 #music .czm-srch-clear { background:none; border:none; color:#666; font-size:16px; cursor:pointer; padding:0 2px; display:flex; align-items:center; flex-shrink:0; }
-#music .czm-srch-mic { color:#aaa; font-size:18px; flex-shrink:0; }
 
-/* Filter Tabs: CyberZain Music | Koleksi */
-#music .czm-srch-tabs { display:flex; gap:0; padding:0 14px; background:#0a1628; flex-shrink:0; border-bottom:1px solid rgba(255,255,255,0.07); overflow-x:auto; scrollbar-width:none; }
-#music .czm-srch-tabs::-webkit-scrollbar { display:none; }
-#music .czm-srch-tab { background:none; border:none; color:#aaa; font-size:13px; font-weight:600; padding:10px 14px; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:color .15s,border-color .15s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
-#music .czm-srch-tab.active { color:#fff; border-bottom-color:#fff; }
-
-/* Filter Chips: Artis | Lagu | Trending | Sedih */
-#music .czm-srch-chips { display:flex; gap:8px; padding:10px 14px; background:#0a1628; flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
+/* Filter Chips */
+#music .czm-srch-chips { display:flex; gap:8px; padding:10px 14px; background:#0a1628; flex-shrink:0; overflow-x:auto; scrollbar-width:none; border-bottom:1px solid rgba(255,255,255,0.06); }
 #music .czm-srch-chips::-webkit-scrollbar { display:none; }
 #music .czm-srch-chip { background:#1e3550; border:none; color:#ccc; font-size:13px; font-weight:600; padding:7px 16px; border-radius:20px; cursor:pointer; white-space:nowrap; transition:background .15s,color .15s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
 #music .czm-srch-chip.active { background:#fff; color:#000; }
@@ -4648,13 +4641,56 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 /* Recent search item */
 #music .czm-qitem-recent { padding:10px 14px; }
 #music .czm-q-hist-ico { width:40px; height:40px; border-radius:50%; background:#1e3550; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:14px; flex-shrink:0; }
-
-/* Artist item */
-#music .czm-qitem-artist .czm-q-artist-img { width:50px; height:50px; border-radius:50%; overflow:hidden; flex-shrink:0; background:#1a2d42; }
-
-/* More btn on items */
-#music .czm-q-more-btn { background:none; border:none; color:#666; font-size:16px; cursor:pointer; padding:6px 10px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
 #music .czm-q-fill-btn { background:none; border:none; color:#666; font-size:14px; cursor:pointer; padding:6px 10px; flex-shrink:0; transform:rotate(180deg); -webkit-tap-highlight-color:transparent; }
+
+/* ===== ARTIST CARD — YT Music style ===== */
+#music .czm-artist-card {
+  background:#161e2e;
+  border-radius:12px;
+  margin:10px 12px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.07);
+}
+#music .czm-ac-header {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 14px 10px;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+}
+#music .czm-ac-header:active { background:rgba(255,255,255,0.04); }
+#music .czm-ac-avatar { width:52px; height:52px; border-radius:50%; overflow:hidden; flex-shrink:0; background:#1a2d42; }
+#music .czm-ac-avatar img { width:100%; height:100%; object-fit:cover; }
+#music .czm-ac-info { flex:1; min-width:0; }
+#music .czm-ac-name { font-size:15px; font-weight:700; color:#fff; }
+#music .czm-ac-meta { font-size:12px; color:#aaa; margin-top:2px; }
+#music .czm-ac-arrow { color:#666; font-size:13px; flex-shrink:0; }
+
+/* Acak + Radio buttons */
+#music .czm-ac-btns { display:flex; gap:10px; padding:4px 14px 12px; }
+#music .czm-ac-btn {
+  flex:1; display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 0; border-radius:99px; font-size:14px; font-weight:700;
+  cursor:pointer; border:none; -webkit-tap-highlight-color:transparent; font-family:inherit;
+  transition:opacity .15s;
+}
+#music .czm-ac-btn:active { opacity:0.75; }
+#music .czm-ac-btn-acak { background:#fff; color:#000; }
+#music .czm-ac-btn-radio { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.3); }
+
+/* Song rows inside card */
+#music .czm-ac-songs { border-top:1px solid rgba(255,255,255,0.07); }
+#music .czm-ac-song {
+  display:flex; align-items:center; gap:12px;
+  padding:9px 14px; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:background .13s;
+}
+#music .czm-ac-song:active { background:rgba(255,255,255,0.05); }
+#music .czm-ac-song-img { width:46px; height:46px; border-radius:4px; object-fit:cover; flex-shrink:0; background:#1a2d42; }
+#music .czm-ac-song-info { flex:1; min-width:0; }
+#music .czm-ac-song-title { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#music .czm-ac-song-meta { font-size:12px; color:#888; margin-top:2px; }
+
+/* More btn */
+#music .czm-q-more-btn { background:none; border:none; color:#666; font-size:16px; cursor:pointer; padding:6px 10px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
 
 /* ===== BOTTOM SHEET ===== */
 #music .czm-bs-ov   { display:none; position:fixed; inset:0; background:rgba(15,32,53,0.5); z-index:10060; }
