@@ -358,6 +358,14 @@ window.czmPlayById=function(id, fromUser){
   const idx=pl.findIndex(s=>String(s.id)===String(id));
   if(idx<0)return;
   czmCurIdx=idx;
+
+  // Simpan lagu yang diputar ke histori
+  const playedSong = pl[idx];
+  if(playedSong){
+    let recentPlayed = JSON.parse(localStorage.getItem('czm_recent_played')||'[]');
+    recentPlayed = [String(playedSong.id), ...recentPlayed.filter(x=>x!==String(playedSong.id))].slice(0,12);
+    localStorage.setItem('czm_recent_played', JSON.stringify(recentPlayed));
+  }
   if(typeof loadSongByIndex==='function') loadSongByIndex(idx);
   const _npbar = document.getElementById('czm-npbar');
   if(_npbar){
@@ -950,42 +958,16 @@ function czmRenderRecentSearches() {
   const box = document.getElementById('czm-search-res');
   if (!box) return;
 
-  if (!czmRecentSearches.length) {
-    box.innerHTML = '<div style="text-align:center;color:#444;padding:60px 0;font-size:13px;"><i class="fa-solid fa-magnifying-glass" style="font-size:28px;margin-bottom:12px;display:block;opacity:0.25;"></i>Ketik untuk mencari lagu</div>';
-    return;
-  }
-
   const pl = czmGetPlaylist();
   const allSongs = pl ? pl.slice(1) : [];
 
-  // Pisahkan histori: yang cocok dengan lagu (punya thumbnail) vs teks biasa
-  const songItems = [];   // {q, song}
-  const textItems = [];   // q string
-  czmRecentSearches.forEach(q => {
-    const match = allSongs.find(s =>
-      s.title.toLowerCase().includes(q.toLowerCase()) ||
-      s.artist.toLowerCase().includes(q.toLowerCase())
-    );
-    if(match) songItems.push({q, song: match});
-    else textItems.push(q);
-  });
+  // Lagu yang pernah diputar (dari localStorage)
+  const recentPlayedIds = JSON.parse(localStorage.getItem('czm_recent_played')||'[]');
+  const recentPlayedSongs = recentPlayedIds
+    .map(id => allSongs.find(s=>String(s.id)===id))
+    .filter(Boolean);
 
-  let html = '';
-
-  // Grid thumbnail (maks 6) — persis seperti YT Music
-  if(songItems.length){
-    html += `<div class="czm-srch-section-lbl">Penelusuran terbaru</div>
-    <div class="czm-recent-grid">`;
-    songItems.slice(0,6).forEach(({q, song})=>{
-      html += `<div class="czm-recent-grid-item" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,"&#39;")}';czmSearchTyping('${q.replace(/'/g,"&#39;")}')">
-        <img src="${song.image}" loading="lazy">
-        <div class="czm-recent-grid-lbl">${q}</div>
-      </div>`;
-    });
-    html += `</div>`;
-  }
-
-  // Artis dari histori
+  // Artis dari histori pencarian (hanya nama artis persis)
   const artistItems = [];
   if(typeof artists !== 'undefined'){
     czmRecentSearches.forEach(q=>{
@@ -995,30 +977,56 @@ function czmRenderRecentSearches() {
       if(key && !artistItems.find(x=>x.key===key)) artistItems.push({key, a: artists[key]});
     });
   }
-  if(artistItems.length){
-    artistItems.forEach(({key, a})=>{
-      const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      html += `<div class="czm-qitem" onclick="czmCloseSearch();czmOpenArtistPage('${safeKey}')">
-        <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
-        <div class="czm-q-info">
-          <div class="czm-q-title">${a.name}</div>
-          <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
-        </div>
-        <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-      </div>`;
-    });
+
+  // Query teks (bukan nama artis)
+  const textItems = czmRecentSearches.filter(q=>{
+    if(typeof artists==='undefined') return true;
+    return !Object.keys(artists).find(k=>
+      artists[k].name.toLowerCase()===q.toLowerCase() || k.toLowerCase()===q.toLowerCase()
+    );
+  });
+
+  if(!recentPlayedSongs.length && !artistItems.length && !textItems.length){
+    box.innerHTML = '<div style="text-align:center;color:#444;padding:60px 0;font-size:13px;"><i class="fa-solid fa-magnifying-glass" style="font-size:28px;margin-bottom:12px;display:block;opacity:0.25;"></i>Ketik untuk mencari lagu</div>';
+    return;
   }
 
-  // Teks histori dengan icon jam
-  if(textItems.length){
-    textItems.forEach(q=>{
-      html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,"&#39;")}';czmSearchTyping('${q.replace(/'/g,"&#39;")}')">
-        <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
-        <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
-        <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,"&#39;")}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+  let html = '';
+
+  // Grid thumbnail — lagu yang pernah diputar, labelnya judul lagu
+  if(recentPlayedSongs.length){
+    html += `<div class="czm-srch-section-lbl">Penelusuran terbaru</div>
+    <div class="czm-recent-grid">`;
+    recentPlayedSongs.slice(0,8).forEach(s=>{
+      html += `<div class="czm-recent-grid-item" onclick="czmCloseSearch();czmPlayById('${s.id}',true)">
+        <img src="${s.image}" loading="lazy">
+        <div class="czm-recent-grid-lbl">${s.title}</div>
       </div>`;
     });
+    html += `</div>`;
   }
+
+  // Artis dari histori
+  artistItems.forEach(({key, a})=>{
+    const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    html += `<div class="czm-qitem" onclick="czmCloseSearch();czmOpenArtistPage('${safeKey}')">
+      <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
+      <div class="czm-q-info">
+        <div class="czm-q-title">${a.name}</div>
+        <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
+      </div>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>`;
+  });
+
+  // Teks histori dengan icon jam
+  textItems.forEach(q=>{
+    html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,"&#39;")}';czmSearchTyping('${q.replace(/'/g,"&#39;")}')">
+      <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,"&#39;")}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+    </div>`;
+  });
 
   box.innerHTML = html;
 } 
