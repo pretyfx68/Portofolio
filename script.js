@@ -80,7 +80,8 @@ function czmGetList(f){
   if(!pl)return[];
   const real=pl.slice(1); // skip index 0 (not found)
   if(f==='all')    return real;
-  if(f==='trending')return[...real].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,20);
+const trendingIds = [112,111,110,109,108,107,106,105,104,103]; // ganti nomornya sesuai index lagu yang mau ditampilin
+if(f==='trending')return trendingIds.map(i=>real[i]).filter(Boolean);
   if(f==='baru')   return[...real].slice(-15).reverse();
   if(f==='sad')    return real.filter(s=>(s.tags||[]).includes('sad'));
   if(f==='senang') return real.filter(s=>(s.tags||[]).includes('😝🤙🏻'));
@@ -212,7 +213,7 @@ function czmRenderHome(f){
           display:flex;align-items:center;justify-content:center;gap:8px;
         ">
           <i class="fa-solid fa-chevron-down"></i>
-          Selengkapnya (${list.length - 8} lagu lagi)
+          Melihat lagu selengkapnya
         </button>
       </div>` : ''}
     </div>`;
