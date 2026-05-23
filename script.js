@@ -934,7 +934,7 @@ window.czmGoHome=function(){
 
 /* ---------- search overlay ---------- */
 /* ===== SEARCH YT MUSIC STYLE ===== */
-let czmSrchChipActive = 'all';
+let czmSrchChipActive = 'semua';
 let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]');
 
 function czmSaveRecentQ(q){
@@ -953,10 +953,8 @@ function czmRenderRecentSearches(){
     czmRecentSearches.map(q=>`
       <div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,'&#39;')}';czmDoSearch('${q.replace(/'/g,'&#39;')}')">
         <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
-        <div class="czm-q-info">
-          <div class="czm-q-title">${q}</div>
-        </div>
-        <button class="czm-q-fill-btn" title="Isi ulang" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,'&#39;')}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+        <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
+        <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,'&#39;')}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
       </div>`).join('');
 }
 
@@ -966,11 +964,10 @@ window.czmOpenSearch=function(){
   const npbar=document.getElementById('czm-npbar');
   const res=document.getElementById('czm-search-res');
   if(res){
-    const npH = (npbar && npbar.classList.contains('czm-vis')) ? npbar.offsetHeight : 0;
-    res.style.paddingBottom = (npH + 6) + 'px';
+    const npH=(npbar&&npbar.classList.contains('czm-vis'))?npbar.offsetHeight:0;
+    res.style.paddingBottom=(npH+6)+'px';
   }
-  const chips = document.getElementById('czm-srch-chips');
-  if(chips) chips.style.display='none';
+  document.getElementById('czm-srch-chips').style.display='none';
   czmRenderRecentSearches();
 };
 
@@ -979,22 +976,40 @@ window.czmCloseSearch=function(){
   const i=document.getElementById('czm-search-inp');if(i)i.value='';
   const clr=document.getElementById('czm-srch-clear');if(clr)clr.style.display='none';
   const r=document.getElementById('czm-search-res');if(r){r.innerHTML='';r.style.paddingBottom='';}
-  const chips = document.getElementById('czm-srch-chips');
-  if(chips) chips.style.display='none';
-  czmSrchChipActive='all';
-  const c0=document.querySelector('.czm-srch-chip[data-chip="all"]');if(c0){
-    document.querySelectorAll('.czm-srch-chip').forEach(b=>b.classList.remove('active'));
-    c0.classList.add('active');
-  }
+  document.getElementById('czm-srch-chips').style.display='none';
+  czmSrchChipActive='semua';
+  document.querySelectorAll('.czm-srch-chip').forEach(b=>b.classList.remove('active'));
+  const c0=document.querySelector('.czm-srch-chip[data-chip="semua"]');if(c0)c0.classList.add('active');
 };
 
-window.czmSrchChip=function(chip, el){
+window.czmSrchChip=function(chip,el){
   czmSrchChipActive=chip;
   document.querySelectorAll('.czm-srch-chip').forEach(b=>b.classList.remove('active'));
   if(el)el.classList.add('active');
   const q=document.getElementById('czm-search-inp')?.value||'';
   czmDoSearch(q);
 };
+
+/* ── Helper: cari artistKey di const artists yg cocok dg nama artis lagu ── */
+function czmFindArtistKey(artistName){
+  if(typeof artists==='undefined') return null;
+  // 1. exact match
+  if(artists[artistName]) return artistName;
+  const nameLow = artistName.toLowerCase();
+  // 2. token match: tiap kata di artistName dicek ke key artists
+  const keys = Object.keys(artists);
+  for(const k of keys){
+    if(nameLow.includes(k.toLowerCase()) || k.toLowerCase().includes(nameLow)) return k;
+  }
+  // 3. partial: tiap token kata artis lagu dicek ke key
+  const tokens = nameLow.split(/[\s,&]+/).filter(Boolean);
+  for(const tok of tokens){
+    if(tok.length < 3) continue;
+    const found = keys.find(k=>k.toLowerCase().includes(tok)||tok.includes(k.toLowerCase()));
+    if(found) return found;
+  }
+  return null;
+}
 
 window.czmDoSearch=function(q){
   const r=document.getElementById('czm-search-res');if(!r)return;
@@ -1003,134 +1018,125 @@ window.czmDoSearch=function(q){
   const query=q.trim().toLowerCase();
 
   if(clr) clr.style.display=q?'flex':'none';
-
-  if(!query){
-    if(chips)chips.style.display='none';
-    czmRenderRecentSearches();
-    return;
-  }
-
-  if(chips)chips.style.display='flex';
+  if(!query){ chips.style.display='none'; czmRenderRecentSearches(); return; }
+  chips.style.display='flex';
 
   const pl=czmGetPlaylist();if(!pl)return;
   const tokens=query.split(/\s+/).filter(Boolean);
-  let songs=pl.slice(1);
+  let allSongs=pl.slice(1);
 
-  if(czmSrchChipActive==='trend'){
-    songs=songs.filter(s=>(s.tags||[]).includes('trend'));
-  } else if(czmSrchChipActive==='sad'){
-    songs=songs.filter(s=>(s.tags||[]).includes('sad'));
-  }
+  // Filter lagu sesuai chip
+  let filteredSongs = allSongs;
+  if(czmSrchChipActive==='trend') filteredSongs=allSongs.filter(s=>(s.tags||[]).includes('trend'));
+  else if(czmSrchChipActive==='sad') filteredSongs=allSongs.filter(s=>(s.tags||[]).includes('sad'));
 
-  const found=songs.filter(s=>{
+  const found=filteredSongs.filter(s=>{
     const text=(s.title+' '+s.artist+' '+(s.tags||[]).join(' ')).toLowerCase();
     return tokens.every(tok=>text.includes(tok));
   });
 
   if(!found.length){
-    r.innerHTML=`<div style="text-align:center;color:#555;padding:60px 0;font-size:14px;">
-      <i class="fa-solid fa-music" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.2;"></i>
-      Tidak ada hasil untuk <b style="color:#ccc">"${q}"</b></div>`;
+    r.innerHTML=`<div style="text-align:center;color:#555;padding:60px 0;font-size:14px;"><i class="fa-solid fa-music" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.2;"></i>Tidak ada hasil untuk <b style="color:#ccc">"${q}"</b></div>`;
     return;
   }
 
-  // Build artist groups — ambil foto & pendengar dari const artists
-  const allSongs = pl.slice(1);
-  const artistMap={};
+  /* ── Kelompokkan per artistKey dari const artists ── */
+  // Tiap lagu dipetakan ke 1 artistKey saja → tidak akan muncul 2 card
+  const artistKeyMap = {}; // artistKey → {data, songs[]}
   found.forEach(s=>{
-    const a=s.artist||'Unknown';
-    if(!artistMap[a]){
-      const artistAllSongs = allSongs.filter(x=>x.artist===a);
-      const totalViews = artistAllSongs.reduce((sum,x)=>(sum+(x.views||0)),0);
-      // Cari di const artists (exact match dulu, lalu partial)
-      const artistData = (typeof artists!=='undefined') ?
-        (artists[a] || Object.values(artists).find(x=>a.toLowerCase().includes(x.name.toLowerCase())||x.name.toLowerCase().includes(a.toLowerCase()))) :
-        null;
-      artistMap[a]={
-        name: a,
-        songs: artistAllSongs,
-        foundSongs: [],
-        img: artistData ? artistData.image : s.image,
-        pendengar: artistData ? artistData.pendengar : null,
+    const key = czmFindArtistKey(s.artist||'') || (s.artist||'Unknown');
+    if(!artistKeyMap[key]){
+      const aData = (typeof artists!=='undefined') ? artists[key] : null;
+      const allOfArtist = allSongs.filter(x=>czmFindArtistKey(x.artist||'')===key || x.artist===key);
+      const totalViews = allOfArtist.reduce((sum,x)=>sum+(x.views||0),0);
+      artistKeyMap[key]={
+        key,
+        name: aData ? aData.name : key,
+        img:  aData ? aData.image : s.image,
+        pendengar: aData ? aData.pendengar : null,
+        songs: allOfArtist,
         totalViews
       };
     }
-    artistMap[a].foundSongs.push(s);
   });
-  const artistList=Object.values(artistMap).sort((a,b)=>b.totalViews-a.totalViews);
+  const artistList = Object.values(artistKeyMap).sort((a,b)=>b.totalViews-a.totalViews);
 
   let html='';
 
-  // ARTIST CARD — YT Music style: satu card per artis, ada Acak + Radio + daftar lagu
-  if(czmSrchChipActive==='all' || czmSrchChipActive==='lagu'){
-    artistList.slice(0,2).forEach(a=>{
-      // Top songs to show inside card (max 3)
+  /* ── CHIP: SEMUA → card artis + lagu di dalam card ── */
+  if(czmSrchChipActive==='semua'){
+    artistList.forEach(a=>{
       const cardSongs = a.songs.slice(0,3);
-      const safeArtist = a.name.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
-      const metaText = a.pendengar ? `${a.pendengar} pendengar bulanan` : `${fv(a.totalViews)} pemutaran`;
-      html += `
+      const safeKey   = a.key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      const metaText  = a.pendengar ? `${a.pendengar} pendengar bulanan` : `${fv(a.totalViews)} pemutaran`;
+      html+=`
       <div class="czm-artist-card">
-        <!-- Artist header row -->
-        <div class="czm-ac-header" onclick="czmCloseSearch();czmSaveRecentQ('${q.replace(/'/g,'&#39;')}');czmSearchAndPlayArtist('${safeArtist}')">
-          <div class="czm-ac-avatar"><img src="${a.img}" loading="lazy"></div>
+        <div class="czm-ac-header" onclick="czmCloseSearch();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));if(typeof czmOpenArtistPage==='function')czmOpenArtistPage('${safeKey}')">
+          <div class="czm-ac-avatar"><img src="${a.img}" loading="lazy" onerror="this.style.display='none'"></div>
           <div class="czm-ac-info">
             <div class="czm-ac-name">${a.name}</div>
             <div class="czm-ac-meta">${metaText}</div>
           </div>
           <i class="fa-solid fa-chevron-right czm-ac-arrow"></i>
         </div>
-        <!-- Action buttons: Acak + Radio -->
         <div class="czm-ac-btns">
-          <button class="czm-ac-btn czm-ac-btn-acak" onclick="czmSaveRecentQ('${q.replace(/'/g,'&#39;')}');czmCloseSearch();czmShuffleArtist('${safeArtist}')">
+          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmShuffleArtist('${safeKey}')">
             <i class="fa-solid fa-shuffle"></i> Acak
           </button>
-          <button class="czm-ac-btn czm-ac-btn-radio" onclick="czmSaveRecentQ('${q.replace(/'/g,'&#39;')}');czmCloseSearch();czmSearchAndPlayArtist('${safeArtist}')">
+          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmPlayArtistFirst('${safeKey}')">
             <i class="fa-solid fa-circle-dot"></i> Radio
           </button>
         </div>
-        <!-- Song list inside card -->
         <div class="czm-ac-songs">
           ${cardSongs.map(s=>`
-          <div class="czm-ac-song" onclick="czmSaveRecentQ('${q.replace(/'/g,'&#39;')}');czmCloseSearch();czmPlayById('${s.id}',true)">
+          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmPlayById('${s.id}',true)">
             <img class="czm-ac-song-img" src="${s.image}" loading="lazy">
             <div class="czm-ac-song-info">
               <div class="czm-ac-song-title">${s.title}</div>
               <div class="czm-ac-song-meta">Lagu • ${fv(s.views)} pemutaran</div>
             </div>
-            <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
           </div>`).join('')}
         </div>
       </div>`;
     });
   }
 
-  // SONGS SECTION — lagu lainnya yang tidak masuk card artis
+  /* ── CHIP: LAGU → daftar lagu saja, tanpa card artis ── */
   if(czmSrchChipActive==='lagu' || czmSrchChipActive==='trend' || czmSrchChipActive==='sad'){
     html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="czmSaveRecentQ('${q.replace(/'/g,'&#39;')}');czmCloseSearch();czmPlayById('${s.id}',true)">
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();czmPlayById('${s.id}',true)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
           <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
         </div>
-        <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+        <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
       </div>`).join('');
   }
 
   r.innerHTML=html;
 };
 
-window.czmSearchAndPlayArtist=function(artist){
+/* Putar lagu pertama artis */
+window.czmPlayArtistFirst=function(key){
   const pl=czmGetPlaylist();if(!pl)return;
-  const s=pl.slice(1).find(x=>x.artist===artist);
+  const s=pl.slice(1).find(x=>czmFindArtistKey(x.artist||'')===key||x.artist===key);
   if(s) czmPlayById(s.id,true);
 };
 
-window.czmShuffleArtist=function(artist){
+/* Shuffle artis */
+window.czmShuffleArtist=function(key){
   const pl=czmGetPlaylist();if(!pl)return;
-  const songs=pl.slice(1).filter(x=>x.artist===artist);
+  const songs=pl.slice(1).filter(x=>czmFindArtistKey(x.artist||'')===key||x.artist===key);
   if(!songs.length)return;
+  // aktifkan shuffle global
+  if(!window.czmShuffleOn){
+    window.czmShuffleOn=true;
+    const btn=document.getElementById('czm-shuffle-btn');
+    if(btn){btn.classList.add('active');btn.style.color='#00d9ff';}
+  }
   const s=songs[Math.floor(Math.random()*songs.length)];
   czmPlayById(s.id,true);
 };
