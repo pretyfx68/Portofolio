@@ -972,11 +972,17 @@ window.czmOpenSearch=function(){
 };
 
 window.czmCloseSearch=function(){
-  document.getElementById('czm-search-ov').classList.remove('czm-on');
+  const ov=document.getElementById('czm-search-ov');
+  if(ov){
+    ov.classList.remove('czm-on');
+    // Force hide segera, tidak tunggu CSS transition
+    ov.style.setProperty('display','none','important');
+    setTimeout(function(){ ov.style.removeProperty('display'); }, 500);
+  }
   const i=document.getElementById('czm-search-inp');if(i)i.value='';
   const clr=document.getElementById('czm-srch-clear');if(clr)clr.style.display='none';
   const r=document.getElementById('czm-search-res');if(r){r.innerHTML='';r.style.paddingBottom='';}
-  document.getElementById('czm-srch-chips').style.display='none';
+  const chips=document.getElementById('czm-srch-chips');if(chips)chips.style.display='none';
   czmSrchChipActive='semua';
   document.querySelectorAll('.czm-srch-chip').forEach(b=>b.classList.remove('active'));
   const c0=document.querySelector('.czm-srch-chip[data-chip="semua"]');if(c0)c0.classList.add('active');
@@ -1042,53 +1048,38 @@ window.czmDoSearch=function(q){
 
   let html='';
 
-  /* ── CHIP: SEMUA → tampilkan LAGU dulu, lalu card artis (hanya jika query cocok nama artis) ── */
+  /* ── CHIP: SEMUA → card artis di atas, lagu di bawah ── */
   if(czmSrchChipActive==='semua'){
-    // --- BAGIAN 1: Daftar Lagu ---
-    html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
-    html+=found.map(s=>`
-      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},50)">
-        <img class="czm-q-thumb" src="${s.image}" loading="lazy">
-        <div class="czm-q-info">
-          <div class="czm-q-title">${s.title}</div>
-          <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
-        </div>
-        <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-      </div>`).join('');
-
-    // --- BAGIAN 2: Card Artis (hanya 1, artis yang paling relevan dengan query) ---
-    // Cari artis yang namanya cocok langsung dengan query
+    // --- BAGIAN 1: Card Artis (hanya 1, paling relevan) di ATAS ---
     let matchedArtistKey = null;
     if(typeof artists !== 'undefined'){
       const artistKeys = Object.keys(artists);
-      // Cari exact atau partial match di nama artis
+      // Cari nama artis yang cocok langsung dengan query
       for(const k of artistKeys){
         if(artists[k].name.toLowerCase().includes(query) || query.includes(k.toLowerCase())){
           matchedArtistKey = k;
           break;
         }
       }
-      // Fallback: cari dari artis lagu yang ditemukan
+      // Fallback: dari artis lagu pertama yang ditemukan
       if(!matchedArtistKey){
         const firstSongArtist = found[0]?.artist || '';
         matchedArtistKey = czmFindArtistKey(firstSongArtist);
       }
     }
 
-    if(matchedArtistKey && artists[matchedArtistKey]){
+    if(matchedArtistKey && typeof artists !== 'undefined' && artists[matchedArtistKey]){
       const a = artists[matchedArtistKey];
       const key = matchedArtistKey;
-      // Encode key untuk onclick - gunakan encodeURIComponent untuk menghindari masalah quote
       const encodedKey = encodeURIComponent(key);
       const allOfArtist = allSongs.filter(x=>czmFindArtistKey(x.artist||'')===key || x.artist===key);
       const totalViews = allOfArtist.reduce((sum,x)=>sum+(x.views||0),0);
       const metaText = a.pendengar ? `${a.pendengar} pendengar bulanan` : `${fv(totalViews)} pemutaran`;
       const cardSongs = allOfArtist.slice(0,3);
 
-      html+=`<div class="czm-srch-section-lbl" style="margin-top:16px;">Artis</div>`;
       html+=`
       <div class="czm-artist-card">
-        <div class="czm-ac-header" onclick="czmCloseSearch();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){if(typeof czmOpenArtistPage==='function')czmOpenArtistPage(decodeURIComponent('${encodedKey}'));},50)">
+        <div class="czm-ac-header" onclick="czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){if(typeof czmOpenArtistPage==='function')czmOpenArtistPage(decodeURIComponent('${encodedKey}'));},200)">
           <div class="czm-ac-avatar"><img src="${a.image}" loading="lazy" onerror="this.style.display='none'"></div>
           <div class="czm-ac-info">
             <div class="czm-ac-name">${a.name}</div>
@@ -1097,16 +1088,16 @@ window.czmDoSearch=function(q){
           <i class="fa-solid fa-chevron-right czm-ac-arrow"></i>
         </div>
         <div class="czm-ac-btns">
-          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmShuffleArtist(decodeURIComponent('${encodedKey}'));},50)">
+          <button class="czm-ac-btn czm-ac-btn-acak" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmShuffleArtist(decodeURIComponent('${encodedKey}'));},200)">
             <i class="fa-solid fa-shuffle"></i> Acak
           </button>
-          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayArtistFirst(decodeURIComponent('${encodedKey}'));},50)">
+          <button class="czm-ac-btn czm-ac-btn-radio" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayArtistFirst(decodeURIComponent('${encodedKey}'));},200)">
             <i class="fa-solid fa-circle-dot"></i> Radio
           </button>
         </div>
         <div class="czm-ac-songs">
           ${cardSongs.map(s=>`
-          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},50)">
+          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},200)">
             <img class="czm-ac-song-img" src="${s.image}" loading="lazy">
             <div class="czm-ac-song-info">
               <div class="czm-ac-song-title">${s.title}</div>
@@ -1117,13 +1108,25 @@ window.czmDoSearch=function(q){
         </div>
       </div>`;
     }
+
+    // --- BAGIAN 2: Daftar Lagu di BAWAH card artis ---
+    html+=`<div class="czm-srch-section-lbl" style="margin-top:12px;">Lagu</div>`;
+    html+=found.map(s=>`
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},200)">
+        <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+        <div class="czm-q-info">
+          <div class="czm-q-title">${s.title}</div>
+          <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
+        </div>
+        <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </div>`).join('');
   }
 
   /* ── CHIP: LAGU → daftar lagu saja, tanpa card artis ── */
   if(czmSrchChipActive==='lagu' || czmSrchChipActive==='trend' || czmSrchChipActive==='sad'){
     html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},50)">
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},200)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
