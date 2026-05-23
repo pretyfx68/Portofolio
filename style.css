@@ -4652,6 +4652,18 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-q-hist-ico { width:40px; height:40px; border-radius:50%; background:#1e3550; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:14px; flex-shrink:0; }
 #music .czm-q-fill-btn { background:none; border:none; color:#666; font-size:14px; cursor:pointer; padding:6px 10px; flex-shrink:0; transform:rotate(180deg); -webkit-tap-highlight-color:transparent; }
 
+/* Recent searches grid thumbnail */
+#music .czm-recent-grid { display:flex; gap:10px; padding:6px 14px 14px; overflow-x:auto; scrollbar-width:none; }
+#music .czm-recent-grid::-webkit-scrollbar { display:none; }
+#music .czm-recent-grid-item { flex-shrink:0; width:80px; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+#music .czm-recent-grid-item img { width:80px; height:80px; border-radius:6px; object-fit:cover; display:block; background:#1a2d42; }
+#music .czm-recent-grid-lbl { font-size:11px; color:#ccc; margin-top:5px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#music .czm-recent-grid-item:active img { opacity:0.7; }
+
+/* Artis circle di histori */
+#music .czm-q-artist-circle { width:46px; height:46px; border-radius:50%; overflow:hidden; flex-shrink:0; background:#1a2d42; }
+#music .czm-q-artist-circle img { width:100%; height:100%; object-fit:cover; }
+
 /* ===== ARTIST CARD — YT Music style ===== */
 #music .czm-artist-card {
   background:#161e2e;
