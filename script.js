@@ -1070,51 +1070,69 @@ window.czmSearchTyping = function(val){
   const chips=document.getElementById('czm-srch-chips');
   const r=document.getElementById('czm-search-res');
   if(clr) clr.style.display=val?'flex':'none';
+  if(chips) chips.style.display='none'; // chip sembunyikan saat ngetik
 
-  // Chip SELALU disembunyikan saat ngetik — muncul hanya setelah Enter
-  if(chips) chips.style.display='none';
+  if(!val){ czmRenderRecentSearches(); return; }
 
-  if(!val){
-    czmRenderRecentSearches();
-    return;
-  }
-
-  // Tampil suggestion: histori yang cocok + artis yang cocok (seperti YT Music)
   const query = val.trim().toLowerCase();
-  let html = '';
+  const tokens = query.split(/\s+/).filter(Boolean);
+  const pl = czmGetPlaylist();
+  const allSongs = pl ? pl.slice(1) : [];
 
-  // Histori yang mengandung query
+  // --- Kumpulkan suggestion teks dari judul lagu ---
+  const titleSuggestions = [];
+  const seen = new Set();
+  allSongs.forEach(s=>{
+    if(tokens.every(tok=>s.title.toLowerCase().includes(tok))){
+      const key = s.title.toLowerCase();
+      if(!seen.has(key)){ seen.add(key); titleSuggestions.push(s.title); }
+    }
+  });
+
+  // --- Histori yang cocok ---
   const matchedQ = czmRecentSearches.filter(q=>q.toLowerCase().includes(query));
 
-  // Artis yang cocok dari const artists
+  // --- Artis yang cocok ---
   const matchedArtists = [];
   if(typeof artists !== 'undefined'){
     Object.keys(artists).forEach(k=>{
-      if(artists[k].name.toLowerCase().includes(query) || k.toLowerCase().includes(query)){
+      if(artists[k].name.toLowerCase().includes(query) || k.toLowerCase().includes(query))
         matchedArtists.push({key:k, a:artists[k]});
-      }
     });
   }
 
-  // Render histori teks dulu (icon jam + panah)
-  matchedQ.slice(0,5).forEach(q=>{
-    html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,"&#39;")}';czmSearchTyping('${q.replace(/'/g,"&#39;")}')">
+  // --- Lagu yang cocok (thumbnail) ---
+  const matchedSongs = allSongs.filter(s=>{
+    const text=(s.title+' '+s.artist).toLowerCase();
+    return tokens.every(tok=>text.includes(tok));
+  });
+
+  let html = '';
+
+  // 1. Histori teks (icon jam)
+  matchedQ.slice(0,3).forEach(q=>{
+    const safe = q.replace(/'/g,"&#39;");
+    html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${safe}';czmDoSearch('${safe}')">
       <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
-      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,"&#39;")}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
     </div>`;
   });
 
-  // Kalau tidak ada histori cocok, tampil query saat ini sebagai suggestion teks
-  if(!matchedQ.length){
-    html += `<div class="czm-qitem czm-qitem-recent" onclick="czmDoSearch('${val.replace(/'/g,"&#39;")}')">
-      <div class="czm-q-hist-ico" style="background:none"><i class="fa-solid fa-magnifying-glass" style="color:#888"></i></div>
-      <div class="czm-q-info"><div class="czm-q-title">${val}</div></div>
+  // 2. Suggestion teks dari judul lagu (icon kaca pembesar)
+  titleSuggestions.slice(0,5).forEach(title=>{
+    const safe = title.replace(/'/g,"&#39;");
+    // Bold bagian yang cocok dengan query
+    const highlighted = title.replace(new RegExp(`(${val.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<b>$1</b>');
+    html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${safe}';czmDoSearch('${safe}')">
+      <div class="czm-q-hist-ico" style="background:none"><i class="fa-solid fa-magnifying-glass" style="color:#888;font-size:15px"></i></div>
+      <div class="czm-q-info"><div class="czm-q-title">${highlighted}</div></div>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
     </div>`;
-  }
+  });
 
-  // Render artis yang cocok
-  matchedArtists.slice(0,3).forEach(({key,a})=>{
+  // 3. Artis yang cocok (foto bulat)
+  matchedArtists.slice(0,2).forEach(({key,a})=>{
     const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     html += `<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
       <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
@@ -1126,7 +1144,19 @@ window.czmSearchTyping = function(val){
     </div>`;
   });
 
-  if(r) r.innerHTML = html || `<div style="text-align:center;color:#444;padding:40px 0;font-size:13px;">Tekan Enter untuk mencari</div>`;
+  // 4. Lagu yang cocok (thumbnail) — max 3
+  matchedSongs.slice(0,3).forEach(s=>{
+    html += `<div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
+      <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+      <div class="czm-q-info">
+        <div class="czm-q-title">${s.title}</div>
+        <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
+      </div>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>`;
+  });
+
+  if(r) r.innerHTML = html || `<div style="text-align:center;color:#444;padding:40px 0;font-size:13px;opacity:0.5">Tidak ada hasil</div>`;
 };
 
 window.czmOpenSearch = function(){
