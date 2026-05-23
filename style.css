@@ -3508,7 +3508,7 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 }
 /* Setiap item dalam kolom */
 #music .czm-qitem {
-  display:flex; align-items:center; gap:12px; padding:9px 14px;
+  display:flex; align-items:center; gap:12px; padding:9px 5px;
   cursor:pointer; transition:background .15s; -webkit-tap-highlight-color:transparent;
   position:relative;
 }
