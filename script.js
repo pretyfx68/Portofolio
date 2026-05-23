@@ -3,6 +3,9 @@
    Bridge ke: audio, playlist, currentRealIndex, isPlaying, loadSongByIndex, playAudio, pauseAudio
    ============================================================ */
 
+var czmSearchWasOpen = false;  // apakah search aktif saat player dibuka
+var czmLastSearchQuery = '';   // query terakhir di search
+
 
 function togglePanel(btn){
   const overlay = document.getElementById("panelOverlay");
@@ -855,10 +858,8 @@ setInterval(czmTickProgress,500);
 
 /* ---------- navigation ---------- */
 window.czmOpenPlayer=function(){
-  // Tandai apakah search sedang terbuka saat ini
-  const searchOv = document.getElementById('czm-search-ov');
-  czmSearchWasOpen = !!(searchOv && searchOv.classList.contains('czm-on'));
   // Sembunyikan search overlay saat player terbuka
+  const searchOv = document.getElementById('czm-search-ov');
   if(searchOv) searchOv.classList.remove('czm-on');
 
   document.getElementById('czm-home').classList.remove('czm-on');
@@ -966,7 +967,6 @@ window.czmGoHome=function(){
 /* ===== SEARCH YT MUSIC STYLE ===== */
 let czmSrchChipActive = 'semua';
 let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]').slice(0,20);
-let czmSearchWasOpen = false; // track apakah search terbuka saat player dibuka
 
 function czmSaveRecentQ(q){
   if(!q || q.trim().length < 2) return;
@@ -1097,9 +1097,6 @@ window.czmSearchTyping = function(val){
       <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`).join('');
 };
-
-// Simpan query terakhir agar bisa di-restore
-let czmLastSearchQuery = '';
 
 window.czmOpenSearch = function(){
   document.getElementById('czm-search-ov').classList.add('czm-on');
