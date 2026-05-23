@@ -1645,7 +1645,7 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
       <div class="czm-pill"        data-f="sad"      onclick="czmMood(this,'sad')">Sedih</div>
       <div class="czm-pill"        data-f="senang"   onclick="czmMood(this,'senang')">Senang</div>
       <div class="czm-pill"        data-f="trending" onclick="czmMood(this,'trending')">Trending</div>
-      <div class="czm-pill"        data-f="baru"     onclick="czmMood(this,'baru')">Baru</div>
+      <div class="czm-pill"        data-f="baru"     onclick="czmMood(this,'baru')">Bersantai</div>
     </div>
   </div>
   <div class="czm-home-body" id="czm-home-body"></div>
@@ -1826,14 +1826,37 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
 
 <!-- SEARCH OVERLAY -->
 <div class="czm-search-ov" id="czm-search-ov">
-  <div class="czm-search-bar">
+  <!-- Top bar: back + search input + mic + eq -->
+  <div class="czm-search-bar" id="czm-search-bar">
     <button class="czm-icon-btn" onclick="czmCloseSearch()"><i class="fa-solid fa-arrow-left"></i></button>
     <div class="czm-search-input-wrap">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="czm-search-inp" placeholder="Cari lagu, artis..." oninput="czmDoSearch(this.value)">
+      <i class="fa-solid fa-magnifying-glass czm-srch-ico"></i>
+      <input type="text" id="czm-search-inp" placeholder="Cari lagu, artis..." oninput="czmDoSearch(this.value)" autocomplete="off">
+      <button class="czm-srch-clear" id="czm-srch-clear" onclick="document.getElementById('czm-search-inp').value='';czmDoSearch('');this.style.display='none';" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    <button class="czm-icon-btn czm-srch-mic" title="Cari dengan suara"><i class="fa-solid fa-microphone"></i></button>
   </div>
-  <div class="czm-search-res" id="czm-search-res"></div>
+
+  <!-- Filter tabs: CyberZain Music | Koleksi -->
+  <div class="czm-srch-tabs" id="czm-srch-tabs" style="display:none;">
+    <button class="czm-srch-tab active" id="czm-stab-music" onclick="czmSrchTab('music',this)">CyberZain Music</button>
+    <button class="czm-srch-tab" id="czm-stab-koleksi" onclick="czmSrchTab('koleksi',this)">Koleksi</button>
+    <button class="czm-srch-tab" id="czm-stab-device" onclick="czmSrchTab('device',this)">File Perangkat</button>
+  </div>
+
+  <!-- Filter chips: Artis | Video | Lagu | Playlist -->
+  <div class="czm-srch-chips" id="czm-srch-chips" style="display:none;">
+    <button class="czm-srch-chip active" data-chip="all"    onclick="czmSrchChip('all',this)">Artis</button>
+    <button class="czm-srch-chip"        data-chip="lagu"   onclick="czmSrchChip('lagu',this)">Lagu</button>
+    <button class="czm-srch-chip"        data-chip="trend"  onclick="czmSrchChip('trend',this)">Trending</button>
+    <button class="czm-srch-chip"        data-chip="sad"    onclick="czmSrchChip('sad',this)">Sedih</button>
+  </div>
+
+  <!-- Result area -->
+  <div class="czm-search-res" id="czm-search-res">
+    <!-- Recent searches shown when no query -->
+    <div id="czm-recent-searches"></div>
+  </div>
 </div>
 
 <!-- NOW PLAYING BAR (dipindah ke body level) -->

@@ -933,41 +933,176 @@ window.czmGoHome=function(){
 };
 
 /* ---------- search overlay ---------- */
+/* ===== SEARCH YT MUSIC STYLE ===== */
+let czmSrchChipActive = 'all';
+let czmSrchTabActive  = 'music';
+let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]');
+
+function czmSaveRecentQ(q){
+  if(!q) return;
+  czmRecentSearches = [q, ...czmRecentSearches.filter(x=>x!==q)].slice(0,8);
+  localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
+}
+
+function czmRenderRecentSearches(){
+  const box = document.getElementById('czm-search-res'); if(!box) return;
+  if(!czmRecentSearches.length){
+    box.innerHTML='<div style="text-align:center;color:#444;padding:60px 0;font-size:13px;"><i class="fa-solid fa-magnifying-glass" style="font-size:28px;margin-bottom:12px;display:block;opacity:0.25;"></i>Ketik untuk mencari lagu</div>';
+    return;
+  }
+  box.innerHTML = `<div class="czm-srch-section-lbl">Pencarian terbaru</div>` +
+    czmRecentSearches.map(q=>`
+      <div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,'&#39;')}';czmDoSearch('${q.replace(/'/g,'&#39;')}')">
+        <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div class="czm-q-info">
+          <div class="czm-q-title">${q}</div>
+        </div>
+        <button class="czm-q-fill-btn" title="Isi ulang" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,'&#39;')}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+      </div>`).join('');
+}
+
 window.czmOpenSearch=function(){
   document.getElementById('czm-search-ov').classList.add('czm-on');
   setTimeout(()=>{const i=document.getElementById('czm-search-inp');if(i)i.focus();},100);
-  // Sesuaikan padding bawah search result dengan tinggi npbar
   const npbar=document.getElementById('czm-npbar');
   const res=document.getElementById('czm-search-res');
   if(res){
     const npH = (npbar && npbar.classList.contains('czm-vis')) ? npbar.offsetHeight : 0;
     res.style.paddingBottom = (npH + 6) + 'px';
   }
+  // hide tabs+chips, show recent
+  const tabs = document.getElementById('czm-srch-tabs');
+  const chips = document.getElementById('czm-srch-chips');
+  if(tabs) tabs.style.display='none';
+  if(chips) chips.style.display='none';
+  czmRenderRecentSearches();
 };
+
 window.czmCloseSearch=function(){
   document.getElementById('czm-search-ov').classList.remove('czm-on');
   const i=document.getElementById('czm-search-inp');if(i)i.value='';
+  const clr=document.getElementById('czm-srch-clear');if(clr)clr.style.display='none';
   const r=document.getElementById('czm-search-res');if(r){r.innerHTML='';r.style.paddingBottom='';}
+  const tabs = document.getElementById('czm-srch-tabs');
+  const chips = document.getElementById('czm-srch-chips');
+  if(tabs) tabs.style.display='none';
+  if(chips) chips.style.display='none';
+  czmSrchChipActive='all';czmSrchTabActive='music';
+  document.querySelectorAll('.czm-stab-tab,.czm-srch-tab,.czm-srch-chip').forEach(el=>el.classList.remove('active'));
+  const t0=document.getElementById('czm-stab-music');if(t0)t0.classList.add('active');
+  const c0=document.querySelector('.czm-srch-chip[data-chip="all"]');if(c0)c0.classList.add('active');
 };
+
+window.czmSrchTab=function(tab, el){
+  czmSrchTabActive=tab;
+  document.querySelectorAll('.czm-srch-tab').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const q=document.getElementById('czm-search-inp')?.value||'';
+  czmDoSearch(q);
+};
+
+window.czmSrchChip=function(chip, el){
+  czmSrchChipActive=chip;
+  document.querySelectorAll('.czm-srch-chip').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const q=document.getElementById('czm-search-inp')?.value||'';
+  czmDoSearch(q);
+};
+
 window.czmDoSearch=function(q){
   const r=document.getElementById('czm-search-res');if(!r)return;
+  const clr=document.getElementById('czm-srch-clear');
+  const tabs=document.getElementById('czm-srch-tabs');
+  const chips=document.getElementById('czm-srch-chips');
   const query=q.trim().toLowerCase();
-  if(!query){r.innerHTML='';return;}
+
+  // show/hide clear btn
+  if(clr) clr.style.display=q?'flex':'none';
+
+  if(!query){
+    if(tabs)tabs.style.display='none';
+    if(chips)chips.style.display='none';
+    czmRenderRecentSearches();
+    return;
+  }
+
+  // show tabs + chips on first query
+  if(tabs)tabs.style.display='flex';
+  if(chips)chips.style.display='flex';
+
   const pl=czmGetPlaylist();if(!pl)return;
   const tokens=query.split(/\s+/).filter(Boolean);
-  const found=pl.slice(1).filter(s=>{
+  let songs=pl.slice(1);
+
+  // apply chip filter
+  if(czmSrchChipActive==='lagu'){
+    // songs only, no artist section
+  } else if(czmSrchChipActive==='trend'){
+    songs=songs.filter(s=>(s.tags||[]).includes('trend'));
+  } else if(czmSrchChipActive==='sad'){
+    songs=songs.filter(s=>(s.tags||[]).includes('sad'));
+  }
+
+  const found=songs.filter(s=>{
     const text=(s.title+' '+s.artist+' '+(s.tags||[]).join(' ')).toLowerCase();
     return tokens.every(tok=>text.includes(tok));
   });
-  if(!found.length){r.innerHTML='<div style="text-align:center;color:#555;padding:48px 0;font-size:14px;">Tidak ditemukan</div>';return;}
-  r.innerHTML=found.map(s=>`
-    <div class="czm-qitem" onclick="czmCloseSearch();czmPlayById('${s.id}',true)">
+
+  if(!found.length){
+    r.innerHTML=`<div style="text-align:center;color:#555;padding:60px 0;font-size:14px;">
+      <i class="fa-solid fa-music" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.2;"></i>
+      Tidak ada hasil untuk <b style="color:#ccc">"${q}"</b></div>`;
+    return;
+  }
+
+  // Build artist groups
+  const artistMap={};
+  found.forEach(s=>{
+    const a=s.artist||'Unknown';
+    if(!artistMap[a]) artistMap[a]={name:a,songs:[],img:s.image,totalViews:0};
+    artistMap[a].songs.push(s);
+    artistMap[a].totalViews+=(s.views||0);
+  });
+  const artists=Object.values(artistMap).sort((a,b)=>b.totalViews-a.totalViews);
+
+  let html='';
+
+  // ARTIST SECTION (only for 'all' chip)
+  if(czmSrchChipActive==='all' && artists.length){
+    const topArtists=artists.slice(0,3);
+    html+=`<div class="czm-srch-section-lbl">Artis</div>`;
+    html+=topArtists.map(a=>`
+      <div class="czm-qitem czm-qitem-artist" onclick="czmCloseSearch();czmSearchAndPlayArtist('${a.name.replace(/'/g,'&#39;')}')">
+        <div class="czm-q-artist-img"><img src="${a.img}" loading="lazy" style="width:100%;height:100%;object-fit:cover;"></div>
+        <div class="czm-q-info">
+          <div class="czm-q-title" style="font-weight:700">${a.name}</div>
+          <div class="czm-q-sub">${fv(a.totalViews)} pemutaran bulanan</div>
+        </div>
+        <button class="czm-q-more-btn" onclick="event.stopPropagation();" title="Opsi"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      </div>`).join('');
+  }
+
+  // SONGS SECTION
+  const topSongs = czmSrchChipActive==='all' ? found.slice(0,10) : found;
+  html+=`<div class="czm-srch-section-lbl" style="margin-top:${czmSrchChipActive==='all'?'4px':'0'}">Lagu</div>`;
+  html+=topSongs.map(s=>`
+    <div class="czm-qitem" onclick="czmSaveRecentQ('${q.replace(/'/g,'&#39;')}');czmCloseSearch();czmPlayById('${s.id}',true)">
       <img class="czm-q-thumb" src="${s.image}" loading="lazy">
       <div class="czm-q-info">
         <div class="czm-q-title">${s.title}</div>
-        <div class="czm-q-sub">${s.artist} • ${fv(s.views)} pemutaran</div>
+        <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
       </div>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}')" title="Opsi"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`).join('');
+
+  r.innerHTML=html;
+};
+
+window.czmSearchAndPlayArtist=function(artist){
+  // Play first song by that artist
+  const pl=czmGetPlaylist();if(!pl)return;
+  const s=pl.slice(1).find(x=>x.artist===artist);
+  if(s) czmPlayById(s.id,true);
 };
 
 /* ---------- filter chips untuk tab BERIKUTNYA ---------- */
@@ -3462,6 +3597,12 @@ const songs = {
        artist: "Justin Bieber",
        tags: ["senang","jastin biber"],
        views: 1490000000},
+ 115: { audio: "https://github.com/PretyFX69/music-files/raw/refs/heads/main/Baby.mp3", 
+       image: "https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/1_00912028-eddb-4830-a8b1-2649bacd9929.jpg", 
+       title: "Baby (feat. Ludacris)", 
+       artist: "Justin Bieber",
+       tags: ["bebi o","jastin biber","trend","senang"],
+       views: 4794800000},
 }; 
 
 const playlist = Object.keys(songs).map(k => ({ id: k, ...songs[k] }));

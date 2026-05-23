@@ -3508,12 +3508,12 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 }
 /* Setiap item dalam kolom */
 #music .czm-qitem {
-  display:flex; align-items:center; gap:12px; padding:9px 0;
-  cursor:pointer; border-radius:8px; transition:background .15s; -webkit-tap-highlight-color:transparent;
+  display:flex; align-items:center; gap:12px; padding:9px 14px;
+  cursor:pointer; transition:background .15s; -webkit-tap-highlight-color:transparent;
   position:relative;
 }
-#music .czm-qitem:active { background:rgba(255,255,255,0.05); padding-left:8px; margin-left:-8px; }
-#music .czm-q-thumb { width:54px; height:54px; border-radius:5px; object-fit:cover; flex-shrink:0; background:#242424; }
+#music .czm-qitem:active { background:rgba(255,255,255,0.06); }
+#music .czm-q-thumb { width:52px; height:52px; border-radius:5px; object-fit:cover; flex-shrink:0; background:#1a2d42; }
 #music .czm-q-info  { flex:1; min-width:0; }
 #music .czm-q-title { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 #music .czm-q-sub   { font-size:12px; color:#aaa; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -4619,13 +4619,42 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 }
 
 /* ===== SEARCH OVERLAY ===== */
-#music .czm-search-ov { display:none!important; position:fixed; inset:0; z-index:10003; background:#0f2035; flex-direction:column;  }
+#music .czm-search-ov { display:none!important; position:fixed; inset:0; z-index:10003; background:#0a1628; flex-direction:column; }
 #music .czm-search-ov.czm-on { display:flex!important; }
-#music .czm-search-bar { padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.09); }
-#music .czm-search-input-wrap { flex:1; display:flex; align-items:center; gap:10px; background:#152840; border-radius:24px; padding:10px 16px; }
-#music .czm-search-input-wrap i { color:#555; font-size:14px; }
-#music #czm-search-inp { flex:1; background:none; border:none; color:#fff; font-size:15px; outline:none; }
-#music .czm-search-res { flex:1; overflow-y:auto; padding:16px; }
+#music .czm-search-bar { padding:10px 12px; display:flex; align-items:center; gap:8px; background:#0a1628; flex-shrink:0; }
+#music .czm-search-input-wrap { flex:1; display:flex; align-items:center; gap:8px; background:#1a2d42; border-radius:24px; padding:10px 14px; }
+#music .czm-srch-ico { color:#666; font-size:14px; flex-shrink:0; }
+#music #czm-search-inp { flex:1; background:none; border:none; color:#fff; font-size:15px; outline:none; font-family:inherit; }
+#music .czm-srch-clear { background:none; border:none; color:#666; font-size:16px; cursor:pointer; padding:0 2px; display:flex; align-items:center; flex-shrink:0; }
+#music .czm-srch-mic { color:#aaa; font-size:18px; flex-shrink:0; }
+
+/* Filter Tabs: CyberZain Music | Koleksi */
+#music .czm-srch-tabs { display:flex; gap:0; padding:0 14px; background:#0a1628; flex-shrink:0; border-bottom:1px solid rgba(255,255,255,0.07); overflow-x:auto; scrollbar-width:none; }
+#music .czm-srch-tabs::-webkit-scrollbar { display:none; }
+#music .czm-srch-tab { background:none; border:none; color:#aaa; font-size:13px; font-weight:600; padding:10px 14px; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:color .15s,border-color .15s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+#music .czm-srch-tab.active { color:#fff; border-bottom-color:#fff; }
+
+/* Filter Chips: Artis | Lagu | Trending | Sedih */
+#music .czm-srch-chips { display:flex; gap:8px; padding:10px 14px; background:#0a1628; flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
+#music .czm-srch-chips::-webkit-scrollbar { display:none; }
+#music .czm-srch-chip { background:#1e3550; border:none; color:#ccc; font-size:13px; font-weight:600; padding:7px 16px; border-radius:20px; cursor:pointer; white-space:nowrap; transition:background .15s,color .15s; -webkit-tap-highlight-color:transparent; font-family:inherit; }
+#music .czm-srch-chip.active { background:#fff; color:#000; }
+
+#music .czm-search-res { flex:1; overflow-y:auto; padding:0 0 80px; }
+
+/* Section label */
+#music .czm-srch-section-lbl { font-size:12px; font-weight:700; color:#aaa; padding:14px 16px 6px; letter-spacing:0.04em; text-transform:uppercase; }
+
+/* Recent search item */
+#music .czm-qitem-recent { padding:10px 14px; }
+#music .czm-q-hist-ico { width:40px; height:40px; border-radius:50%; background:#1e3550; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:14px; flex-shrink:0; }
+
+/* Artist item */
+#music .czm-qitem-artist .czm-q-artist-img { width:50px; height:50px; border-radius:50%; overflow:hidden; flex-shrink:0; background:#1a2d42; }
+
+/* More btn on items */
+#music .czm-q-more-btn { background:none; border:none; color:#666; font-size:16px; cursor:pointer; padding:6px 10px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
+#music .czm-q-fill-btn { background:none; border:none; color:#666; font-size:14px; cursor:pointer; padding:6px 10px; flex-shrink:0; transform:rotate(180deg); -webkit-tap-highlight-color:transparent; }
 
 /* ===== BOTTOM SHEET ===== */
 #music .czm-bs-ov   { display:none; position:fixed; inset:0; background:rgba(15,32,53,0.5); z-index:10060; }
