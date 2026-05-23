@@ -943,22 +943,42 @@ function czmSaveRecentQ(q){
   localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
 }
 
-function czmRenderRecentSearches(){
-  const box = document.getElementById('czm-search-res'); if(!box) return;
-  if(!czmRecentSearches.length){
-    box.innerHTML='<div style="text-align:center;color:#444;padding:60px 0;font-size:13px;"><i class="fa-solid fa-magnifying-glass" style="font-size:28px;margin-bottom:12px;display:block;opacity:0.25;"></i>Ketik untuk mencari lagu</div>';
-    return;
-  }
-  box.innerHTML = `<div class="czm-srch-section-lbl">Pencarian terbaru</div>` +
-    czmRecentSearches.map(q=>`
-      <div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,'&#39;')}';czmDoSearch('${q.replace(/'/g,'&#39;')}')">
+// 1. Fungsi Utama (Jangan potong di tengah!)
+// --- AREA CZM ENGINE (Cari lokasi fungsi czmRenderHome, taruh di bawahnya) ---
+
+// 1. Ganti fungsi czmRenderRecentSearches yang lama dengan ini:
+function czmRenderRecentSearches() {
+    const box = document.getElementById('czm-search-res');
+    if (!box) return;
+
+    if (!czmRecentSearches.length) {
+        box.innerHTML = '<div style="text-align:center;color:#444;padding:60px 0;font-size:13px;"><i class="fa-solid fa-magnifying-glass" style="font-size:28px;margin-bottom:12px;display:block;opacity:0.25;"></i>Ketik untuk mencari lagu</div>';
+        return;
+    }
+
+    // Ini adalah versi yang benar (sudah pakai setTimeout/Fix 3)
+    box.innerHTML = `<div class="czm-srch-section-lbl">Pencarian terbaru</div>` +
+    czmRecentSearches.map(q => `
+      <div class="czm-qitem czm-qitem-recent" onclick="setTimeout(function(){ czmCloseSearch(); document.getElementById('czm-search-inp').value='${q.replace(/'/g, '&#39;')}'; czmDoSearch('${q.replace(/'/g, '&#39;')}'); }, 200)">
         <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
         <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
-        <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,'&#39;')}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+        <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g, '&#39;')}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
       </div>`).join('');
-}
+} 
 
-window.czmOpenSearch=function(){
+// 2. Tambahkan fungsi baru (Fix 2) persis di bawah kurung tutup } fungsi di atas:
+window.czmSearchTyping = function(val) {
+  const clr = document.getElementById('czm-srch-clear');
+  const chips = document.getElementById('czm-srch-chips');
+  if (clr) clr.style.display = val ? 'flex' : 'none';
+  if (!val) { 
+      if(chips) chips.style.display='none'; 
+      czmRenderRecentSearches(); 
+  }
+};
+
+// 3. Pastikan fungsi czmOpenSearch Anda adalah versi ini:
+window.czmOpenSearch = function(){
   document.getElementById('czm-search-ov').classList.add('czm-on');
   setTimeout(()=>{const i=document.getElementById('czm-search-inp');if(i)i.focus();},100);
   const npbar=document.getElementById('czm-npbar');
@@ -1097,7 +1117,7 @@ window.czmDoSearch=function(q){
         </div>
         <div class="czm-ac-songs">
           ${cardSongs.map(s=>`
-          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},200)">
+          <div class="czm-ac-song" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){czmCloseSearch();czmPlayById('${s.id}',true);},50)">
             <img class="czm-ac-song-img" src="${s.image}" loading="lazy">
             <div class="czm-ac-song-info">
               <div class="czm-ac-song-title">${s.title}</div>
@@ -1112,7 +1132,7 @@ window.czmDoSearch=function(q){
     // --- BAGIAN 2: Daftar Lagu di BAWAH card artis ---
     html+=`<div class="czm-srch-section-lbl" style="margin-top:12px;">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},200)">
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){czmCloseSearch();czmPlayById('${s.id}',true);},50)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
@@ -1126,7 +1146,7 @@ window.czmDoSearch=function(q){
   if(czmSrchChipActive==='lagu' || czmSrchChipActive==='trend' || czmSrchChipActive==='sad'){
     html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
     html+=found.map(s=>`
-      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));czmCloseSearch();setTimeout(function(){czmPlayById('${s.id}',true);},200)">
+      <div class="czm-qitem" onclick="event.stopPropagation();czmSaveRecentQ(decodeURIComponent('${encodeURIComponent(q)}'));setTimeout(function(){czmCloseSearch();czmPlayById('${s.id}',true);},50)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
@@ -1149,16 +1169,14 @@ window.czmPlayArtistFirst=function(key){
 /* Shuffle artis */
 window.czmShuffleArtist=function(key){
   const pl=czmGetPlaylist();if(!pl)return;
-  const songs=pl.slice(1).filter(x=>czmFindArtistKey(x.artist||'')===key||x.artist===key);
+  const lkey=key.toLowerCase();
+  const songs=pl.slice(1).filter(x=>(x.artist||'').toLowerCase().includes(lkey.split(/[&,]/)[0].trim()));
   if(!songs.length)return;
-  // aktifkan shuffle global
   window.czmShuffleOn=true;
   const btn=document.getElementById('czm-shuffle-btn');
   if(btn){btn.classList.add('active');btn.style.color='#00d9ff';}
-  const s=songs[Math.floor(Math.random()*songs.length)];
-  czmPlayById(s.id,true);
+  czmPlayById(songs[Math.floor(Math.random()*songs.length)].id,true);
 };
-
 /* ---------- filter chips untuk tab BERIKUTNYA ---------- */
 let czmPlFilter = 'all';
 

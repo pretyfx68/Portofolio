@@ -4693,6 +4693,10 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
   transition:background .13s;
 }
 #music .czm-ac-song:active { background:rgba(255,255,255,0.05); }
+#music .czm-ac-song, #music .czm-ac-header, #music .czm-ac-btn, #music .czm-qitem {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 #music .czm-ac-song-img { width:46px; height:46px; border-radius:4px; object-fit:cover; flex-shrink:0; background:#1a2d42; }
 #music .czm-ac-song-info { flex:1; min-width:0; }
 #music .czm-ac-song-title { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -7916,4 +7920,3 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 #czm-artist-page {
   overscroll-behavior-y: contain;
 }
-body.czm-restoring { visibility: hidden; }
