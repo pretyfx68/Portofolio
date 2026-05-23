@@ -3487,9 +3487,18 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-sec-link  { font-size:13px; color:#666; cursor:pointer; transition:color .2s; }
 #music .czm-sec-link:hover { color:#aaa; }
 #music .czm-play-all {
-  display:flex; align-items:center; gap:8px; background:none;
-  border:1px solid rgba(255,255,255,0.18); color:#fff; border-radius:20px;
-  padding:7px 18px; font-size:13px; font-weight:600; cursor:pointer; transition:background .2s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:none;
+  border:1px solid rgba(255,255,255,0.18);
+  color:#fff;
+  border-radius:16px;
+  padding:5px 14px;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .2s;
 }
 #music .czm-play-all:hover { background:rgba(255,255,255,0.08); }
 #music .czm-play-all i { font-size:10px; }
