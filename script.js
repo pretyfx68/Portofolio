@@ -928,6 +928,16 @@ window.czmGoHome=function(){
     document.getElementById('czm-home').classList.add('czm-on');
     const topBar = document.querySelector('.top-bar');
     if(topBar) topBar.style.display = '';
+    // Restore query & hasil terakhir
+    if(czmLastSearchQuery){
+      const inp=document.getElementById('czm-search-inp');
+      if(inp) inp.value=czmLastSearchQuery;
+      const clr=document.getElementById('czm-srch-clear');
+      if(clr) clr.style.display='flex';
+      const chips=document.getElementById('czm-srch-chips');
+      if(chips) chips.style.display='flex';
+      czmDoSearch(czmLastSearchQuery);
+    }
     const _npbar = document.getElementById('czm-npbar');
     if(_npbar && _npbar.dataset.hasTrack==='1'){
       _npbar.classList.add('czm-vis');
@@ -1060,42 +1070,63 @@ window.czmSearchTyping = function(val){
   const chips=document.getElementById('czm-srch-chips');
   const r=document.getElementById('czm-search-res');
   if(clr) clr.style.display=val?'flex':'none';
+
+  // Chip SELALU disembunyikan saat ngetik — muncul hanya setelah Enter
+  if(chips) chips.style.display='none';
+
   if(!val){
-    if(chips) chips.style.display='none';
     czmRenderRecentSearches();
     return;
   }
-  if(chips) chips.style.display='flex';
 
-  const pl=czmGetPlaylist();if(!pl||!r)return;
-  const query=val.trim().toLowerCase();
-  const tokens=query.split(/\s+/).filter(Boolean);
-  let allSongs=pl.slice(1);
+  // Tampil suggestion: histori yang cocok + artis yang cocok (seperti YT Music)
+  const query = val.trim().toLowerCase();
+  let html = '';
 
-  let filteredSongs=allSongs;
-  if(czmSrchChipActive==='trend') filteredSongs=allSongs.filter(s=>(s.tags||[]).includes('trend'));
-  else if(czmSrchChipActive==='sad') filteredSongs=allSongs.filter(s=>(s.tags||[]).includes('sad'));
+  // Histori yang mengandung query
+  const matchedQ = czmRecentSearches.filter(q=>q.toLowerCase().includes(query));
 
-  const found=filteredSongs.filter(s=>{
-    const text=(s.title+' '+s.artist+' '+(s.tags||[]).join(' ')).toLowerCase();
-    return tokens.every(tok=>text.includes(tok));
-  });
-
-  if(!found.length){
-    r.innerHTML=`<div style="text-align:center;color:#555;padding:60px 0;font-size:14px;"><i class="fa-solid fa-music" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.2;"></i>Tidak ada hasil untuk <b style="color:#ccc">"${val}"</b></div>`;
-    return;
+  // Artis yang cocok dari const artists
+  const matchedArtists = [];
+  if(typeof artists !== 'undefined'){
+    Object.keys(artists).forEach(k=>{
+      if(artists[k].name.toLowerCase().includes(query) || k.toLowerCase().includes(query)){
+        matchedArtists.push({key:k, a:artists[k]});
+      }
+    });
   }
 
-  // Hanya daftar lagu, tanpa card artis
-  r.innerHTML=`<div class="czm-srch-section-lbl">Lagu</div>`+found.map(s=>`
-    <div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
-      <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+  // Render histori teks dulu (icon jam + panah)
+  matchedQ.slice(0,5).forEach(q=>{
+    html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${q.replace(/'/g,"&#39;")}';czmSearchTyping('${q.replace(/'/g,"&#39;")}')">
+      <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${q.replace(/'/g,"&#39;")}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+    </div>`;
+  });
+
+  // Kalau tidak ada histori cocok, tampil query saat ini sebagai suggestion teks
+  if(!matchedQ.length){
+    html += `<div class="czm-qitem czm-qitem-recent" onclick="czmDoSearch('${val.replace(/'/g,"&#39;")}')">
+      <div class="czm-q-hist-ico" style="background:none"><i class="fa-solid fa-magnifying-glass" style="color:#888"></i></div>
+      <div class="czm-q-info"><div class="czm-q-title">${val}</div></div>
+    </div>`;
+  }
+
+  // Render artis yang cocok
+  matchedArtists.slice(0,3).forEach(({key,a})=>{
+    const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    html += `<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
+      <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
       <div class="czm-q-info">
-        <div class="czm-q-title">${s.title}</div>
-        <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
+        <div class="czm-q-title">${a.name}</div>
+        <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
       </div>
-      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-    </div>`).join('');
+      <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>`;
+  });
+
+  if(r) r.innerHTML = html || `<div style="text-align:center;color:#444;padding:40px 0;font-size:13px;">Tekan Enter untuk mencari</div>`;
 };
 
 window.czmOpenSearch = function(){
@@ -1106,30 +1137,27 @@ window.czmOpenSearch = function(){
     const npH=(npbar&&npbar.classList.contains('czm-vis'))?npbar.offsetHeight:0;
     res.style.paddingBottom=(npH+6)+'px';
   }
-  // Restore query & hasil terakhir
+  const chips=document.getElementById('czm-srch-chips');
+  if(chips) chips.style.display='none';
   const inp=document.getElementById('czm-search-inp');
-  if(inp && czmLastSearchQuery){
-    inp.value=czmLastSearchQuery;
-    const clr=document.getElementById('czm-srch-clear');
-    if(clr)clr.style.display='flex';
-    const chips=document.getElementById('czm-srch-chips');
-    if(chips)chips.style.display='flex';
-    // Re-render hasil terakhir (typing mode = lagu saja)
-    czmSearchTyping(czmLastSearchQuery);
-    setTimeout(()=>inp.focus(),100);
-  } else {
-    if(inp)inp.value='';
-    document.getElementById('czm-srch-chips').style.display='none';
-    czmRenderRecentSearches();
-    setTimeout(()=>{if(inp)inp.focus();},100);
-  }
+  if(inp) inp.value='';
+  const clr=document.getElementById('czm-srch-clear');
+  if(clr) clr.style.display='none';
+  czmRenderRecentSearches();
+  setTimeout(()=>{if(inp)inp.focus();},100);
 };
 
 window.czmCloseSearch=function(){
-  // Simpan query sebelum close
+  czmSearchWasOpen = false;
+  czmLastSearchQuery = '';
+
+  // Reset input & hasil → tampil histori
   const inp=document.getElementById('czm-search-inp');
-  czmLastSearchQuery=(inp&&inp.value)||'';
-  czmSearchWasOpen = false; // tombol ← = tutup search beneran
+  if(inp) inp.value='';
+  const clr=document.getElementById('czm-srch-clear');
+  if(clr) clr.style.display='none';
+  const chips=document.getElementById('czm-srch-chips');
+  if(chips) chips.style.display='none';
 
   const ov=document.getElementById('czm-search-ov');
   if(ov){
@@ -1142,7 +1170,9 @@ window.czmCloseSearch=function(){
 /* Hanya sembunyikan search sementara (saat putar lagu/buka artis dari search)
    → state tetap ada, saat balik dari player langsung muncul lagi */
 window.czmHideSearch=function(){
-  czmSearchWasOpen = true; // tandai: search harus muncul lagi saat balik
+  czmSearchWasOpen = true;
+  const inp=document.getElementById('czm-search-inp');
+  czmLastSearchQuery=(inp&&inp.value)||'';
   const ov=document.getElementById('czm-search-ov');
   if(ov) ov.classList.remove('czm-on');
 };
