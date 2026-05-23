@@ -855,6 +855,12 @@ setInterval(czmTickProgress,500);
 
 /* ---------- navigation ---------- */
 window.czmOpenPlayer=function(){
+  // Tandai apakah search sedang terbuka saat ini
+  const searchOv = document.getElementById('czm-search-ov');
+  czmSearchWasOpen = !!(searchOv && searchOv.classList.contains('czm-on'));
+  // Sembunyikan search overlay saat player terbuka
+  if(searchOv) searchOv.classList.remove('czm-on');
+
   document.getElementById('czm-home').classList.remove('czm-on');
   const playerEl = document.getElementById('czm-player');
   playerEl.classList.add('czm-on');
@@ -908,10 +914,26 @@ window.czmGoHome=function(){
     setTimeout(czmRunMarquee, 350);
     return; // jangan lanjut ke home
   }
-  // Tab tidak terbuka → kembali ke halaman utama atau playlist detail
+  // Tab tidak terbuka → cek apakah search sebelumnya terbuka
   playerEl.classList.remove('czm-on');
   const m = document.getElementById('czm-more-menu');
   if(m) m.classList.remove('open');
+
+  // Kalau search sedang terbuka sebelum player → balik ke search
+  if(czmSearchWasOpen){
+    czmSearchWasOpen = false;
+    const searchOv = document.getElementById('czm-search-ov');
+    if(searchOv) searchOv.classList.add('czm-on');
+    document.getElementById('czm-home').classList.add('czm-on');
+    const topBar = document.querySelector('.top-bar');
+    if(topBar) topBar.style.display = '';
+    const _npbar = document.getElementById('czm-npbar');
+    if(_npbar && _npbar.dataset.hasTrack==='1'){
+      _npbar.classList.add('czm-vis');
+      setTimeout(czmRunNpMarquee, 100);
+    }
+    return;
+  }
 
   // Kalau ada playlist aktif yang sedang dipilih, buka kembali playlist detail
   if(czmCurPlId){
@@ -943,11 +965,12 @@ window.czmGoHome=function(){
 /* ---------- search overlay ---------- */
 /* ===== SEARCH YT MUSIC STYLE ===== */
 let czmSrchChipActive = 'semua';
-let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]');
+let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]').slice(0,20);
+let czmSearchWasOpen = false; // track apakah search terbuka saat player dibuka
 
 function czmSaveRecentQ(q){
-  if(!q) return;
-  czmRecentSearches = [q, ...czmRecentSearches.filter(x=>x!==q)].slice(0,8);
+  if(!q || q.trim().length < 2) return;
+  czmRecentSearches = [q.trim(), ...czmRecentSearches.filter(x=>x!==q.trim())].slice(0,20);
   localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
 }
 

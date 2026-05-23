@@ -1831,7 +1831,7 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
     <button class="czm-icon-btn" onclick="czmCloseSearch()"><i class="fa-solid fa-arrow-left"></i></button>
     <div class="czm-search-input-wrap">
       <i class="fa-solid fa-magnifying-glass czm-srch-ico"></i>
-      <input type="text" id="czm-search-inp" placeholder="Cari lagu, artis..." oninput="czmDoSearch(this.value)" autocomplete="off">
+      <input type="text" id="czm-search-inp" placeholder="Cari lagu, artis..." oninput="czmSearchTyping(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();czmDoSearch(this.value);}" autocomplete="off">
       <button class="czm-srch-clear" id="czm-srch-clear" onclick="document.getElementById('czm-search-inp').value='';czmDoSearch('');this.style.display='none';" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
     </div>
   </div>
