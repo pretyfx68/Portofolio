@@ -944,6 +944,11 @@ window.czmOpenSearch=function(){
     res.style.paddingBottom = (npH + 6) + 'px';
   }
 };
+window.czmCloseSearch=function(){
+  document.getElementById('czm-search-ov').classList.remove('czm-on');
+  const i=document.getElementById('czm-search-inp');if(i)i.value='';
+  const r=document.getElementById('czm-search-res');if(r){r.innerHTML='';r.style.paddingBottom='';}
+};
 window.czmDoSearch=function(q){
   const r=document.getElementById('czm-search-res');if(!r)return;
   const query=q.trim().toLowerCase();
@@ -955,41 +960,14 @@ window.czmDoSearch=function(q){
     return tokens.every(tok=>text.includes(tok));
   });
   if(!found.length){r.innerHTML='<div style="text-align:center;color:#555;padding:48px 0;font-size:14px;">Tidak ditemukan</div>';return;}
-
-  const matchedArtistKey=Object.keys(artists).find(k=>k.toLowerCase().includes(query)||query.includes(k.toLowerCase()));
-  let html='';
-
-  if(matchedArtistKey){
-    const a=artists[matchedArtistKey];
-    const ek=matchedArtistKey.replace(/'/g,"\\'");
-    html+=`
-    <div style="background:#0f1e30;border-radius:12px;margin:12px 16px 8px;padding:16px;">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;cursor:pointer;" onclick="czmCloseSearch();czmOpenArtistPage('${ek}')">
-        <img src="${a.image}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;flex-shrink:0;">
-        <div style="flex:1;min-width:0;">
-          <div style="font-weight:700;font-size:16px;color:#fff;">${a.name}</div>
-          <div style="font-size:13px;color:#888;margin-top:2px;">${a.pendengar?a.pendengar+' pendengar bulanan':'Artis'}</div>
-        </div>
-        <i class="fa-solid fa-chevron-right" style="color:#555;font-size:14px;"></i>
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="czmCloseSearch();czmShuffleArtist('${ek}');" style="flex:1;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:20px;padding:9px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-shuffle"></i> Acak</button>
-        <button onclick="czmCloseSearch();czmOpenArtistPage('${ek}');" style="flex:1;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:20px;padding:9px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa-solid fa-tower-broadcast"></i> Radio</button>
-      </div>
-    </div>
-    <div style="padding:10px 16px 4px;font-size:12px;color:#888;font-weight:600;letter-spacing:1px;">LAGU</div>`;
-  }
-
-  html+=found.map(s=>`
+  r.innerHTML=found.map(s=>`
     <div class="czm-qitem" onclick="czmCloseSearch();czmPlayById('${s.id}',true)">
       <img class="czm-q-thumb" src="${s.image}" loading="lazy">
       <div class="czm-q-info">
         <div class="czm-q-title">${s.title}</div>
-        <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)} pemutaran</div>
+        <div class="czm-q-sub">${s.artist} • ${fv(s.views)} pemutaran</div>
       </div>
     </div>`).join('');
-
-  r.innerHTML=html;
 };
 
 /* ---------- filter chips untuk tab BERIKUTNYA ---------- */
@@ -10172,10 +10150,3 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.style.visibility = 'visible';
   }
 });
-window.czmShuffleArtist=function(artistKey){
-  const pl=czmGetPlaylist();if(!pl)return;
-  const songs=pl.slice(1).filter(s=>s.artist&&s.artist.toLowerCase().includes(artistKey.toLowerCase()));
-  if(!songs.length)return;
-  const shuffled=[...songs].sort(()=>Math.random()-0.5);
-  czmPlayById(shuffled[0].id,true);
-};
