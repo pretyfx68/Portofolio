@@ -94,7 +94,7 @@ function czmRenderHome(f){
   const quick=list.slice(0,25);       // 5 slides × 5 lagu
   const heroList=quick;               // hero SAMA dengan quick = 25 slide
   const grid =list.slice(5,14);
-  const trend=[...list].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,12);
+  const trend=czmGetList('trending');
   const body =document.getElementById('czm-home-body');
   if(!body)return;
   body.innerHTML=`
