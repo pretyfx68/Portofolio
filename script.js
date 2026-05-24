@@ -1067,7 +1067,7 @@ function czmRenderRecentSearches() {
       <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
       <button class="czm-q-del-btn" onclick="event.stopPropagation();czmDeleteRecentQ('${safe}')"><i class="fa-solid fa-xmark"></i></button>
-      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-right"></i></button>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-angles-left"></i></button>
     </div>`;
   });
 
