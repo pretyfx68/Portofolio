@@ -4638,8 +4638,8 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
   gap:8px;
   background:#1a2d42;
 
-  border-radius:18px;
-  padding:6px 12px;
+  border-radius:30px;
+  padding:1px 12px;
 }
 #music .czm-srch-ico { color:#666; font-size:14px; flex-shrink:0; }
 #music #czm-search-inp { flex:1; background:none; border:none; color:#fff; font-size:15px; outline:none; font-family:inherit; }
