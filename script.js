@@ -983,6 +983,14 @@ function czmSaveRecentQ(q){
   czmRecentSearches = [q.trim(), ...czmRecentSearches.filter(x=>x!==q.trim())].slice(0,20);
   localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
 }
+window.czmDeleteRecentQ = function(q){
+  czmRecentSearches = czmRecentSearches.filter(x=>x!==q);
+  localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
+  const inp = document.getElementById('czm-search-inp');
+  const val = inp ? inp.value.trim() : '';
+  if(val) czmSearchTyping(val);
+  else czmRenderRecentSearches();
+};
 
 // 1. Fungsi Utama (Jangan potong di tengah!)
 // --- AREA CZM ENGINE (Cari lokasi fungsi czmRenderHome, taruh di bawahnya) ---
@@ -1058,6 +1066,7 @@ function czmRenderRecentSearches() {
     html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${safe}';czmDoSearch('${safe}')">
       <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
+      <button class="czm-q-del-btn" onclick="event.stopPropagation();czmDeleteRecentQ('${safe}')"><i class="fa-solid fa-xmark"></i></button>
       <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
     </div>`;
   });
@@ -1116,6 +1125,7 @@ window.czmSearchTyping = function(val){
     html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${safe}';czmDoSearch('${safe}')">
       <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
+      <button class="czm-q-del-btn" onclick="event.stopPropagation();czmDeleteRecentQ('${safe}')"><i class="fa-solid fa-xmark"></i></button>
       <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
     </div>`;
   });
@@ -2276,11 +2286,44 @@ window.czmArtistPageTogglePlay = function(){
 window.czmCloseArtistPage = function(){
   const page = document.getElementById('czm-artist-page');
   if(page){ page.classList.remove('open'); }
-  // Tampilkan kembali mini player
-  const npbar = document.getElementById('czm-npbar');
-  if(npbar){
-    npbar.style.removeProperty('display');
-    if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis');
+
+  // Kalau search sedang tersembunyi (dibuka dari search) → restore search
+  if(czmSearchWasOpen){
+    czmSearchWasOpen = false;
+    const searchOv = document.getElementById('czm-search-ov');
+    if(searchOv) searchOv.classList.add('czm-on');
+    const homeEl = document.getElementById('czm-home');
+    if(homeEl) homeEl.classList.add('czm-on');
+    const topBar = document.querySelector('.top-bar');
+    if(topBar) topBar.style.display = '';
+    if(czmLastSearchQuery){
+      const inp = document.getElementById('czm-search-inp');
+      if(inp) inp.value = czmLastSearchQuery;
+      const clr = document.getElementById('czm-srch-clear');
+      if(clr) clr.style.display = 'flex';
+      const chips = document.getElementById('czm-srch-chips');
+      if(chips) chips.style.display = 'flex';
+      czmDoSearch(czmLastSearchQuery);
+    } else {
+      czmRenderRecentSearches();
+    }
+    const npbar2 = document.getElementById('czm-npbar');
+    if(npbar2 && npbar2.dataset.hasTrack==='1'){
+      npbar2.style.removeProperty('display');
+      npbar2.classList.add('czm-vis');
+    }
+    return;
+  }
+
+  // Tampilkan mini player HANYA jika full player TIDAK sedang terbuka
+  const playerEl = document.getElementById('czm-player');
+  const isPlayerOpen = playerEl && playerEl.classList.contains('czm-on');
+  if(!isPlayerOpen){
+    const npbar = document.getElementById('czm-npbar');
+    if(npbar){
+      npbar.style.removeProperty('display');
+      if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis');
+    }
   }
 };
 
