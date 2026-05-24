@@ -1067,7 +1067,7 @@ function czmRenderRecentSearches() {
       <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
       <button class="czm-q-del-btn" onclick="event.stopPropagation();czmDeleteRecentQ('${safe}')"><i class="fa-solid fa-xmark"></i></button>
-      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-right"></i></button>
     </div>`;
   });
 
@@ -1126,7 +1126,7 @@ window.czmSearchTyping = function(val){
       <div class="czm-q-hist-ico"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="czm-q-info"><div class="czm-q-title">${q}</div></div>
       <button class="czm-q-del-btn" onclick="event.stopPropagation();czmDeleteRecentQ('${safe}')"><i class="fa-solid fa-xmark"></i></button>
-      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-right"></i></button>
     </div>`;
   });
 
@@ -1138,7 +1138,7 @@ window.czmSearchTyping = function(val){
     html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${safe}';czmDoSearch('${safe}')">
       <div class="czm-q-hist-ico" style="background:none"><i class="fa-solid fa-magnifying-glass" style="color:#888;font-size:15px"></i></div>
       <div class="czm-q-info"><div class="czm-q-title">${highlighted}</div></div>
-      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-left"></i></button>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();const inp=document.getElementById('czm-search-inp');inp.value='${safe}';inp.dispatchEvent(new Event('input'))"><i class="fa-solid fa-arrow-up-right"></i></button>
     </div>`;
   });
 
