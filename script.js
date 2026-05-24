@@ -1341,7 +1341,7 @@ window.czmDoSearch=function(q){
       </div>`;
 
     } else if(found.length > 0){
-      /* --- CARD LAGU (YT Music style) — top result --- */
+      /* --- CARD LAGU (top result) --- */
       const top = exactTitleMatch || found[0];
       html+=`<div class="czm-song-card">
         <div class="czm-sc-row">
@@ -1363,8 +1363,8 @@ window.czmDoSearch=function(q){
       </div>`;
     }
 
-    // Daftar lagu di bawah card lagu
-    html+=`<div class="czm-srch-section-lbl" style="margin-top:8px">Lagu</div>`;
+    // --- LAGU PILIHAN (lagu yang cocok query) ---
+    html+=`<div class="czm-srch-section-lbl" style="margin-top:8px">Lagu Pilihan</div>`;
     html+=found.map(s=>`
       <div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
         <img class="czm-q-thumb" src="${s.image}" loading="lazy">
@@ -1375,17 +1375,53 @@ window.czmDoSearch=function(q){
         <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
       </div>`).join('');
 
-    // Artis yang cocok — tampil sebagai item biasa (foto bulat + "Artis • pendengar")
-    if(typeof artists !== 'undefined'){
-      const artistMatches = Object.keys(artists).filter(k=>{
-        const name = artists[k].name.toLowerCase();
-        return tokens.some(tok=>name.includes(tok)||tok.includes(name));
-      });
-      if(artistMatches.length){
-        html+=`<div class="czm-srch-section-lbl" style="margin-top:4px">Artis</div>`;
-        artistMatches.slice(0,3).forEach(k=>{
-          const a = artists[k];
-          const safeKey = k.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    // --- INTERLEAVED: lagu random artis → artis → lagu random artis → ... ---
+    // Kumpulkan artis yang relevan dari lagu yang ditemukan
+    const usedArtistKeys = new Set();
+    const interleaveItems = []; // [{type:'artist',key,a} atau {type:'song',s}]
+
+    found.forEach(s=>{
+      const key = czmFindArtistKey(s.artist||'');
+      if(key && !usedArtistKeys.has(key) && typeof artists!=='undefined' && artists[key]){
+        usedArtistKeys.add(key);
+        const artistSongs = allSongs.filter(x=>
+          (czmFindArtistKey(x.artist||'')===key||x.artist===key) &&
+          !found.find(f=>f.id===x.id) // exclude lagu yang sudah di "Lagu Pilihan"
+        );
+        if(artistSongs.length){
+          // Lagu random sebelum artis
+          const rnd1 = artistSongs[Math.floor(Math.random()*artistSongs.length)];
+          interleaveItems.push({type:'song', s:rnd1});
+        }
+        // Artis
+        interleaveItems.push({type:'artist', key, a:artists[key]});
+        if(artistSongs.length > 1){
+          // Lagu random sesudah artis
+          const remaining = artistSongs.filter(x=>!interleaveItems.find(i=>i.type==='song'&&i.s.id===x.id));
+          if(remaining.length){
+            const rnd2 = remaining[Math.floor(Math.random()*remaining.length)];
+            interleaveItems.push({type:'song', s:rnd2});
+          }
+        }
+      }
+    });
+
+    if(interleaveItems.length){
+      html+=`<div class="czm-srch-section-lbl" style="margin-top:8px">Mungkin kamu suka</div>`;
+      interleaveItems.forEach(item=>{
+        if(item.type==='song'){
+          const s=item.s;
+          html+=`<div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
+            <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+            <div class="czm-q-info">
+              <div class="czm-q-title">${s.title}</div>
+              <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
+            </div>
+            <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+          </div>`;
+        } else {
+          const {key,a}=item;
+          const safeKey=key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
           html+=`<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
             <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
             <div class="czm-q-info">
@@ -1394,8 +1430,8 @@ window.czmDoSearch=function(q){
             </div>
             <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
           </div>`;
-        });
-      }
+        }
+      });
     }
   }
 
