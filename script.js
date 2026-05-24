@@ -1172,22 +1172,43 @@ window.czmSearchTyping = function(val){
 
 window.czmOpenSearch = function(){
   document.getElementById('czm-search-ov').classList.add('czm-on');
+
   const npbar=document.getElementById('czm-npbar');
   const res=document.getElementById('czm-search-res');
+
   if(res){
-    const npH=(npbar&&npbar.classList.contains('czm-vis'))?npbar.offsetHeight:0;
+    const npH=(npbar&&npbar.classList.contains('czm-vis'))
+      ? npbar.offsetHeight
+      : 0;
+
     res.style.paddingBottom=(npH+6)+'px';
   }
+
   const chips=document.getElementById('czm-srch-chips');
   if(chips) chips.style.display='none';
+
   const inp=document.getElementById('czm-search-inp');
-  if(inp) inp.value='';
+
+  if(inp){
+    inp.value='';
+
+    // input awalnya tidak aktif
+    inp.setAttribute('readonly', true);
+
+    // aktif saat user klik
+    inp.onclick = function(){
+      this.removeAttribute('readonly');
+    };
+  }
+
   const clr=document.getElementById('czm-srch-clear');
   if(clr) clr.style.display='none';
-  czmRenderRecentSearches();
-  setTimeout(()=>{if(inp)inp.focus();},100);
-};
 
+  czmRenderRecentSearches();
+
+  // HAPUS focus otomatis
+  // setTimeout(()=>{if(inp)inp.focus();},100);
+};
 window.czmCloseSearch=function(){
   czmSearchWasOpen = false;
   czmLastSearchQuery = '';

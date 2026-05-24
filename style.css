@@ -4631,7 +4631,16 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-search-ov { display:none!important; position:fixed; inset:0; z-index:10003; background:#0a1628; flex-direction:column; }
 #music .czm-search-ov.czm-on { display:flex!important; }
 #music .czm-search-bar { padding:10px 12px; display:flex; align-items:center; gap:8px; background:#0a1628; flex-shrink:0; }
-#music .czm-search-input-wrap { flex:1; display:flex; align-items:center; gap:8px; background:#1a2d42; border-radius:24px; padding:10px 14px; }
+#music .czm-search-input-wrap{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#1a2d42;
+
+  border-radius:18px;
+  padding:6px 12px;
+}
 #music .czm-srch-ico { color:#666; font-size:14px; flex-shrink:0; }
 #music #czm-search-inp { flex:1; background:none; border:none; color:#fff; font-size:15px; outline:none; font-family:inherit; }
 #music .czm-srch-clear { background:none; border:none; color:#666; font-size:16px; cursor:pointer; padding:0 2px; display:flex; align-items:center; flex-shrink:0; }
