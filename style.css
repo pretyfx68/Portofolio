@@ -4651,8 +4651,8 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-qitem-recent { padding:10px 14px; }
 #music .czm-search-res .czm-qitem { padding:9px 14px; }
 #music .czm-q-hist-ico { width:40px; height:40px; border-radius:50%; background:#1e3550; display:flex; align-items:center; justify-content:center; color:#aaa; font-size:14px; flex-shrink:0; }
-#music .czm-q-fill-btn { background:none; border:none; color:#999; font-size:15px; cursor:pointer; padding:6px 8px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
-#music .czm-q-del-btn { background:none; border:none; color:#666; font-size:13px; cursor:pointer; padding:6px 8px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
+#music .czm-q-fill-btn { background:none; border:none; color:#999; font-size:16px; cursor:pointer; padding:6px 8px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
+#music .czm-q-del-btn { background:none; border:none; color:#999; font-size:16px; cursor:pointer; padding:6px 8px; flex-shrink:0; -webkit-tap-highlight-color:transparent; }
 
 /* Recent searches grid thumbnail */
 #music .czm-recent-grid { display:flex; gap:10px; padding:6px 14px 14px; overflow-x:auto; scrollbar-width:none; }
