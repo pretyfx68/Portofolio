@@ -4636,13 +4636,41 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
   display:flex;
   align-items:center;
   gap:8px;
-  background:#1a2d42;
 
-  border-radius:30px;
-  padding:1px 12px;
+  background:#1a2d42;
+  border-radius:999px;
+
+  height:38px;
+  padding:0 14px;
 }
-#music .czm-srch-ico { color:#666; font-size:14px; flex-shrink:0; }
-#music #czm-search-inp { flex:1; background:none; border:none; color:#fff; font-size:15px; outline:none; font-family:inherit; }
+
+#music .czm-srch-ico{
+  color:#8b8b8b;
+  font-size:14px;
+  flex-shrink:0;
+}
+
+#music #czm-search-inp{
+  flex:1;
+
+  background:none;
+  border:none;
+  outline:none;
+
+  color:#fff;
+  font-size:15px;
+  font-family:inherit;
+
+  height:100%;
+  line-height:38px;
+
+  padding:0;
+  margin:0;
+}
+
+#music #czm-search-inp::placeholder{
+  color:#8b8b8b;
+}
 #music .czm-srch-clear { background:none; border:none; color:#666; font-size:16px; cursor:pointer; padding:0 2px; display:flex; align-items:center; flex-shrink:0; }
 
 /* Filter Chips */
