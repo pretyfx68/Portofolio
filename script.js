@@ -45,6 +45,49 @@ function togglePanel(btn){
 /* GLOBAL — harus bisa diakses dari semua scope termasuk audio ended */
 var czmDisplayOrder = [];
 var czmActivePlId   = '__all__';
+
+/* ---- AMBIENT COLOR: ikut warna dominan cover lagu ---- */
+function czmApplyAmbientColor(imgSrc) {
+  const playerEl = document.getElementById('czm-player');
+  if (!playerEl) return;
+  if (!imgSrc) {
+    playerEl.style.background = '#0f2035';
+    return;
+  }
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function() {
+    try {
+      // Gambar kecil 10x10 cukup buat ambil warna dominan
+      const c = document.createElement('canvas');
+      c.width = 10; c.height = 10;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, 10, 10);
+      const d = ctx.getImageData(0, 0, 10, 10).data;
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        const bright = (d[i] + d[i+1] + d[i+2]) / 3;
+        // Skip terlalu gelap/terlalu terang
+        if (bright > 25 && bright < 235) {
+          r += d[i]; g += d[i+1]; b += d[i+2]; n++;
+        }
+      }
+      if (!n) { r = 15; g = 32; b = 53; n = 1; }
+      // Gelap-in warnanya biar kayak YT Music (jangan terlalu terang)
+      const dr = Math.max(8,  Math.min(Math.floor(r/n * 0.45), 90));
+      const dg = Math.max(8,  Math.min(Math.floor(g/n * 0.45), 90));
+      const db = Math.max(12, Math.min(Math.floor(b/n * 0.45), 90));
+      playerEl.style.background =
+        `linear-gradient(to bottom, rgb(${dr},${dg},${db}) 0%, rgba(${dr},${dg},${db},0.6) 35%, #0d1825 65%, #0a1220 100%)`;
+    } catch(e) {
+      // CORS gagal, pakai default
+      playerEl.style.background = '#0f2035';
+    }
+  };
+  img.onerror = function() { playerEl.style.background = '#0f2035'; };
+  img.src = imgSrc + (imgSrc.includes('?') ? '&' : '?') + '_czm=' + Date.now();
+}
+/* ---- END AMBIENT COLOR ---- */
 (function(){
 'use strict';
 
@@ -431,6 +474,8 @@ function czmSyncUI(idx, skipPlaylist){
     if(vidEl){ vidEl.pause(); vidEl.style.display = 'none'; }
     if(imgEl){ imgEl.src = s.image||''; imgEl.style.display = 'block'; }
     if(wrap)   wrap.classList.remove('czm-video-mode');
+    // Apply ambient background color dari cover lagu
+    czmApplyAmbientColor(s.image||'');
   }
 
   // Update ambient glow

@@ -3323,7 +3323,7 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 /* ===== PLAYER: flex column agar tab bar bisa pinned bawah ===== */
 #music #czm-player {
   transform: translateY(100%);
-  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 0.38s;
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 0.38s, background 0.8s ease;
   display: flex !important;
   flex-direction: column;
   pointer-events: none;
