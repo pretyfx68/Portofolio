@@ -4454,11 +4454,18 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
   transform: translateY(18px);
   pointer-events: none;
   transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  /* Hilangkan space saat tidak aktif */
+  height: 0;
+  overflow: hidden;
+  padding: 0;
 }
 #music .czm-collapsed-view.czm-visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+  height: auto;
+  overflow: visible;
+  padding: 0 20px 20px;
 }
 #music .czm-tab {
   flex: 1; background: none; border: none;

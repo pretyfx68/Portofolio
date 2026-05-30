@@ -976,11 +976,11 @@ window.czmGoHome=function(){
 /* ---------- search overlay ---------- */
 /* ===== SEARCH YT MUSIC STYLE ===== */
 let czmSrchChipActive = 'semua';
-let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]').slice(0,20);
+let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]');
 
 function czmSaveRecentQ(q){
   if(!q || q.trim().length < 2) return;
-  czmRecentSearches = [q.trim(), ...czmRecentSearches.filter(x=>x!==q.trim())].slice(0,20);
+  czmRecentSearches = [q.trim(), ...czmRecentSearches.filter(x=>x!==q.trim())];
   localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
 }
 window.czmDeleteRecentQ = function(q){
@@ -1099,6 +1099,17 @@ window.czmSearchTyping = function(val){
     }
   });
 
+  // --- Kumpulkan suggestion teks dari nama artis ---
+  const artistNameSuggestions = [];
+  if(typeof artists !== 'undefined'){
+    Object.keys(artists).forEach(k=>{
+      const name = artists[k].name;
+      if(name.toLowerCase().includes(query) || k.toLowerCase().includes(query)){
+        if(!seen.has(name.toLowerCase())){ seen.add(name.toLowerCase()); artistNameSuggestions.push({key:k, name}); }
+      }
+    });
+  }
+
   // --- Histori yang cocok ---
   const matchedQ = czmRecentSearches.filter(q=>q.toLowerCase().includes(query));
 
@@ -1130,7 +1141,19 @@ window.czmSearchTyping = function(val){
     </div>`;
   });
 
-  // 2. Suggestion teks dari judul lagu (icon kaca pembesar)
+  // 1b. Suggestion teks nama artis (icon kaca pembesar) — seperti Spotify
+  artistNameSuggestions.slice(0,3).forEach(({key, name})=>{
+    const safe = name.replace(/'/g,"&#39;");
+    const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const highlighted = name.replace(new RegExp(`(${val.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<b>$1</b>');
+    html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${safe}';czmDoSearch('${safe}')">
+      <div class="czm-q-hist-ico" style="background:none"><i class="fa-solid fa-magnifying-glass" style="color:#888;font-size:15px"></i></div>
+      <div class="czm-q-info"><div class="czm-q-title">${highlighted}</div></div>
+      <button class="czm-q-fill-btn" onclick="event.stopPropagation();czmHideSearch();czmOpenArtistPage('${safeKey}')"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+    </div>`;
+  });
+
+    // 2. Suggestion teks dari judul lagu (icon kaca pembesar)
   titleSuggestions.slice(0,5).forEach(title=>{
     const safe = title.replace(/'/g,"&#39;");
     // Bold bagian yang cocok dengan query
@@ -2110,6 +2133,11 @@ function czmRenderInlineArtist(){
 
 /* ===== Artist Page (fullscreen) ===== */
 window.czmOpenArtistPage = function(artistKey){
+  const a  = artists[artistKey];
+  // Simpan nama artis ke histori pencarian
+  if(a && a.name) czmSaveRecentQ(a.name);
+  else if(artistKey) czmSaveRecentQ(artistKey);
+
   // Otomatis nyalakan shuffle saat masuk artist page
   if(!window.czmShuffleOn){
     window.czmShuffleOn = true;
@@ -2117,7 +2145,6 @@ window.czmOpenArtistPage = function(artistKey){
     if(btn2){ btn2.classList.add('active'); btn2.style.color='#00d9ff'; }
   }
   const pl = czmGetPlaylist();
-  const a  = artists[artistKey];
   const artistName = a ? a.name : artistKey;
   const artistImg  = a ? a.image : (pl?.[czmCurIdx]?.image||'');
 
