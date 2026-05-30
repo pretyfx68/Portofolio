@@ -254,7 +254,7 @@ function czmRenderHome(f){
       </div>` : ''}
     </div>`;
   // Init hero slider & quick picks slider setelah render
-  setTimeout(()=>{ czmInitHero(); czmInitQs(); }, 50);
+  setTimeout(()=>{ czmInitHero(); czmInitQs(); czmObserveLazy(body); }, 50);
 }
 
 window.czmShowMoreSongs=function(){
@@ -1203,7 +1203,7 @@ window.czmSearchTyping = function(val){
     </div>`;
   });
 
-  if(r) r.innerHTML = html || `<div style="text-align:center;color:#444;padding:40px 0;font-size:13px;opacity:0.5">Tidak ada hasil</div>`;
+  if(r){ r.innerHTML = html || `<div style="text-align:center;color:#444;padding:40px 0;font-size:13px;opacity:0.5">Tidak ada hasil</div>`; czmObserveLazy(r); }
 };
 
 window.czmOpenSearch = function(){
