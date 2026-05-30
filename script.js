@@ -2391,9 +2391,14 @@ window.czmCloseArtistPage = function(){
       czmRenderRecentSearches();
     }
     const npbar2 = document.getElementById('czm-npbar');
-    if(npbar2 && npbar2.dataset.hasTrack==='1'){
+    const playerEl2 = document.getElementById('czm-player');
+    const isPlayerOpen2 = playerEl2 && playerEl2.classList.contains('czm-on');
+    if(npbar2){
       npbar2.style.removeProperty('display');
-      npbar2.classList.add('czm-vis');
+      // Tampilkan npbar HANYA kalau full player tidak sedang terbuka
+      if(!isPlayerOpen2 && npbar2.dataset.hasTrack==='1'){
+        npbar2.classList.add('czm-vis');
+      }
     }
     return;
   }
