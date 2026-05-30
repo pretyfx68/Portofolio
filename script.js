@@ -53,6 +53,40 @@ function czmGetAudio()    { return window.audio; }
 function czmGetPlaylist() { return window.playlist; }
 function czmGetVideo()    { return document.getElementById('czm-video'); }
 
+/* ===== LAZY IMAGE LOADER (IntersectionObserver) =====
+   Semua img dengan data-src akan dimuat hanya saat masuk viewport.
+   Panggil czmObserveLazy() setelah setiap render HTML dinamis.
+   ===================================================== */
+const _czmLazyObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if(!entry.isIntersecting) return;
+    const img = entry.target;
+    const src = img.dataset.src;
+    if(src){
+      img.src = src;
+      img.removeAttribute('data-src');
+      // Fade-in halus saat gambar loaded
+      img.style.opacity = '0';
+      img.style.transition = 'opacity 0.3s ease';
+      img.onload = () => { img.style.opacity = '1'; };
+      img.onerror = () => { img.style.opacity = '1'; };
+    }
+    obs.unobserve(img);
+  });
+}, {
+  rootMargin: '120px 0px',  // mulai load 120px sebelum masuk layar
+  threshold: 0
+});
+
+/* Daftarkan semua img[data-src] yang baru di-render ke observer */
+function czmObserveLazy(container){
+  const root = container || document;
+  root.querySelectorAll('img[data-src]').forEach(img => {
+    _czmLazyObserver.observe(img);
+  });
+}
+
+
 /* ---------- state ---------- */
 let czmCurIdx  = 0;          // index di playlist[]
 let czmLiked   = new Set();
@@ -105,7 +139,7 @@ function czmRenderHome(f){
       <div class="czm-hero-track" id="czm-hero-track">
         ${heroList.map((s,i)=>`
           <div class="czm-hero-slide" data-id="${s.id}">
-            <img class="czm-hero-img" src="${s.image}" loading="lazy"
+            <img class="czm-hero-img" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy"
               onerror="this.style.display='none'">
             <div class="czm-hero-overlay">
               <div class="czm-hero-bottom">
@@ -139,7 +173,7 @@ function czmRenderHome(f){
               <div class="czm-qslide">
                 ${slide.map(s=>`
                   <div class="czm-qitem" onclick="czmPlayById('${s.id}',true)">
-                    <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
+                    <img class="czm-q-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" onerror="this.style.display='none'">
                     <div class="czm-q-info">
                       <div class="czm-q-title">${s.title}</div>
                       <div class="czm-q-sub">${s.artist} · ${fv(s.views)} pemutaran</div>
@@ -160,7 +194,7 @@ function czmRenderHome(f){
       <div class="czm-grid">
         ${grid.map(s=>`
           <div class="czm-gcard" onclick="czmPlayById('${s.id}',true)">
-            <img src="${s.image}" loading="lazy" onerror="this.style.display='none'">
+            <img data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" onerror="this.style.display='none'">
             <div class="czm-glabel">${s.title}</div>
           </div>`).join('')}
       </div>
@@ -174,7 +208,7 @@ function czmRenderHome(f){
       <div class="czm-hrow">
         ${trend.map(s=>`
           <div class="czm-hcard" onclick="czmPlayById('${s.id}',true)">
-            <img class="czm-h-img" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
+            <img class="czm-h-img" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" onerror="this.style.display='none'">
             <div class="czm-h-title">${s.title}</div>
             <div class="czm-h-sub">${s.artist}</div>
           </div>`).join('')}
@@ -189,7 +223,7 @@ function czmRenderHome(f){
       <div class="czm-qlist" id="czm-all-songs-list">
         ${list.slice(0,8).map(s=>`
           <div class="czm-qitem" onclick="czmPlayById('${s.id}',true)">
-            <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
+            <img class="czm-q-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" onerror="this.style.display='none'">
             <div class="czm-q-info">
               <div class="czm-q-title">${s.title}</div>
               <div class="czm-q-sub">${s.artist} • ${fv(s.views)} pemutaran</div>
@@ -232,13 +266,14 @@ window.czmShowMoreSongs=function(){
   // Render semua lagu
   container.innerHTML=list.map(s=>`
     <div class="czm-qitem" onclick="czmPlayById('${s.id}',true)">
-      <img class="czm-q-thumb" src="${s.image}" loading="lazy" onerror="this.style.display='none'">
+      <img class="czm-q-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" onerror="this.style.display='none'">
       <div class="czm-q-info">
         <div class="czm-q-title">${s.title}</div>
         <div class="czm-q-sub">${s.artist} • ${fv(s.views)} pemutaran</div>
       </div>
       <span class="czm-q-dots" onclick="czmOpenBs('${s.id}',event)">⋮</span>
     </div>`).join('');
+  czmObserveLazy(container);
   if(wrap) wrap.remove();
 };
 
@@ -976,11 +1011,11 @@ window.czmGoHome=function(){
 /* ---------- search overlay ---------- */
 /* ===== SEARCH YT MUSIC STYLE ===== */
 let czmSrchChipActive = 'semua';
-let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]');
+let czmRecentSearches = JSON.parse(localStorage.getItem('czm_recent_q')||'[]').slice(0,20);
 
 function czmSaveRecentQ(q){
   if(!q || q.trim().length < 2) return;
-  czmRecentSearches = [q.trim(), ...czmRecentSearches.filter(x=>x!==q.trim())];
+  czmRecentSearches = [q.trim(), ...czmRecentSearches.filter(x=>x!==q.trim())].slice(0,20);
   localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
 }
 window.czmDeleteRecentQ = function(q){
@@ -1040,7 +1075,7 @@ function czmRenderRecentSearches() {
     <div class="czm-recent-grid">`;
     recentPlayedSongs.slice(0,8).forEach(s=>{
       html += `<div class="czm-recent-grid-item" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
-        <img src="${s.image}" loading="lazy">
+        <img data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
         <div class="czm-recent-grid-lbl">${s.title}</div>
       </div>`;
     });
@@ -1051,7 +1086,7 @@ function czmRenderRecentSearches() {
   artistItems.forEach(({key, a})=>{
     const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     html += `<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
-      <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
+      <div class="czm-q-artist-circle"><img data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy"></div>
       <div class="czm-q-info">
         <div class="czm-q-title">${a.name}</div>
         <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
@@ -1072,6 +1107,7 @@ function czmRenderRecentSearches() {
   });
 
   box.innerHTML = html;
+  czmObserveLazy(box);
 } 
 
 /* ── Saat ngetik: tampil lagu saja (tanpa card artis) ── */
@@ -1098,17 +1134,6 @@ window.czmSearchTyping = function(val){
       if(!seen.has(key)){ seen.add(key); titleSuggestions.push(s.title); }
     }
   });
-
-  // --- Kumpulkan suggestion teks dari nama artis ---
-  const artistNameSuggestions = [];
-  if(typeof artists !== 'undefined'){
-    Object.keys(artists).forEach(k=>{
-      const name = artists[k].name;
-      if(name.toLowerCase().includes(query) || k.toLowerCase().includes(query)){
-        if(!seen.has(name.toLowerCase())){ seen.add(name.toLowerCase()); artistNameSuggestions.push({key:k, name}); }
-      }
-    });
-  }
 
   // --- Histori yang cocok ---
   const matchedQ = czmRecentSearches.filter(q=>q.toLowerCase().includes(query));
@@ -1141,19 +1166,7 @@ window.czmSearchTyping = function(val){
     </div>`;
   });
 
-  // 1b. Suggestion teks nama artis (icon kaca pembesar) — seperti Spotify
-  artistNameSuggestions.slice(0,3).forEach(({key, name})=>{
-    const safe = name.replace(/'/g,"&#39;");
-    const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const highlighted = name.replace(new RegExp(`(${val.trim().replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<b>$1</b>');
-    html += `<div class="czm-qitem czm-qitem-recent" onclick="document.getElementById('czm-search-inp').value='${safe}';czmDoSearch('${safe}')">
-      <div class="czm-q-hist-ico" style="background:none"><i class="fa-solid fa-magnifying-glass" style="color:#888;font-size:15px"></i></div>
-      <div class="czm-q-info"><div class="czm-q-title">${highlighted}</div></div>
-      <button class="czm-q-fill-btn" onclick="event.stopPropagation();czmHideSearch();czmOpenArtistPage('${safeKey}')"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
-    </div>`;
-  });
-
-    // 2. Suggestion teks dari judul lagu (icon kaca pembesar)
+  // 2. Suggestion teks dari judul lagu (icon kaca pembesar)
   titleSuggestions.slice(0,5).forEach(title=>{
     const safe = title.replace(/'/g,"&#39;");
     // Bold bagian yang cocok dengan query
@@ -1169,7 +1182,7 @@ window.czmSearchTyping = function(val){
   matchedArtists.slice(0,2).forEach(({key,a})=>{
     const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     html += `<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
-      <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
+      <div class="czm-q-artist-circle"><img data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy"></div>
       <div class="czm-q-info">
         <div class="czm-q-title">${a.name}</div>
         <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
@@ -1181,7 +1194,7 @@ window.czmSearchTyping = function(val){
   // 4. Lagu yang cocok (thumbnail) — max 3
   matchedSongs.slice(0,3).forEach(s=>{
     html += `<div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
-      <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+      <img class="czm-q-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
       <div class="czm-q-info">
         <div class="czm-q-title">${s.title}</div>
         <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
@@ -1369,7 +1382,7 @@ window.czmDoSearch=function(q){
       const safeKey=key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       html+=`<div class="czm-artist-card">
         <div class="czm-ac-header" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
-          <div class="czm-ac-avatar"><img src="${a.image}" loading="lazy" onerror="this.style.display='none'"></div>
+          <div class="czm-ac-avatar"><img data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" onerror="this.style.display='none'"></div>
           <div class="czm-ac-info"><div class="czm-ac-name">${a.name}</div><div class="czm-ac-meta">${metaText}</div></div>
           <i class="fa-solid fa-chevron-right czm-ac-arrow"></i>
         </div>
@@ -1379,7 +1392,7 @@ window.czmDoSearch=function(q){
         </div>
         <div class="czm-ac-songs">
           ${allOfArtist.slice(0,3).map(s=>`<div class="czm-ac-song" onclick="event.stopPropagation();czmHideSearch();czmPlayById('${s.id}',true)">
-            <img class="czm-ac-song-img" src="${s.image}" loading="lazy">
+            <img class="czm-ac-song-img" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
             <div class="czm-ac-song-info"><div class="czm-ac-song-title">${s.title}</div><div class="czm-ac-song-meta">Lagu • ${fv(s.views)} pemutaran</div></div>
             <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
           </div>`).join('')}
@@ -1389,7 +1402,7 @@ window.czmDoSearch=function(q){
       // Lagu-lagu artis lainnya langsung di bawah card
       html+=allSongs.filter(x=>(czmFindArtistKey(x.artist||'')===key||x.artist===key)&&!allOfArtist.slice(0,3).find(c=>c.id===x.id)).map(s=>`
         <div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
-          <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+          <img class="czm-q-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
           <div class="czm-q-info"><div class="czm-q-title">${s.title}</div><div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div></div>
           <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
         </div>`).join('');
@@ -1399,7 +1412,7 @@ window.czmDoSearch=function(q){
       const top = exactTitleMatch || found[0];
       html+=`<div class="czm-song-card">
         <div class="czm-sc-row">
-          <img class="czm-sc-img" src="${top.image}" loading="lazy">
+          <img class="czm-sc-img" data-src="${top.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
           <div class="czm-sc-info"><div class="czm-sc-title">${top.title}</div><div class="czm-sc-sub">Lagu • ${top.artist}</div></div>
           <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${top.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
         </div>
@@ -1425,7 +1438,7 @@ window.czmDoSearch=function(q){
 
             // Artis item
             html+=`<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
-              <div class="czm-q-artist-circle"><img src="${a.image}" loading="lazy"></div>
+              <div class="czm-q-artist-circle"><img data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy"></div>
               <div class="czm-q-info"><div class="czm-q-title">${a.name}</div><div class="czm-q-sub">Artis • ${a.pendengar} pendengar bulanan</div></div>
               <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             </div>`;
@@ -1438,7 +1451,7 @@ window.czmDoSearch=function(q){
             artistSongs.forEach(s2=>{
               shownIds.add(s2.id);
               html+=`<div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s2.id}',true)">
-                <img class="czm-q-thumb" src="${s2.image}" loading="lazy">
+                <img class="czm-q-thumb" data-src="${s2.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
                 <div class="czm-q-info"><div class="czm-q-title">${s2.title}</div><div class="czm-q-sub">Lagu • ${s2.artist} • ${fv(s2.views)}</div></div>
                 <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s2.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
               </div>`;
@@ -1450,7 +1463,7 @@ window.czmDoSearch=function(q){
       // Lagu yang cocok query tapi belum tampil
       found.filter(s=>!shownIds.has(s.id)).forEach(s=>{
         html+=`<div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
-          <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+          <img class="czm-q-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
           <div class="czm-q-info"><div class="czm-q-title">${s.title}</div><div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div></div>
           <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
         </div>`;
@@ -1463,7 +1476,7 @@ window.czmDoSearch=function(q){
     html+=`<div class="czm-srch-section-lbl">Lagu</div>`;
     html+=found.map(s=>`
       <div class="czm-qitem" onclick="czmHideSearch();czmPlayById('${s.id}',true)">
-        <img class="czm-q-thumb" src="${s.image}" loading="lazy">
+        <img class="czm-q-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
         <div class="czm-q-info">
           <div class="czm-q-title">${s.title}</div>
           <div class="czm-q-sub">Lagu • ${s.artist} • ${fv(s.views)}</div>
@@ -1473,6 +1486,7 @@ window.czmDoSearch=function(q){
   }
 
   r.innerHTML=html;
+  czmObserveLazy(r);
 };
 
 /* Putar lagu pertama artis */
@@ -1592,12 +1606,13 @@ function czmRenderPlBox(q){
   box.innerHTML=list.map((s,i)=>`
     <div class="czm-plitem ${cur&&String(s.id)===String(cur.id)?'czm-cur':''}" data-id="${s.id}" onclick="czmPlayById('${s.id}',true)">
       <span class="czm-pl-num">${cur&&String(s.id)===String(cur.id)?'<span class="czm-dot"></span>':(i+1)}</span>
-      <img class="czm-pl-img" src="${s.image}" loading="lazy">
+      <img class="czm-pl-img" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
       <div class="czm-pl-t-wrap">
         <div class="czm-pl-t">${s.title}</div>
         <div class="czm-pl-s">${s.artist} • ${fv(s.views)}</div>
       </div>
     </div>`).join('');
+  czmObserveLazy(box);
 
   // Set --pl-start dan --pl-ex untuk item yang sedang diputar (marquee kanan→kiri)
   requestAnimationFrame(()=>{
@@ -1654,7 +1669,7 @@ function czmRenderPlayerPlBox(){
     ${list.map((s,i)=>`
     <div class="czm-plitem ${cur&&String(s.id)===String(cur.id)?'czm-cur':''}" onclick="czmPlayById('${s.id}',true);setTimeout(czmRenderPlayerPlBox,80);">
       <span class="czm-pl-num">${cur&&String(s.id)===String(cur.id)?'<span class="czm-dot"></span>':(i+1)}</span>
-      <img class="czm-pl-img" src="${s.image}" loading="lazy">
+      <img class="czm-pl-img" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
       <div class="czm-pl-t-wrap">
         <div class="czm-pl-t" style="${cur&&String(s.id)===String(cur.id)?'color:#00d9ff;':''}">${s.title}</div>
         <div class="czm-pl-s">${s.artist}</div>
@@ -1749,7 +1764,7 @@ window.czmAddToPlaylistFromMenu=function(){
 
   const rows=czmPls.map(p=>`
     <div onclick="czmPickPlForSong(${p.id},'${s.id}')" style="display:flex;align-items:center;gap:16px;padding:16px 20px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background .13s;" onmousedown="this.style.background='rgba(0,217,255,0.07)'" onmouseup="this.style.background=''" ontouchstart="this.style.background='rgba(0,217,255,0.07)'" ontouchend="this.style.background=''">
-      ${(()=>{const _pl=czmGetPlaylist()||[];const _fs=_pl.find(s=>String(s.id)===String(p.songs[0]));return _fs&&_fs.image?`<div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;"><img src="${_fs.image}" style="width:100%;height:100%;object-fit:cover;"></div>`:`<div style="width:44px;height:44px;background:#1e4a7a;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 12px rgba(0,217,255,0.25);"><i class="fa-solid fa-music" style="color:#00d9ff;font-size:16px;"></i></div>`;})()}
+      ${(()=>{const _pl=czmGetPlaylist()||[];const _fs=_pl.find(s=>String(s.id)===String(p.songs[0]));return _fs&&_fs.image?`<div style="width:44px;height:44px;border-radius:10px;overflow:hidden;flex-shrink:0;"><img data-src="${_fs.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:100%;height:100%;object-fit:cover;"></div>`:`<div style="width:44px;height:44px;background:#1e4a7a;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 12px rgba(0,217,255,0.25);"><i class="fa-solid fa-music" style="color:#00d9ff;font-size:16px;"></i></div>`;})()}
       <div style="flex:1;min-width:0;">
         <div style="font-size:15px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</div>
         <div style="font-size:12px;color:#7a9bb5;margin-top:2px;">${p.songs.length} lagu</div>
@@ -2076,7 +2091,7 @@ function czmRenderInlineArtist(){
     const {key, data: a} = foundArtists[0];
     box.innerHTML = `
       <div class="czm-ia-card" onclick="czmOpenArtistPage('${key.replace(/'/g,"\\'")}')">
-        <img class="czm-ia-bg" src="${a.image}">
+        <img class="czm-ia-bg" data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">
         <div class="czm-ia-banner-overlay"></div>
         <div class="czm-ia-card-label">TENTANG ARTIS</div>
         <div class="czm-ia-banner-info">
@@ -2090,7 +2105,7 @@ function czmRenderInlineArtist(){
   // Multiple artis — buat slider
   const cards = foundArtists.map(({key, data: a}) => `
     <div class="czm-ia-card" onclick="czmOpenArtistPage('${key.replace(/'/g,"\\'")}')">
-      <img class="czm-ia-bg" src="${a.image}">
+      <img class="czm-ia-bg" data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">
       <div class="czm-ia-banner-overlay"></div>
       <div class="czm-ia-card-label">TENTANG ARTIS</div>
       <div class="czm-ia-banner-info">
@@ -2133,11 +2148,6 @@ function czmRenderInlineArtist(){
 
 /* ===== Artist Page (fullscreen) ===== */
 window.czmOpenArtistPage = function(artistKey){
-  const a  = artists[artistKey];
-  // Simpan nama artis ke histori pencarian
-  if(a && a.name) czmSaveRecentQ(a.name);
-  else if(artistKey) czmSaveRecentQ(artistKey);
-
   // Otomatis nyalakan shuffle saat masuk artist page
   if(!window.czmShuffleOn){
     window.czmShuffleOn = true;
@@ -2145,6 +2155,7 @@ window.czmOpenArtistPage = function(artistKey){
     if(btn2){ btn2.classList.add('active'); btn2.style.color='#00d9ff'; }
   }
   const pl = czmGetPlaylist();
+  const a  = artists[artistKey];
   const artistName = a ? a.name : artistKey;
   const artistImg  = a ? a.image : (pl?.[czmCurIdx]?.image||'');
 
@@ -2192,7 +2203,7 @@ window.czmOpenArtistPage = function(artistKey){
             return `
             <div class="czm-ap-song${isActive?' czm-ap-active':''}" onclick="czmPlayById('${song.id}',true)">
               <div class="czm-ap-song-img-wrap">
-                <img src="${song.image}" loading="lazy">
+                <img data-src="${song.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
                 ${isActive ? `<div class="czm-ap-bars-overlay${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>` : ''}
                 <div class="czm-ap-song-num-badge">${_globalIdx}</div>
               </div>
@@ -2237,7 +2248,7 @@ window.czmOpenArtistPage = function(artistKey){
       const ar = artists[k];
       return `
         <div class="czm-ap-other-artist" onclick="czmOpenArtistPage('${k}')">
-          <img src="${ar.image}" loading="lazy" onerror="this.style.opacity='0.3'">
+          <img data-src="${ar.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" onerror="this.style.opacity='0.3'">
           <div class="czm-ap-other-artist-name">${ar.name}</div>
         </div>`;
     }).join('');
@@ -2402,7 +2413,7 @@ function czmRenderArtistTab(){
     box.innerHTML = `
       <div style="padding:20px 16px;">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-          <img src="${s.image}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,217,255,0.4);">
+          <img data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,217,255,0.4);">
           <div>
             <div style="font-size:18px;font-weight:700;color:#fff;">${s.artist}</div>
             <div style="font-size:13px;color:#888;margin-top:4px;">Artis</div>
@@ -2412,7 +2423,7 @@ function czmRenderArtistTab(){
           <div style="font-size:13px;font-weight:600;color:#888;letter-spacing:.5px;margin-bottom:10px;">LAGU LAINNYA</div>
           ${artistSongs.map(song=>`
             <div onclick="czmPlayById('${song.id}',true)" style="display:flex;align-items:center;gap:12px;padding:9px 0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);">
-              <img src="${song.image}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+              <img data-src="${song.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;">
               <div style="flex:1;min-width:0;">
                 <div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${song.title}</div>
                 <div style="font-size:12px;color:#888;margin-top:2px;">${fv(song.views)} pemutaran</div>
@@ -2425,7 +2436,7 @@ function czmRenderArtistTab(){
   box.innerHTML = `
     <!-- Hero full-bleed ala Spotify -->
     <div style="position:relative;width:100%;height:220px;overflow:hidden;flex-shrink:0;">
-      <img src="${a.image}" style="width:100%;height:100%;object-fit:cover;object-position:top;filter:brightness(0.55);">
+      <img data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:100%;height:100%;object-fit:cover;object-position:top;filter:brightness(0.55);">
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 25%,rgba(10,22,40,0.95) 100%);"></div>
       <div style="position:absolute;bottom:14px;left:14px;right:14px;">
         <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.1;text-shadow:0 1px 6px rgba(0,0,0,0.7);">${a.name}</div>
@@ -2440,7 +2451,7 @@ function czmRenderArtistTab(){
           <div onclick="czmPlayById('${song.id}',true)" style="display:flex;align-items:center;gap:12px;padding:8px 0;cursor:pointer;transition:background .15s;"
             onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background=''">
             <div style="width:20px;text-align:center;color:#888;font-size:13px;flex-shrink:0;">${i+1}</div>
-            <img src="${song.image}" style="width:44px;height:44px;border-radius:4px;object-fit:cover;flex-shrink:0;">
+            <img data-src="${song.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:44px;height:44px;border-radius:4px;object-fit:cover;flex-shrink:0;">
             <div style="flex:1;min-width:0;">
               <div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${song.title}</div>
               <div style="font-size:12px;color:#888;margin-top:2px;">${fv(song.views)} pemutaran</div>
@@ -2514,7 +2525,7 @@ window.czmDoRelatedSearch = function(q){
     <div onclick="czmPlayById('${s.id}',true);czmCloseRelatedSearch();"
       style="display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background .13s;"
       onmouseover="this.style.background='rgba(255,255,255,.05)'" onmouseout="this.style.background=''">
-      <img src="${s.image}" style="width:48px;height:48px;border-radius:6px;object-fit:cover;flex-shrink:0;" loading="lazy">
+      <img data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:48px;height:48px;border-radius:6px;object-fit:cover;flex-shrink:0;" loading="lazy">
       <div style="flex:1;min-width:0;">
         <div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title}</div>
         <div style="font-size:12px;color:#888;margin-top:2px;">${s.artist} · ${fv(s.views)}</div>
@@ -2524,6 +2535,7 @@ window.czmDoRelatedSearch = function(q){
         <i class="fa-solid fa-ellipsis-vertical"></i>
       </button>
     </div>`).join('');
+  czmObserveLazy(box);
 };
 
 function czmRenderRelatedHtml(q){
@@ -2549,7 +2561,7 @@ function czmRenderRelatedHtml(q){
   let html=`<div class="czm-rel-title">${q?'Hasil pencarian':'Anda mungkin juga suka'}</div>`;
   html+=listSongs.map(s=>`
     <div class="czm-rel-item" onclick="czmPlayById('${s.id}',true)">
-      <img class="czm-rel-img" src="${s.image}" loading="lazy">
+      <img class="czm-rel-img" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">
       <div class="czm-rel-info">
         <div class="czm-rel-t">${s.title}</div>
         <div class="czm-rel-s">${s.artist} · ${fv(s.views)}</div>
@@ -2567,7 +2579,7 @@ function czmRenderRelatedHtml(q){
       const plNames=['Favoritmu','Mix Harian','Mood Booster','Santai'];
       html+=`<div class="czm-rel-grid-item" onclick="czmPlayById('${group[0].id}',true)">
         <div class="czm-rel-grid-mosaic">
-          ${group.slice(0,4).map(s=>`<img src="${s.image}" loading="lazy">`).join('')}
+          ${group.slice(0,4).map(s=>`<img data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy">`).join('')}
         </div>
         <div class="czm-rel-grid-name">${plNames[i]||'Mix'}</div>
         <div class="czm-rel-grid-sub">Playlist · ${group.length} lagu</div>
@@ -2727,7 +2739,8 @@ function czmRenderPlmList(){
   const pl=czmGetPlaylist()||[];
   box.innerHTML=czmPls.map(p=>{
     const firstSong=pl.find(s=>String(s.id)===String(p.songs[0]));
-    const thumb=firstSong&&firstSong.image?`<img src="${firstSong.image}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`:`<i class="fa-solid fa-music" style="color:#00d9ff;font-size:18px;"></i>`;
+  czmObserveLazy(box);
+    const thumb=firstSong&&firstSong.image?`<img data-src="${firstSong.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`:`<i class="fa-solid fa-music" style="color:#00d9ff;font-size:18px;"></i>`;
     const bg=firstSong&&firstSong.image?'transparent':'#1e4a7a';
     return`<div onclick="czmOpenPlDetail(${p.id})" style="display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;transition:background .13s;border-bottom:1px solid rgba(255,255,255,.05);" ontouchstart="this.style.background='rgba(0,217,255,0.06)'" ontouchend="this.style.background=''" onmouseover="this.style.background='rgba(0,217,255,0.06)'" onmouseout="this.style.background=''">
       <div style="width:48px;height:48px;border-radius:10px;background:${bg};overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(0,217,255,0.2);">
@@ -2755,7 +2768,7 @@ window.czmOpenPlDetail=function(id){
     const heroArt=document.getElementById('czm-pld-hero-art');
     const heroBg=document.getElementById('czm-pld-hero-bg');
     if(heroArt){
-      if(firstSong?.image){ heroArt.innerHTML=`<img src="${firstSong.image}">`; }
+      if(firstSong?.image){ heroArt.innerHTML=`<img data-src="${firstSong.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">`; }
       else { heroArt.innerHTML='<i class="fa-solid fa-music"></i>'; }
     }
     if(heroBg && firstSong?.image) heroBg.style.backgroundImage=`url(${firstSong.image})`;
@@ -2789,7 +2802,7 @@ function czmRenderPlDetail(){
       ${isActive
         ? `<div class="czm-pld-bars${window.isPlaying?'':' czm-paused'}"><span></span><span></span><span></span></div>`
         : `<span class="czm-pld-num">${i+1}</span>`}
-      <img class="czm-pld-thumb" src="${s.image}" loading="lazy" style="cursor:pointer;" onclick="event.stopPropagation();czmPlayFromPlaylist('${p.id}','${s.id}');czmOpenPlayerFromPlaylist();">
+      <img class="czm-pld-thumb" data-src="${s.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy" style="cursor:pointer;" onclick="event.stopPropagation();czmPlayFromPlaylist('${p.id}','${s.id}');czmOpenPlayerFromPlaylist();">
       <div class="czm-pld-info">
         <div class="czm-pld-title">${s.title}</div>
         <div class="czm-pld-artist">${s.artist}</div>
@@ -2797,6 +2810,7 @@ function czmRenderPlDetail(){
       <button class="czm-pld-more-btn" onclick="event.stopPropagation();czmPlItemMore(${czmCurPlId},'${sid}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   }).join('');
+  czmObserveLazy(box);
 }
 window.czmPlItemMore=function(plId, songId){
   // Bottom sheet opsi lagu di playlist
@@ -2812,7 +2826,7 @@ window.czmPlItemMore=function(plId, songId){
     <div style="position:absolute;bottom:0;left:0;right:0;background:#1a2d42;border-radius:16px 16px 0 0;padding:0 0 32px;">
       <div style="display:flex;justify-content:center;padding:10px 0 6px;"><div style="width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;"></div></div>
       <div style="display:flex;align-items:center;gap:12px;padding:12px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07);">
-        <img src="${s?.image||''}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;">
+        <img data-src="${s?.image||''}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:44px;height:44px;border-radius:6px;object-fit:cover;">
         <div><div style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;">${s?.title||''}</div><div style="font-size:12px;color:#aaa;margin-top:2px;">${s?.artist||''}</div></div>
       </div>
       <div onclick="document.getElementById('czm-pl-item-bs').remove();czmRemoveFromPl(${plId},'${songId}')" style="display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;color:#ff4d4d;">
@@ -3029,7 +3043,7 @@ function czmOpenPlPick(songId){
     row.ontouchend=function(){this.style.background='';};
     const _pl0=czmGetPlaylist()||[];
     const _fs=_pl0.find(s=>String(s.id)===String(p.songs[0]));
-    const _thumb=_fs&&_fs.image?`<img src="${_fs.image}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`:`<i class="fa-solid fa-music" style="color:#00d9ff;font-size:16px;"></i>`;
+    const _thumb=_fs&&_fs.image?`<img data-src="${_fs.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`:`<i class="fa-solid fa-music" style="color:#00d9ff;font-size:16px;"></i>`;
     const _bg=_fs&&_fs.image?'transparent':'#1e4a7a';
     row.innerHTML=`
       <div style="width:44px;height:44px;background:${_bg};border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
