@@ -3523,6 +3523,17 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 }
 #music .czm-qitem:active { background:rgba(255,255,255,0.06); }
 #music .czm-q-thumb { width:52px; height:52px; border-radius:5px; object-fit:cover; flex-shrink:0; background:#1a2d42; }
+
+/* Shimmer saat gambar belum load — berlaku untuk semua img lazy */
+#music img.czm-img-loading {
+  background: linear-gradient(90deg, #1a2d42 25%, #243a52 50%, #1a2d42 75%);
+  background-size: 400px 100%;
+  animation: czmSkShimmer 1.2s ease-in-out infinite;
+}
+#music img.czm-img-loading[style*="opacity: 0"],
+#music img.czm-img-loading[style*="opacity:0"] {
+  /* gambar transparan = shimmer terlihat */
+}
 #music .czm-q-info  { flex:1; min-width:0; }
 #music .czm-q-title { font-size:14px; font-weight:600; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 #music .czm-q-sub   { font-size:12px; color:#aaa; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

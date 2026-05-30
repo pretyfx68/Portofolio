@@ -65,11 +65,10 @@ const _czmLazyObserver = new IntersectionObserver((entries, obs) => {
     if(src){
       img.src = src;
       img.removeAttribute('data-src');
-      // Fade-in halus saat gambar loaded
       img.style.opacity = '0';
       img.style.transition = 'opacity 0.3s ease';
-      img.onload = () => { img.style.opacity = '1'; };
-      img.onerror = () => { img.style.opacity = '1'; };
+      img.onload = () => { img.classList.remove('czm-img-loading'); img.style.opacity = '1'; };
+      img.onerror = () => { img.classList.remove('czm-img-loading'); img.style.opacity = '1'; };
     }
     obs.unobserve(img);
   });
@@ -82,6 +81,8 @@ const _czmLazyObserver = new IntersectionObserver((entries, obs) => {
 function czmObserveLazy(container){
   const root = container || document;
   root.querySelectorAll('img[data-src]').forEach(img => {
+    // Tambah class shimmer selama belum load
+    img.classList.add('czm-img-loading');
     _czmLazyObserver.observe(img);
   });
 }
