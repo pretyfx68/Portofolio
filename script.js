@@ -2106,7 +2106,7 @@ function czmRenderInlineArtist(){
     const {key, data: a} = foundArtists[0];
     box.innerHTML = `
       <div class="czm-ia-card" onclick="czmOpenArtistPage('${key.replace(/'/g,"\\'")}')">
-        <img class="czm-ia-bg" data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">
+        <img class="czm-ia-bg" src="${a.image}">
         <div class="czm-ia-banner-overlay"></div>
         <div class="czm-ia-card-label">TENTANG ARTIS</div>
         <div class="czm-ia-banner-info">
@@ -2114,13 +2114,16 @@ function czmRenderInlineArtist(){
           ${a.pendengar ? `<div class="czm-ia-listeners">${a.pendengar} pendengar bulanan</div>` : ''}
         </div>
       </div>`;
+    czmObserveLazy(box);
+    // Fallback: paksa load setelah player animasi selesai
+    setTimeout(() => { czmObserveLazy(box); }, 350);
     return;
   }
 
   // Multiple artis — buat slider
   const cards = foundArtists.map(({key, data: a}) => `
     <div class="czm-ia-card" onclick="czmOpenArtistPage('${key.replace(/'/g,"\\'")}')">
-      <img class="czm-ia-bg" data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">
+      <img class="czm-ia-bg" src="${a.image}">
       <div class="czm-ia-banner-overlay"></div>
       <div class="czm-ia-card-label">TENTANG ARTIS</div>
       <div class="czm-ia-banner-info">
@@ -2136,6 +2139,9 @@ function czmRenderInlineArtist(){
       <div class="czm-ia-slider" id="czm-ia-slider">${cards}</div>
       <div class="czm-ia-dots" id="czm-ia-dots">${dots}</div>
     </div>`;
+  czmObserveLazy(box);
+  // Fallback: paksa load setelah player animasi selesai
+  setTimeout(() => { czmObserveLazy(box); }, 350);
 
   // Auto scroll + dots
   const slider = document.getElementById('czm-ia-slider');
