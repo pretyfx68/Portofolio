@@ -2294,6 +2294,9 @@ window.czmOpenArtistPage = function(artistKey){
     page.classList.add('open');
     if(!wasAlreadyOpen) page.scrollTop = 0;
   }
+  // Catat dari mana artist page dibuka
+  const playerEl = document.getElementById('czm-player');
+  page.dataset.openedFrom = (playerEl && playerEl.classList.contains('czm-on')) ? 'player' : 'search';
   // Sembunyikan mini player saat di halaman artis
   const npbar = document.getElementById('czm-npbar');
   if(npbar) npbar.style.setProperty('display','none','important');
@@ -2368,9 +2371,20 @@ window.czmArtistPageTogglePlay = function(){
 };
 window.czmCloseArtistPage = function(){
   const page = document.getElementById('czm-artist-page');
+  const openedFrom = page ? (page.dataset.openedFrom || 'search') : 'search';
   if(page){ page.classList.remove('open'); }
 
-  // Kalau search sedang tersembunyi (dibuka dari search) → restore search
+  const npbar = document.getElementById('czm-npbar');
+  const playerEl = document.getElementById('czm-player');
+  const isPlayerOpen = playerEl && playerEl.classList.contains('czm-on');
+
+  // Dibuka dari player → kembali ke player, jangan restore search/npbar
+  if(openedFrom === 'player'){
+    if(npbar) npbar.style.removeProperty('display');
+    return;
+  }
+
+  // Dibuka dari search → restore search + npbar (kalau player tidak terbuka)
   if(czmSearchWasOpen){
     czmSearchWasOpen = false;
     const searchOv = document.getElementById('czm-search-ov');
@@ -2390,30 +2404,17 @@ window.czmCloseArtistPage = function(){
     } else {
       czmRenderRecentSearches();
     }
-    const npbar2 = document.getElementById('czm-npbar');
-    const playerEl2 = document.getElementById('czm-player');
-    const isPlayerOpen2 = playerEl2 && playerEl2.classList.contains('czm-on');
-    if(npbar2){
-      npbar2.style.removeProperty('display');
-      // Tampilkan npbar HANYA kalau full player tidak sedang terbuka
-      if(!isPlayerOpen2 && npbar2.dataset.hasTrack==='1'){
-        npbar2.classList.add('czm-vis');
-      }
+    if(npbar){
+      npbar.style.removeProperty('display');
+      if(!isPlayerOpen && npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis');
     }
     return;
   }
 
-  // Tampilkan mini player HANYA jika full player TIDAK sedang terbuka
-  const playerEl = document.getElementById('czm-player');
-  const isPlayerOpen = playerEl && playerEl.classList.contains('czm-on');
-  const npbar = document.getElementById('czm-npbar');
+  // Default: restore mini player
   if(npbar){
-    // Selalu hapus display:none!important yang dipasang czmOpenArtistPage
-    // supaya czmGoHome bisa tampilkan npbar dengan benar nanti
     npbar.style.removeProperty('display');
-    if(!isPlayerOpen && npbar.dataset.hasTrack==='1'){
-      npbar.classList.add('czm-vis');
-    }
+    if(!isPlayerOpen && npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis');
   }
 };
 
