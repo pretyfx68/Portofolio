@@ -68,12 +68,12 @@ const _czmLazyObserver = new IntersectionObserver((entries, obs) => {
       img.style.opacity = '0';
       img.style.transition = 'opacity 0.3s ease';
       img.onload = () => { img.classList.remove('czm-img-loading'); img.style.opacity = '1'; };
-      img.onerror = () => { img.classList.remove('czm-img-loading'); img.style.opacity = '1'; };
+      img.onerror = () => { img.classList.remove('czm-img-loading'); img.style.opacity = '0.3'; };
     }
     obs.unobserve(img);
   });
 }, {
-  rootMargin: '120px 0px',  // mulai load 120px sebelum masuk layar
+  rootMargin: '400px 0px',
   threshold: 0
 });
 
@@ -81,9 +81,22 @@ const _czmLazyObserver = new IntersectionObserver((entries, obs) => {
 function czmObserveLazy(container){
   const root = container || document;
   root.querySelectorAll('img[data-src]').forEach(img => {
-    // Tambah class shimmer selama belum load
     img.classList.add('czm-img-loading');
-    _czmLazyObserver.observe(img);
+    // Force load langsung kalau elemen sudah visible di viewport
+    const rect = img.getBoundingClientRect();
+    if(rect.top < window.innerHeight + 400 && rect.bottom > -400){
+      const src = img.dataset.src;
+      if(src){
+        img.src = src;
+        img.removeAttribute('data-src');
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.3s ease';
+        img.onload = () => { img.classList.remove('czm-img-loading'); img.style.opacity = '1'; };
+        img.onerror = () => { img.classList.remove('czm-img-loading'); img.style.opacity = '0.3'; };
+      }
+    } else {
+      _czmLazyObserver.observe(img);
+    }
   });
 }
 
@@ -2230,6 +2243,8 @@ window.czmOpenArtistPage = function(artistKey){
           arrow.classList.remove('visible');
         }
       }
+      // Pasang lazy observer
+      czmObserveLazy(songsBox);
     } else {
       songsBox.innerHTML = '<div style="color:#555;padding:20px 14px;font-size:13px;">Tidak ada lagu dari artis ini.</div>';
       const arrow = document.getElementById('czm-ap-songs-arrow');
@@ -2253,6 +2268,7 @@ window.czmOpenArtistPage = function(artistKey){
           <div class="czm-ap-other-artist-name">${ar.name}</div>
         </div>`;
     }).join('');
+    czmObserveLazy(otherBox);
   }
 
   // Sync play button state
@@ -2769,7 +2785,10 @@ window.czmOpenPlDetail=function(id){
     const heroArt=document.getElementById('czm-pld-hero-art');
     const heroBg=document.getElementById('czm-pld-hero-bg');
     if(heroArt){
-      if(firstSong?.image){ heroArt.innerHTML=`<img data-src="${firstSong.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">`; }
+      if(firstSong?.image){ 
+        heroArt.innerHTML=`<img data-src="${firstSong.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=">`;
+        czmObserveLazy(heroArt);
+      }
       else { heroArt.innerHTML='<i class="fa-solid fa-music"></i>'; }
     }
     if(heroBg && firstSong?.image) heroBg.style.backgroundImage=`url(${firstSong.image})`;
