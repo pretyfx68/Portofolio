@@ -1808,6 +1808,7 @@ window.czmAddToPlaylistFromMenu=function(){
     </div>`;
 
   document.body.appendChild(overlay);
+  czmObserveLazy(overlay);
   overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
 
   // Fix: attach click event untuk buat playlist baru
@@ -2756,7 +2757,6 @@ function czmRenderPlmList(){
   const pl=czmGetPlaylist()||[];
   box.innerHTML=czmPls.map(p=>{
     const firstSong=pl.find(s=>String(s.id)===String(p.songs[0]));
-  czmObserveLazy(box);
     const thumb=firstSong&&firstSong.image?`<img data-src="${firstSong.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`:`<i class="fa-solid fa-music" style="color:#00d9ff;font-size:18px;"></i>`;
     const bg=firstSong&&firstSong.image?'transparent':'#1e4a7a';
     return`<div onclick="czmOpenPlDetail(${p.id})" style="display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;transition:background .13s;border-bottom:1px solid rgba(255,255,255,.05);" ontouchstart="this.style.background='rgba(0,217,255,0.06)'" ontouchend="this.style.background=''" onmouseover="this.style.background='rgba(0,217,255,0.06)'" onmouseout="this.style.background=''">
@@ -2769,6 +2769,7 @@ function czmRenderPlmList(){
       </div>
       <i class="fa-solid fa-chevron-right" style="color:#3a6080;font-size:13px;"></i>
     </div>`;}).join('');
+  czmObserveLazy(box);
 }
 window.czmOpenPlDetail=function(id){
   czmCurPlId=id;const p=czmPls.find(x=>String(x.id)===String(id));if(!p)return;
