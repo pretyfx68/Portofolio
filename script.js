@@ -815,23 +815,6 @@ function czmSyncPlayState(){
     }
   }
 }
-  if(apIco){
-    const apPage=document.getElementById('czm-artist-page');
-    if(apPage && apPage.classList.contains('open')){
-      const pl=czmGetPlaylist();
-      const curSong=pl?.[czmCurIdx];
-      const curId=curSong?String(curSong.id):null;
-      const apNameEl=document.getElementById('czm-ap-name');
-      const artistName=(apNameEl?apNameEl.textContent:'').toLowerCase();
-      const artistSongs=pl?pl.slice(1).filter(s=>(s.artist||'').toLowerCase().includes(artistName)):[];
-      const hasActive=artistSongs.some(s=>String(s.id)===curId);
-      apIco.className=(hasActive&&playing)?'fa-solid fa-pause':'fa-solid fa-play';
-      // Sync bars
-      const bars=apPage.querySelector('.czm-ap-bars-overlay');
-      if(bars){playing?bars.classList.remove('czm-paused'):bars.classList.add('czm-paused');}
-    }
-  }
-}
 window.czmSeek=function(e){
   if(_czmVideoMode){
     const v = czmGetVideo(); if(!v||!v.duration) return;
