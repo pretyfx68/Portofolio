@@ -8065,9 +8065,9 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 /* ===== TOMBOL SEMUA di header Lagu Populer ===== */
 #music .czm-ap-semua-btn {
-  background: none; border: none; color: #00d9ff; font-size: 13px; font-weight: 700;
-  cursor: pointer; margin-left: auto; padding: 0; font-family: inherit;
-  -webkit-tap-highlight-color: transparent; float: right;
+  background: none; border: none; color: #aaa; font-size: 13px; font-weight: 600;
+  cursor: pointer; margin-left: 8px; padding: 0; font-family: inherit;
+  -webkit-tap-highlight-color: transparent; display: inline-flex; align-items: center; gap: 3px;
 }
 
 /* ===== HALAMAN LAGU TOP ===== */
