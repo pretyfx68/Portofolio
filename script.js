@@ -791,8 +791,30 @@ function czmSyncPlayState(){
   if(ico)ico.className=playing?'fa-solid fa-pause':'fa-solid fa-play';
   if(npIco)npIco.className=playing?'fa-solid fa-pause':'fa-solid fa-play';
   if(miniIco)miniIco.className=playing?'fa-solid fa-pause':'fa-solid fa-play';
+  // Sync bars di top songs page (play/pause)
+  if(window._czmInTopSongs){
+    const tspBars = document.querySelector('#czm-tsp-list .czm-tsp-bars');
+    if(tspBars) tspBars.classList.toggle('czm-paused', !playing);
+  }
   // Sync artist page play button icon langsung
   const apIco=document.getElementById('czm-ap-play-ico');
+  if(apIco){
+    const apPage=document.getElementById('czm-artist-page');
+    if(apPage && apPage.classList.contains('open')){
+      const pl=czmGetPlaylist();
+      const curSong=pl?.[czmCurIdx];
+      const curId=curSong?String(curSong.id):null;
+      const apNameEl=document.getElementById('czm-ap-name');
+      const artistName=(apNameEl?apNameEl.textContent:'').toLowerCase();
+      const artistSongs=pl?pl.slice(1).filter(s=>(s.artist||'').toLowerCase().includes(artistName)):[];
+      const hasActive=artistSongs.some(s=>String(s.id)===curId);
+      apIco.className=(hasActive&&playing)?'fa-solid fa-pause':'fa-solid fa-play';
+      // Sync bars
+      const bars=apPage.querySelector('.czm-ap-bars-overlay');
+      if(bars){playing?bars.classList.remove('czm-paused'):bars.classList.add('czm-paused');}
+    }
+  }
+}
   if(apIco){
     const apPage=document.getElementById('czm-artist-page');
     if(apPage && apPage.classList.contains('open')){
@@ -1320,13 +1342,11 @@ window.czmCloseSearch=function(){
     setTimeout(function(){ ov.style.removeProperty('display'); }, 500);
   }
 
-  // Kalau search dibuka dari Top Songs → tetap di Top, restore npbar
+  // Kalau search dibuka dari Top Songs → tetap di Top, hide npbar lagi
   if(window._czmSearchFromTop){
     window._czmSearchFromTop = false;
-    setTimeout(function(){
-      const npbar = document.getElementById('czm-npbar');
-      if(npbar){ npbar.style.removeProperty('display'); if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis'); }
-    }, 100);
+    const npbar = document.getElementById('czm-npbar');
+    if(npbar){ npbar.classList.remove('czm-vis'); npbar.style.setProperty('display','none','important'); setTimeout(()=>{ npbar.style.removeProperty('display'); }, 300); }
     return;
   }
 
@@ -2451,10 +2471,14 @@ window.czmOpenArtistTopSongs = function(){
   const curSong = pl?.[czmCurIdx];
   const curId = curSong ? String(curSong.id) : null;
 
+  const isPlayingNow = !!window.isPlaying;
   list.innerHTML = songs.map((s,i)=>{
     const isActive = String(s.id) === curId;
     return `<div class="czm-tsp-item${isActive?' czm-tsp-active':''}" onclick="czmPlayById('${s.id}',true);czmSyncTspActive()">
-      <img class="czm-tsp-img" src="${s.image}" loading="lazy" onerror="this.style.opacity='0.3'">
+      <div class="czm-tsp-img-wrap">
+        <img class="czm-tsp-img" src="${s.image}" loading="lazy" onerror="this.style.opacity='0.3'">
+        ${isActive ? `<div class="czm-tsp-bars${isPlayingNow?'':' czm-paused'}"><span></span><span></span><span></span></div>` : ''}
+      </div>
       <div class="czm-tsp-info">
         <div class="czm-tsp-title-txt${isActive?' czm-tsp-playing':''}">${s.title}</div>
         <div class="czm-tsp-meta">${name} • ${s.duration||''} • ${fv(s.views)} pemutaran</div>
@@ -2463,13 +2487,12 @@ window.czmOpenArtistTopSongs = function(){
     </div>`;
   }).join('');
 
-  // Buka halaman dulu, baru tampilkan npbar setelah page visible (hindari flash di artist page)
+  // Buka halaman — TIDAK show npbar (diganti bars overlay di thumbnail)
   window._czmInTopSongs = true;
   page.classList.add('open');
-  setTimeout(function(){
-    const npbar = document.getElementById('czm-npbar');
-    if(npbar){ npbar.style.removeProperty('display'); if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis'); }
-  }, 80);
+  // Pastikan npbar tersembunyi di top songs
+  const _npbarTs = document.getElementById('czm-npbar');
+  if(_npbarTs){ _npbarTs.classList.remove('czm-vis'); _npbarTs.style.setProperty('display','none','important'); setTimeout(()=>{ _npbarTs.style.removeProperty('display'); }, 50); }
 };
 
 window.czmCloseArtistTopSongs = function(){
@@ -2477,7 +2500,7 @@ window.czmCloseArtistTopSongs = function(){
   const page = document.getElementById('czm-top-songs-page');
   if(page) page.classList.remove('open');
 
-  // Tutup search overlay kalau masih terbuka (mungkin terbuka tapi invisible di balik top songs)
+  // Tutup search overlay kalau masih terbuka
   window._czmSearchFromTop = false;
   const ov = document.getElementById('czm-search-ov');
   if(ov && ov.classList.contains('czm-on')){
@@ -2486,28 +2509,48 @@ window.czmCloseArtistTopSongs = function(){
     setTimeout(()=>{ ov.style.removeProperty('display'); }, 400);
   }
 
-  // Sembunyikan npbar → artist page terlihat bersih tanpa mini player
+  // Npbar memang sudah hidden di top songs — pastikan tetap hidden saat balik ke artist page
   const npbar = document.getElementById('czm-npbar');
-  if(npbar){
-    npbar.classList.remove('czm-vis');
-    npbar.style.setProperty('display','none','important');
-    setTimeout(()=>{ npbar.style.removeProperty('display'); }, 400);
-  }
+  if(npbar){ npbar.classList.remove('czm-vis'); }
 };
 
 /* Buka search dari halaman Top Songs — Top tetap open di belakang */
 window.czmTspOpenSearch = function(){
   window._czmSearchFromTop = true;  // flag: balik ke Top saat search ditutup
+  // Show mini player saat masuk search dari top songs
+  const npbar = document.getElementById('czm-npbar');
+  if(npbar && npbar.dataset.hasTrack==='1'){
+    npbar.style.removeProperty('display');
+    npbar.classList.add('czm-vis');
+  }
   czmOpenSearch();
 };
 
 window.czmSyncTspActive = function(){
   const pl = czmGetPlaylist();
   const curId = pl?.[czmCurIdx] ? String(pl[czmCurIdx].id) : null;
+  const playing = !!window.isPlaying;
   document.querySelectorAll('.czm-tsp-item').forEach(el=>{
     const id = el.getAttribute('onclick')?.match(/czmPlayById\('([^']+)'/)?.[1];
-    el.classList.toggle('czm-tsp-active', id===curId);
-    el.querySelector('.czm-tsp-title-txt')?.classList.toggle('czm-tsp-playing', id===curId);
+    const isActive = id === curId;
+    el.classList.toggle('czm-tsp-active', isActive);
+    el.querySelector('.czm-tsp-title-txt')?.classList.toggle('czm-tsp-playing', isActive);
+    // Sync bars overlay
+    const wrap = el.querySelector('.czm-tsp-img-wrap');
+    if(wrap){
+      let bars = wrap.querySelector('.czm-tsp-bars');
+      if(isActive){
+        if(!bars){
+          bars = document.createElement('div');
+          bars.className = 'czm-tsp-bars';
+          bars.innerHTML = '<span></span><span></span><span></span>';
+          wrap.appendChild(bars);
+        }
+        bars.classList.toggle('czm-paused', !playing);
+      } else {
+        if(bars) bars.remove();
+      }
+    }
   });
 };
 
