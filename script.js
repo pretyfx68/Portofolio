@@ -561,11 +561,14 @@ function czmSyncUI(idx, skipPlaylist){
   // update now playing row di tab berikutnya
   if(typeof czmUpdateNowPlayingRow==='function') czmUpdateNowPlayingRow();
   // re-render artist page kalau sedang terbuka (biar highlight lagu aktif pindah)
+  // SKIP saat di top songs page — czmOpenArtistPage akan hide npbar yang baru saja kita tampilkan
   const _apPage = document.getElementById('czm-artist-page');
-  if(_apPage && _apPage.classList.contains('open')){
+  if(_apPage && _apPage.classList.contains('open') && !window._czmInTopSongs){
     const _apKey = _apPage.dataset.artistKey || '';
     if(_apKey && typeof czmOpenArtistPage === 'function') setTimeout(()=>czmOpenArtistPage(_apKey), 120);
   }
+  // Kalau lagi di top songs: cukup update highlight row saja tanpa re-render artist page
+  if(window._czmInTopSongs && typeof czmSyncTspActive === 'function') setTimeout(czmSyncTspActive, 80);
   // sync topbar mini (tampil saat tab terbuka)
   const tma=document.getElementById('czm-topbar-mini-art');
   const tmt=document.getElementById('czm-topbar-mini-title');
@@ -923,6 +926,8 @@ setInterval(czmTickProgress,500);
 
 /* ---------- navigation ---------- */
 window.czmOpenPlayer=function(){
+  // Kalau dibuka dari top songs context → tandai agar czmGoHome tahu harus balik ke top songs
+  if(window._czmInTopSongs) window._czmReturnToTop = true;
   // Sembunyikan search overlay saat player terbuka
   const searchOv = document.getElementById('czm-search-ov');
   if(searchOv) searchOv.classList.remove('czm-on');
