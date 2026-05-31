@@ -2598,11 +2598,21 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
       </div>
     </div>
     <div class="czm-ap-genre" id="czm-ap-genre"></div>
-    <div class="czm-ap-section-label">LAGU POPULER <span id="czm-ap-songs-arrow" class="czm-ap-songs-arrow"><i class="fa-solid fa-chevron-right"></i></span></div>
+    <div class="czm-ap-section-label">LAGU POPULER <span id="czm-ap-songs-arrow" class="czm-ap-songs-arrow"><i class="fa-solid fa-chevron-right"></i></span><button class="czm-ap-semua-btn" onclick="czmOpenArtistTopSongs()">Semua <i class="fa-solid fa-chevron-right"></i></button></div>
     <div id="czm-ap-songs"></div>
     <div class="czm-ap-section-label" style="margin-top:8px;">ARTIS LAINNYA</div>
     <div id="czm-ap-other-artists" class="czm-ap-other-artists"></div>
   </div>
+</div>
+
+<!-- HALAMAN LAGU TOP ARTIS -->
+<div class="czm-top-songs-page" id="czm-top-songs-page">
+  <div class="czm-tsp-header">
+    <button class="czm-tsp-back" onclick="czmCloseArtistTopSongs()"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="czm-tsp-title" id="czm-tsp-title">Lagu top</div>
+    <button class="czm-tsp-search" onclick="czmCloseArtistTopSongs();czmOpenSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+  </div>
+  <div class="czm-tsp-list" id="czm-tsp-list"></div>
 </div>
 
 </body>

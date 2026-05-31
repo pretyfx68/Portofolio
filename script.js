@@ -2212,9 +2212,13 @@ window.czmOpenArtistPage = function(artistKey){
   const songsBox = document.getElementById('czm-ap-songs');
   if(songsBox){
     if(artistSongs.length){
-      // Bagi per 6 lagu (2 baris × 3 kolom) = 1 halaman
+      // Max 2 halaman slide (12 lagu) — sisanya di halaman "Semua"
       const pages = [];
-      for(let i = 0; i < artistSongs.length; i += 6) pages.push(artistSongs.slice(i, i+6));
+      const maxSongs = artistSongs.slice(0, 12);
+      for(let i = 0; i < maxSongs.length; i += 6) pages.push(maxSongs.slice(i, i+6));
+      // Simpan semua lagu artis untuk halaman "Semua"
+      window._czmArtistAllSongs = artistSongs;
+      window._czmArtistName = artistName;
       let _globalIdx = 0;
       songsBox.innerHTML = pages.map(page => `
         <div class="czm-ap-song-page">
@@ -2369,6 +2373,55 @@ window.czmArtistPageTogglePlay = function(){
   // Sync icon setelah state berubah
   setTimeout(czmSyncPlayState, 80);
 };
+window.czmOpenArtistTopSongs = function(){
+  const songs = window._czmArtistAllSongs || [];
+  const name  = window._czmArtistName || 'Artis';
+  const page  = document.getElementById('czm-top-songs-page');
+  const list  = document.getElementById('czm-tsp-list');
+  const title = document.getElementById('czm-tsp-title');
+  if(!page || !list) return;
+
+  if(title) title.textContent = 'Lagu top';
+
+  const pl = czmGetPlaylist();
+  const curSong = pl?.[czmCurIdx];
+  const curId = curSong ? String(curSong.id) : null;
+
+  list.innerHTML = songs.map((s,i)=>{
+    const isActive = String(s.id) === curId;
+    return `<div class="czm-tsp-item${isActive?' czm-tsp-active':''}" onclick="czmPlayById('${s.id}',true);czmSyncTspActive()">
+      <img class="czm-tsp-img" src="${s.image}" loading="lazy" onerror="this.style.opacity='0.3'">
+      <div class="czm-tsp-info">
+        <div class="czm-tsp-title-txt${isActive?' czm-tsp-playing':''}">${s.title}</div>
+        <div class="czm-tsp-meta">${name} • ${s.duration||''} • ${fv(s.views)} pemutaran</div>
+      </div>
+      <button class="czm-tsp-more" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>`;
+  }).join('');
+
+  // Tampilkan npbar
+  const npbar = document.getElementById('czm-npbar');
+  if(npbar){ npbar.style.removeProperty('display'); if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis'); }
+
+  page.classList.add('open');
+};
+
+window.czmCloseArtistTopSongs = function(){
+  const page = document.getElementById('czm-top-songs-page');
+  if(page) page.classList.remove('open');
+  // npbar tetap tampil
+};
+
+window.czmSyncTspActive = function(){
+  const pl = czmGetPlaylist();
+  const curId = pl?.[czmCurIdx] ? String(pl[czmCurIdx].id) : null;
+  document.querySelectorAll('.czm-tsp-item').forEach(el=>{
+    const id = el.getAttribute('onclick')?.match(/czmPlayById\('([^']+)'/)?.[1];
+    el.classList.toggle('czm-tsp-active', id===curId);
+    el.querySelector('.czm-tsp-title-txt')?.classList.toggle('czm-tsp-playing', id===curId);
+  });
+};
+
 window.czmCloseArtistPage = function(){
   const page = document.getElementById('czm-artist-page');
   const openedFrom = page ? (page.dataset.openedFrom || 'search') : 'search';

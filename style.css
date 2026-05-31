@@ -8063,3 +8063,66 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 #czm-artist-page {
   overscroll-behavior-y: contain;
 }
+/* ===== TOMBOL SEMUA di header Lagu Populer ===== */
+#music .czm-ap-semua-btn {
+  background: none; border: none; color: #00d9ff; font-size: 13px; font-weight: 700;
+  cursor: pointer; margin-left: auto; padding: 0; font-family: inherit;
+  -webkit-tap-highlight-color: transparent; float: right;
+}
+
+/* ===== HALAMAN LAGU TOP ===== */
+#music .czm-top-songs-page {
+  display: none; position: fixed; inset: 0; z-index: 10005;
+  background: #000; flex-direction: column;
+  font-family: inherit;
+}
+#music .czm-top-songs-page.open { display: flex; }
+
+#music .czm-tsp-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 12px; background: #000; flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+#music .czm-tsp-back {
+  background: none; border: none; color: #fff; font-size: 20px;
+  cursor: pointer; padding: 4px; -webkit-tap-highlight-color: transparent;
+}
+#music .czm-tsp-title {
+  flex: 1; font-size: 17px; font-weight: 700; color: #fff;
+}
+#music .czm-tsp-search {
+  background: none; border: none; color: #aaa; font-size: 18px;
+  cursor: pointer; padding: 4px; -webkit-tap-highlight-color: transparent;
+}
+
+#music .czm-tsp-list {
+  flex: 1; overflow-y: auto; padding-bottom: 80px;
+}
+
+#music .czm-tsp-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; cursor: pointer; transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+#music .czm-tsp-item:active { background: rgba(255,255,255,0.05); }
+#music .czm-tsp-item.czm-tsp-active { background: rgba(0,217,255,0.06); }
+
+#music .czm-tsp-img {
+  width: 50px; height: 50px; border-radius: 4px;
+  object-fit: cover; flex-shrink: 0; background: #1a2d42;
+}
+#music .czm-tsp-info { flex: 1; min-width: 0; }
+#music .czm-tsp-title-txt {
+  font-size: 14px; font-weight: 600; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#music .czm-tsp-title-txt.czm-tsp-playing { color: #00d9ff; }
+#music .czm-tsp-meta {
+  font-size: 12px; color: #888; margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#music .czm-tsp-more {
+  background: none; border: none; color: #666; font-size: 16px;
+  cursor: pointer; padding: 6px 4px; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
