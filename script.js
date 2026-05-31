@@ -5,6 +5,7 @@
 
 var czmSearchWasOpen = false;  // apakah search aktif saat player dibuka
 var czmLastSearchQuery = '';   // query terakhir di search
+var czmNavStack = [];          // stack: 'search' | 'topSongs' | 'artistPage'
 
 
 function togglePanel(btn){
@@ -986,6 +987,7 @@ window.czmGoHome=function(){
   if(window._czmReturnToTop){
     window._czmReturnToTop = false;
     window._czmInTopSongs = true;
+    czmSearchWasOpen = false; // reset search flag - top songs lebih prioritas
     const tspPage = document.getElementById('czm-top-songs-page');
     if(tspPage) tspPage.classList.add('open');
     // Tampilkan npbar lagi
@@ -2796,9 +2798,7 @@ window.czmOpenBs=function(id,e){
   const ov=document.getElementById('czm-bs-ov'),menu=document.getElementById('czm-bs-menu');
   ov.style.display='block';menu.style.display='block';
   requestAnimationFrame(()=>requestAnimationFrame(()=>menu.style.transform='translateY(0)'));
-  // Sembunyikan now playing bar
-  const npbar=document.getElementById('czm-npbar');
-  if(npbar){ npbar.classList.remove('czm-vis'); npbar.style.setProperty('display','none','important'); }
+  // Jangan sembunyikan npbar — biarkan apa adanya
 };
 window.czmCloseBs=function(){
   const menu=document.getElementById('czm-bs-menu'),ov=document.getElementById('czm-bs-ov');
@@ -2806,17 +2806,6 @@ window.czmCloseBs=function(){
   setTimeout(()=>{
     if(menu)menu.style.display='none';
     if(ov)ov.style.display='none';
-    const playerEl=document.getElementById('czm-player');
-    const isPlayerOpen=playerEl&&playerEl.classList.contains('czm-on');
-    const npbar=document.getElementById('czm-npbar');
-    if(npbar){
-      // Selalu hapus display:none!important agar nanti bisa tampil
-      npbar.style.removeProperty('display');
-      // Tampilkan czm-vis hanya kalau player tidak sedang terbuka
-      if(!isPlayerOpen && npbar.dataset.hasTrack==='1'){
-        npbar.classList.add('czm-vis');
-      }
-    }
   },300);
 };
 window.czmBsPlay=function(){czmCloseBs();if(czmBsId)czmPlayById(czmBsId);};
