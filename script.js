@@ -1277,6 +1277,28 @@ window.czmCloseSearch=function(){
     ov.style.setProperty('display','none','important');
     setTimeout(function(){ ov.style.removeProperty('display'); }, 500);
   }
+
+  // Kalau search dibuka dari Top Songs → tetap di Top, restore npbar
+  if(window._czmSearchFromTop){
+    window._czmSearchFromTop = false;
+    setTimeout(function(){
+      const npbar = document.getElementById('czm-npbar');
+      if(npbar){ npbar.style.removeProperty('display'); if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis'); }
+    }, 100);
+    return;
+  }
+
+  // Kalau full player masih terbuka, sembunyikan mini player
+  const playerEl = document.getElementById('czm-player');
+  const isPlayerOpen = playerEl && playerEl.classList.contains('czm-on');
+  if(isPlayerOpen){
+    const npbar = document.getElementById('czm-npbar');
+    if(npbar){
+      npbar.classList.remove('czm-vis');
+      npbar.style.setProperty('display','none','important');
+      setTimeout(function(){ npbar.style.removeProperty('display'); }, 500);
+    }
+  }
 };
 
 /* Hanya sembunyikan search sementara (saat putar lagu/buka artis dari search)
@@ -2399,17 +2421,30 @@ window.czmOpenArtistTopSongs = function(){
     </div>`;
   }).join('');
 
-  // Tampilkan npbar
-  const npbar = document.getElementById('czm-npbar');
-  if(npbar){ npbar.style.removeProperty('display'); if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis'); }
-
+  // Buka halaman dulu, baru tampilkan npbar setelah page visible (hindari flash di artist page)
   page.classList.add('open');
+  setTimeout(function(){
+    const npbar = document.getElementById('czm-npbar');
+    if(npbar){ npbar.style.removeProperty('display'); if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis'); }
+  }, 80);
 };
 
 window.czmCloseArtistTopSongs = function(){
   const page = document.getElementById('czm-top-songs-page');
   if(page) page.classList.remove('open');
-  // npbar tetap tampil
+  // Sembunyikan npbar → artist page terlihat bersih tanpa mini player
+  const npbar = document.getElementById('czm-npbar');
+  if(npbar){
+    npbar.classList.remove('czm-vis');
+    npbar.style.setProperty('display','none','important');
+    setTimeout(()=>{ npbar.style.removeProperty('display'); }, 400);
+  }
+};
+
+/* Buka search dari halaman Top Songs — Top tetap open di belakang */
+window.czmTspOpenSearch = function(){
+  window._czmSearchFromTop = true;  // flag: balik ke Top saat search ditutup
+  czmOpenSearch();
 };
 
 window.czmSyncTspActive = function(){
