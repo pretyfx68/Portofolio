@@ -6,6 +6,7 @@
 var czmSearchWasOpen = false;  // apakah search aktif saat player dibuka
 var czmLastSearchQuery = '';   // query terakhir di search
 var czmNavStack = [];          // stack: 'search' | 'topSongs' | 'artistPage'
+var _czmReturnToTopAfterSearch = false; // setelah search ditutup → balik ke Top Songs
 
 
 function togglePanel(btn){
@@ -557,13 +558,21 @@ function czmSyncUI(idx, skipPlaylist){
   // update now playing row di tab berikutnya
   if(typeof czmUpdateNowPlayingRow==='function') czmUpdateNowPlayingRow();
   // re-render artist page kalau sedang terbuka (biar highlight lagu aktif pindah)
-  // SKIP saat di top songs page — czmOpenArtistPage akan hide npbar yang baru saja kita tampilkan
   const _apPage = document.getElementById('czm-artist-page');
-  if(_apPage && _apPage.classList.contains('open') && !window._czmInTopSongs){
+  if(_apPage && _apPage.classList.contains('open')){
     const _apKey = _apPage.dataset.artistKey || '';
-    if(_apKey && typeof czmOpenArtistPage === 'function') setTimeout(()=>czmOpenArtistPage(_apKey), 120);
+    if(_apKey && typeof czmOpenArtistPage === 'function'){
+      setTimeout(()=>{
+        czmOpenArtistPage(_apKey);
+        // Kalau lagi di top songs, restore npbar yang mungkin disembunyikan oleh czmOpenArtistPage
+        if(window._czmInTopSongs){
+          const _npbarFix = document.getElementById('czm-npbar');
+          if(_npbarFix){ _npbarFix.style.removeProperty('display'); if(_npbarFix.dataset.hasTrack==='1') _npbarFix.classList.add('czm-vis'); }
+        }
+      }, 120);
+    }
   }
-  // Kalau lagi di top songs: cukup update highlight row saja tanpa re-render artist page
+  // Kalau lagi di top songs: update highlight row
   if(window._czmInTopSongs && typeof czmSyncTspActive === 'function') setTimeout(czmSyncTspActive, 80);
   // sync topbar mini (tampil saat tab terbuka)
   const tma=document.getElementById('czm-topbar-mini-art');
@@ -944,10 +953,13 @@ window.czmNpbarClick = function(){
   }
 
   if(window._czmSearchFromTop){
-    // Kasus: user di search yang dibuka dari top songs
-    // → buka player, saat player ditutup harus balik ke search (bukan top songs)
-    window._czmSearchFromTop = false; // clear flag, czmGoHome pakai czmSearchWasOpen
-    czmSearchWasOpen = true;
+    // User di search yang dibuka dari Top Songs
+    // Flow: search → player → ← player → search → ← search → Top Songs
+    // Tandai: saat player ditutup (czmGoHome) → balik ke search
+    // Saat search ditutup (czmCloseSearch) → balik ke Top Songs
+    window._czmSearchFromTop = false;
+    czmSearchWasOpen = true; // player → balik ke search
+    window._czmReturnToTopAfterSearch = true; // search → balik ke Top Songs
     const inp = document.getElementById('czm-search-inp');
     if(inp) czmLastSearchQuery = inp.value || '';
     czmOpenPlayer();
@@ -1352,11 +1364,25 @@ window.czmCloseSearch=function(){
     setTimeout(function(){ ov.style.removeProperty('display'); }, 500);
   }
 
-  // Kalau search dibuka dari Top Songs → tetap di Top, hide npbar lagi
+  // Kalau search dibuka dari Top Songs via mini player → balik ke Top Songs
+  if(window._czmReturnToTopAfterSearch){
+    window._czmReturnToTopAfterSearch = false;
+    window._czmInTopSongs = true;
+    const tspPage = document.getElementById('czm-top-songs-page');
+    if(tspPage) tspPage.classList.add('open');
+    const npbar2 = document.getElementById('czm-npbar');
+    if(npbar2){ npbar2.style.removeProperty('display'); if(npbar2.dataset.hasTrack==='1') npbar2.classList.add('czm-vis'); }
+    return;
+  }
+
+  // Kalau search dibuka dari Top Songs (tombol search) → tetap di Top, hide npbar lagi
   if(window._czmSearchFromTop){
     window._czmSearchFromTop = false;
+    window._czmInTopSongs = true;
+    const tspPage = document.getElementById('czm-top-songs-page');
+    if(tspPage) tspPage.classList.add('open');
     const npbar = document.getElementById('czm-npbar');
-    if(npbar){ npbar.classList.remove('czm-vis'); npbar.style.setProperty('display','none','important'); setTimeout(()=>{ npbar.style.removeProperty('display'); }, 300); }
+    if(npbar){ npbar.style.removeProperty('display'); if(npbar.dataset.hasTrack==='1') npbar.classList.add('czm-vis'); }
     return;
   }
 

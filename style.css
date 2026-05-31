@@ -8110,7 +8110,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
 #music .czm-tsp-list {
-  flex: 1; overflow-y: auto; padding-bottom: 80px;
+  flex: 1; overflow-y: auto; padding-bottom: 0;
 }
 
 #music .czm-tsp-item {
