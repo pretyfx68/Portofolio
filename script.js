@@ -422,13 +422,9 @@ window.czmPlayById=function(id, fromUser){
   if(typeof loadSongByIndex==='function') loadSongByIndex(idx);
   const _npbar = document.getElementById('czm-npbar');
 
-  // Kalau sedang di Top Songs → tampilkan npbar, jangan buka player
+  // Kalau sedang di Top Songs → jangan buka player, jangan show npbar
   if(window._czmInTopSongs){
-    if(_npbar){
-      _npbar.dataset.hasTrack = '1';
-      _npbar.style.removeProperty('display');
-      _npbar.classList.add('czm-vis');
-    }
+    if(_npbar) _npbar.dataset.hasTrack = '1'; // set flag saja, TIDAK add czm-vis
     setTimeout(()=>{ if(typeof playAudio==='function') playAudio(); }, 80);
     czmSyncUI(idx, true);
     setTimeout(czmSyncTspActive, 50);
@@ -930,9 +926,40 @@ setInterval(czmTickProgress,500);
 
 
 /* ---------- navigation ---------- */
+/* ===== Handler klik mini player (npbar) — satu tempat, semua kasus beres ===== */
+window.czmNpbarClick = function(){
+  const _sov = document.getElementById('czm-search-ov');
+  const searchIsOpen = !!(_sov && _sov.classList.contains('czm-on'));
+
+  if(window._czmInTopSongs && !window._czmSearchFromTop){
+    // Kasus: user di Top Songs (bukan search yang dibuka dari top songs)
+    // → tandai harus balik ke top songs, tutup top songs page
+    // → JANGAN tutup artist page (biar tetap ada saat player ditutup)
+    window._czmReturnToTop = true;
+    window._czmInTopSongs = false;
+    const tspPage = document.getElementById('czm-top-songs-page');
+    if(tspPage) tspPage.classList.remove('open');
+    setTimeout(czmOpenPlayer, 50);
+    return;
+  }
+
+  if(window._czmSearchFromTop){
+    // Kasus: user di search yang dibuka dari top songs
+    // → buka player, saat player ditutup harus balik ke search (bukan top songs)
+    window._czmSearchFromTop = false; // clear flag, czmGoHome pakai czmSearchWasOpen
+    czmSearchWasOpen = true;
+    const inp = document.getElementById('czm-search-inp');
+    if(inp) czmLastSearchQuery = inp.value || '';
+    czmOpenPlayer();
+    return;
+  }
+
+  // Kasus normal: dari home atau search biasa
+  czmSearchWasOpen = searchIsOpen;
+  czmOpenPlayer();
+};
+
 window.czmOpenPlayer=function(){
-  // Kalau dibuka dari top songs context → tandai agar czmGoHome tahu harus balik ke top songs
-  if(window._czmInTopSongs) window._czmReturnToTop = true;
   // Sembunyikan search overlay saat player terbuka
   const searchOv = document.getElementById('czm-search-ov');
   if(searchOv) searchOv.classList.remove('czm-on');

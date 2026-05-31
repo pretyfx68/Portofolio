@@ -8129,20 +8129,24 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 #music .czm-tsp-img-wrap {
   position: relative; width: 50px; height: 50px; flex-shrink: 0;
 }
+/* Bars animasi — pojok kanan bawah thumbnail (YouTube Music style) */
 #music .czm-tsp-bars {
-  position: absolute; inset: 0;
-  display: flex; align-items: flex-end; justify-content: center; gap: 3px;
-  background: rgba(10,22,40,0.55); border-radius: 4px;
-  padding: 0 0 7px;
+  position: absolute;
+  bottom: 3px; right: 3px;
+  display: flex; align-items: flex-end; gap: 2px;
+  background: rgba(10,22,40,0.72);
+  border-radius: 3px;
+  padding: 3px 4px;
+  box-sizing: border-box;
 }
 #music .czm-tsp-bars span {
-  display: block; width: 3.5px; border-radius: 2px;
+  display: block; width: 3px; border-radius: 1.5px;
   background: #00d9ff;
   animation: czm-bar-anim 0.7s ease-in-out infinite alternate;
 }
-#music .czm-tsp-bars span:nth-child(1) { height: 8px; animation-delay: 0s; }
-#music .czm-tsp-bars span:nth-child(2) { height: 16px; animation-delay: 0.18s; }
-#music .czm-tsp-bars span:nth-child(3) { height: 11px; animation-delay: 0.36s; }
+#music .czm-tsp-bars span:nth-child(1) { height: 7px; animation-delay: 0s; }
+#music .czm-tsp-bars span:nth-child(2) { height: 14px; animation-delay: 0.18s; }
+#music .czm-tsp-bars span:nth-child(3) { height: 9px; animation-delay: 0.36s; }
 #music .czm-tsp-bars.czm-paused span { animation-play-state: paused; }
 #music .czm-tsp-info { flex: 1; min-width: 0; }
 #music .czm-tsp-title-txt {
