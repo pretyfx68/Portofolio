@@ -2656,6 +2656,9 @@ window.czmTspSyncPlayBtn = function(){
   if(!ico) return;
   ico.className = window.isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play';
 };
+
+/* Buka search dari halaman Top Songs — Top tetap open di belakang */
+window.czmTspOpenSearch = function(){
   window._czmSearchFromTop = true;  // flag: balik ke Top saat search ditutup
   // Show mini player saat masuk search dari top songs
   const npbar = document.getElementById('czm-npbar');
