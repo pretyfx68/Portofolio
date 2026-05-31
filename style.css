@@ -4849,7 +4849,7 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 #music .czm-sc-btn-save { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.3); }
 
 /* ===== BOTTOM SHEET ===== */
-#music .czm-bs-ov   { display:none; position:fixed; inset:0; background:rgba(15,32,53,0.5); z-index:10060; }
+#music .czm-bs-ov   { display:none; position:fixed; inset:0; background:rgba(15,32,53,0.5); z-index:10065; }
 #music .czm-bs-menu {
   display:none; position:fixed; bottom:0; left:0; right:0; z-index:10061;
   background:#1a2d42; border-radius:16px 16px 0 0; overflow:hidden;
@@ -8064,7 +8064,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   overscroll-behavior-y: contain;
 }
 /* ===== TOMBOL SEMUA di header Lagu Populer ===== */
-#music .czm-ap-semua-btn {
+#czm-artist-page .czm-ap-semua-btn {
   background: none;
   border: 1.5px solid rgba(255,255,255,0.35);
   color: #fff;
@@ -8082,7 +8082,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   letter-spacing: 0.2px;
   transition: background 0.15s;
 }
-#music .czm-ap-semua-btn:active { background: rgba(255,255,255,0.1); }
+#czm-artist-page .czm-ap-semua-btn:active { background: rgba(255,255,255,0.1); }
 
 /* ===== HALAMAN LAGU TOP ===== */
 #music .czm-top-songs-page {

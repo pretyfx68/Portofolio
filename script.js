@@ -446,6 +446,19 @@ window.czmPlayById=function(id, fromUser){
   }
   const playerEl = document.getElementById('czm-player');
   const isPlayerOpen = playerEl && playerEl.classList.contains('czm-on');
+
+  // Kalau sedang di halaman Top Songs → jangan buka player, cukup update npbar
+  if(window._czmInTopSongs){
+    const _npbar2 = document.getElementById('czm-npbar');
+    if(_npbar2){
+      _npbar2.dataset.hasTrack = '1';
+      _npbar2.style.removeProperty('display');
+      _npbar2.classList.add('czm-vis');
+    }
+    setTimeout(czmSyncTspActive, 50);
+    return;
+  }
+
   if(!isPlayerOpen){
     czmOpenPlayer();
     setTimeout(()=>{ czmRenderPlBox(null); }, 420);
@@ -968,6 +981,21 @@ window.czmGoHome=function(){
   playerEl.classList.remove('czm-on');
   const m = document.getElementById('czm-more-menu');
   if(m) m.classList.remove('open');
+
+  // Kalau dibuka dari Top Songs → kembali ke Top Songs
+  if(window._czmReturnToTop){
+    window._czmReturnToTop = false;
+    window._czmInTopSongs = true;
+    const tspPage = document.getElementById('czm-top-songs-page');
+    if(tspPage) tspPage.classList.add('open');
+    // Tampilkan npbar lagi
+    const _npbarT = document.getElementById('czm-npbar');
+    if(_npbarT && _npbarT.dataset.hasTrack==='1'){
+      _npbarT.style.removeProperty('display');
+      _npbarT.classList.add('czm-vis');
+    }
+    return;
+  }
 
   // Kalau search sedang terbuka sebelum player → balik ke search langsung
   if(czmSearchWasOpen){
@@ -2422,6 +2450,7 @@ window.czmOpenArtistTopSongs = function(){
   }).join('');
 
   // Buka halaman dulu, baru tampilkan npbar setelah page visible (hindari flash di artist page)
+  window._czmInTopSongs = true;
   page.classList.add('open');
   setTimeout(function(){
     const npbar = document.getElementById('czm-npbar');
@@ -2430,6 +2459,7 @@ window.czmOpenArtistTopSongs = function(){
 };
 
 window.czmCloseArtistTopSongs = function(){
+  window._czmInTopSongs = false;
   const page = document.getElementById('czm-top-songs-page');
   if(page) page.classList.remove('open');
 
@@ -2476,10 +2506,9 @@ window.czmCloseArtistPage = function(){
   const playerEl = document.getElementById('czm-player');
   const isPlayerOpen = playerEl && playerEl.classList.contains('czm-on');
 
-  // Dibuka dari player → kembali ke player, jangan restore search/npbar
+  // Dibuka dari player → kembali ke player, biarkan czmGoHome yang handle restore search
   if(openedFrom === 'player'){
-    // Reset semua flag search supaya tidak bocor ke navigasi berikutnya
-    czmSearchWasOpen = false;
+    // Jangan reset czmSearchWasOpen agar czmGoHome masih bisa restore search
     window._czmSearchFromTop = false;
     // Tutup search overlay kalau terbuka secara tidak sengaja
     const strayOv = document.getElementById('czm-search-ov');
