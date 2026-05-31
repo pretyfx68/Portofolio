@@ -558,22 +558,25 @@ function czmSyncUI(idx, skipPlaylist){
   // update now playing row di tab berikutnya
   if(typeof czmUpdateNowPlayingRow==='function') czmUpdateNowPlayingRow();
   // re-render artist page kalau sedang terbuka (biar highlight lagu aktif pindah)
-  const _apPage = document.getElementById('czm-artist-page');
-  if(_apPage && _apPage.classList.contains('open')){
-    const _apKey = _apPage.dataset.artistKey || '';
-    if(_apKey && typeof czmOpenArtistPage === 'function'){
-      setTimeout(()=>{
-        czmOpenArtistPage(_apKey);
-        // Kalau lagi di top songs, restore npbar yang mungkin disembunyikan oleh czmOpenArtistPage
-        if(window._czmInTopSongs){
-          const _npbarFix = document.getElementById('czm-npbar');
-          if(_npbarFix){ _npbarFix.style.removeProperty('display'); if(_npbarFix.dataset.hasTrack==='1') _npbarFix.classList.add('czm-vis'); }
-        }
-      }, 120);
+  // Skip saat _czmInTopSongs agar tidak trigger npbar flash
+  if(!window._czmInTopSongs){
+    const _apPage = document.getElementById('czm-artist-page');
+    if(_apPage && _apPage.classList.contains('open')){
+      const _apKey = _apPage.dataset.artistKey || '';
+      if(_apKey && typeof czmOpenArtistPage === 'function'){
+        setTimeout(()=>{ czmOpenArtistPage(_apKey); }, 120);
+      }
     }
   }
-  // Kalau lagi di top songs: update highlight row
-  if(window._czmInTopSongs && typeof czmSyncTspActive === 'function') setTimeout(czmSyncTspActive, 80);
+  // Kalau lagi di top songs: update highlight row saja, pastikan npbar TIDAK muncul
+  if(window._czmInTopSongs){
+    if(typeof czmSyncTspActive === 'function') setTimeout(czmSyncTspActive, 80);
+    if(typeof czmTspSyncPlayBtn === 'function') setTimeout(czmTspSyncPlayBtn, 100);
+    // Paksa npbar tetap hidden
+    const _npbarTs2 = document.getElementById('czm-npbar');
+    if(_npbarTs2){ _npbarTs2.classList.remove('czm-vis'); _npbarTs2.style.setProperty('display','none','important'); setTimeout(()=>{ _npbarTs2.style.removeProperty('display'); }, 50); }
+    return;
+  }
   // sync topbar mini (tampil saat tab terbuka)
   const tma=document.getElementById('czm-topbar-mini-art');
   const tmt=document.getElementById('czm-topbar-mini-title');
@@ -1191,7 +1194,7 @@ function czmRenderRecentSearches() {
         <div class="czm-q-title">${a.name}</div>
         <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
       </div>
-      <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet(safeKey)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   });
 
@@ -1287,7 +1290,7 @@ window.czmSearchTyping = function(val){
         <div class="czm-q-title">${a.name}</div>
         <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
       </div>
-      <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet(safeKey)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   });
 
@@ -1574,7 +1577,7 @@ window.czmDoSearch=function(q){
             html+=`<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
               <div class="czm-q-artist-circle"><img data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy"></div>
               <div class="czm-q-info"><div class="czm-q-title">${a.name}</div><div class="czm-q-sub">Artis • ${a.pendengar} pendengar bulanan</div></div>
-              <button class="czm-q-more-btn" onclick="event.stopPropagation()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+              <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet(safeKey)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             </div>`;
 
             // 2-3 lagu random dari artis ini (exclude duplikat)
@@ -2545,13 +2548,114 @@ window.czmCloseArtistTopSongs = function(){
     setTimeout(()=>{ ov.style.removeProperty('display'); }, 400);
   }
 
-  // Npbar memang sudah hidden di top songs — pastikan tetap hidden saat balik ke artist page
+  // Cek apakah artist page masih open (kembali ke artis) atau ke home
+  const artistPage = document.getElementById('czm-artist-page');
+  const isArtistOpen = artistPage && artistPage.classList.contains('open');
   const npbar = document.getElementById('czm-npbar');
-  if(npbar){ npbar.classList.remove('czm-vis'); }
+  if(isArtistOpen){
+    // Kembali ke artist page → tetap hide npbar
+    if(npbar){ npbar.classList.remove('czm-vis'); }
+  } else {
+    // Kembali ke home → tampilkan npbar kalau ada lagu
+    if(npbar && npbar.dataset.hasTrack === '1'){
+      npbar.style.removeProperty('display');
+      npbar.classList.add('czm-vis');
+    }
+  }
 };
 
-/* Buka search dari halaman Top Songs — Top tetap open di belakang */
-window.czmTspOpenSearch = function(){
+/* Bottom sheet artis dari tampilan search — gaya YT Music */
+window.czmOpenArtistSheet = function(artistKey){
+  const a = (typeof artists !== 'undefined') ? artists[artistKey] : null;
+  const name = a ? a.name : artistKey;
+  const listeners = a ? a.pendengar : '';
+  const img = a ? a.image : '';
+
+  // Hapus overlay lama kalau ada
+  const oldOv = document.getElementById('czm-art-sheet-ov');
+  if(oldOv) oldOv.remove();
+
+  const ov = document.createElement('div');
+  ov.id = 'czm-art-sheet-ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10072;background:rgba(0,0,0,0.6);display:flex;flex-direction:column;justify-content:flex-end;';
+  ov.innerHTML = `
+    <div id="czm-art-sheet-menu" style="background:#1e2a3a;border-radius:16px 16px 0 0;padding:0 0 24px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);">
+      <!-- Handle -->
+      <div style="display:flex;justify-content:center;padding:10px 0 4px;"><div style="width:36px;height:4px;background:#444;border-radius:2px;"></div></div>
+      <!-- Header artis -->
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px 14px;">
+        <img src="${img}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
+        <div>
+          <div style="font-size:16px;font-weight:700;color:#fff;">${name}</div>
+          ${listeners ? `<div style="font-size:13px;color:#aaa;margin-top:2px;">${listeners} pendengar bulanan</div>` : ''}
+        </div>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08);margin:0 0 8px;"></div>
+      <!-- Action buttons row -->
+      <div style="display:flex;gap:10px;padding:14px 16px 8px;justify-content:center;">
+        <div onclick="czmArtistSheetShuffle('${artistKey}');document.getElementById('czm-art-sheet-ov').remove();" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;">
+          <div style="width:52px;height:52px;background:#243548;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;"><i class="fa-solid fa-shuffle"></i></div>
+          <span style="font-size:11px;color:#ccc;text-align:center;">Putar acak</span>
+        </div>
+        <div onclick="alert('Mix dari ${name} — coming soon');document.getElementById('czm-art-sheet-ov').remove();" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;">
+          <div style="width:52px;height:52px;background:#243548;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;"><i class="fa-solid fa-radio"></i></div>
+          <span style="font-size:11px;color:#ccc;text-align:center;">Mulai mix</span>
+        </div>
+        <div onclick="czmArtistSheetShare('${artistKey}');document.getElementById('czm-art-sheet-ov').remove();" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;">
+          <div style="width:52px;height:52px;background:#243548;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;"><i class="fa-solid fa-share-nodes"></i></div>
+          <span style="font-size:11px;color:#ccc;text-align:center;">Bagikan</span>
+        </div>
+      </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08);margin:8px 0;"></div>
+      <!-- List menu -->
+      <div onclick="czmHideSearch();czmOpenArtistPage('${artistKey}');document.getElementById('czm-art-sheet-ov')?.remove();" style="display:flex;align-items:center;gap:16px;padding:14px 20px;cursor:pointer;">
+        <i class="fa-solid fa-user" style="color:#aaa;font-size:18px;width:22px;text-align:center;"></i>
+        <span style="font-size:14px;color:#fff;font-weight:500;">Lihat artis</span>
+      </div>
+      <div onclick="czmDeleteRecentQ('${name}');document.getElementById('czm-art-sheet-ov').remove();" style="display:flex;align-items:center;gap:16px;padding:14px 20px;cursor:pointer;">
+        <i class="fa-solid fa-trash-can" style="color:#aaa;font-size:18px;width:22px;text-align:center;"></i>
+        <span style="font-size:14px;color:#fff;font-weight:500;">Hapus dari histori</span>
+      </div>
+    </div>`;
+
+  document.body.appendChild(ov);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.getElementById('czm-art-sheet-menu').style.transform = 'translateY(0)';
+  }));
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
+};
+
+window.czmArtistSheetShuffle = function(artistKey){
+  const pl = window.playlist || [];
+  const songs = pl.slice(1).filter(s=>(s.artist||'').toLowerCase().includes(artistKey.toLowerCase()));
+  if(!songs.length) return;
+  const pick = songs[Math.floor(Math.random()*songs.length)];
+  if(typeof czmPlayById==='function') czmPlayById(pick.id, true);
+};
+
+window.czmArtistSheetShare = function(artistKey){
+  const a = (typeof artists !== 'undefined') ? artists[artistKey] : null;
+  const name = a ? a.name : artistKey;
+  if(navigator.share){ navigator.share({title: name, text: 'Dengarkan '+name+' di CyberZain Music'}); }
+  else { alert('Bagikan: '+name); }
+};
+
+/* Toggle play/pause dari tombol di Top Songs */
+window.czmTspTogglePlay = function(){
+  if(window.isPlaying){
+    if(typeof pauseAudio==='function') pauseAudio();
+  } else {
+    if(typeof playAudio==='function') playAudio();
+  }
+  setTimeout(czmTspSyncPlayBtn, 80);
+};
+
+/* Sync ikon play/pause button di topbar Top Songs */
+window.czmTspSyncPlayBtn = function(){
+  const ico = document.getElementById('czm-tsp-play-ico');
+  if(!ico) return;
+  ico.className = window.isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+};
   window._czmSearchFromTop = true;  // flag: balik ke Top saat search ditutup
   // Show mini player saat masuk search dari top songs
   const npbar = document.getElementById('czm-npbar');
