@@ -4639,7 +4639,7 @@ box-shadow: 0 -4px 12px rgba(0, 217, 255, 0.1);
 }
 
 /* ===== SEARCH OVERLAY ===== */
-#music .czm-search-ov { display:none!important; position:fixed; inset:0; z-index:10003; background:#0a1628; flex-direction:column; }
+#music .czm-search-ov { display:none!important; position:fixed; inset:0; z-index:10070; background:#0a1628; flex-direction:column; }
 #music .czm-search-ov.czm-on { display:flex!important; }
 #music .czm-search-bar { padding:10px 12px; display:flex; align-items:center; gap:8px; background:#0a1628; flex-shrink:0; }
 #music .czm-search-input-wrap{
@@ -8086,7 +8086,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 
 /* ===== HALAMAN LAGU TOP ===== */
 #music .czm-top-songs-page {
-  display: none; position: fixed; inset: 0; z-index: 10060;
+  display: none; position: fixed; inset: 0; z-index: 10062;
   background: #000; flex-direction: column;
   font-family: inherit;
 }
