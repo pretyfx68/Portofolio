@@ -421,6 +421,20 @@ window.czmPlayById=function(id, fromUser){
   }
   if(typeof loadSongByIndex==='function') loadSongByIndex(idx);
   const _npbar = document.getElementById('czm-npbar');
+
+  // Kalau sedang di Top Songs → tampilkan npbar, jangan buka player
+  if(window._czmInTopSongs){
+    if(_npbar){
+      _npbar.dataset.hasTrack = '1';
+      _npbar.style.removeProperty('display');
+      _npbar.classList.add('czm-vis');
+    }
+    setTimeout(()=>{ if(typeof playAudio==='function') playAudio(); }, 80);
+    czmSyncUI(idx, true);
+    setTimeout(czmSyncTspActive, 50);
+    return;
+  }
+
   if(_npbar){
     _npbar.dataset.hasTrack = '1';
     _npbar.style.removeProperty('display');
@@ -447,18 +461,6 @@ window.czmPlayById=function(id, fromUser){
   }
   const playerEl = document.getElementById('czm-player');
   const isPlayerOpen = playerEl && playerEl.classList.contains('czm-on');
-
-  // Kalau sedang di halaman Top Songs → jangan buka player, cukup update npbar
-  if(window._czmInTopSongs){
-    const _npbar2 = document.getElementById('czm-npbar');
-    if(_npbar2){
-      _npbar2.dataset.hasTrack = '1';
-      _npbar2.style.removeProperty('display');
-      _npbar2.classList.add('czm-vis');
-    }
-    setTimeout(czmSyncTspActive, 50);
-    return;
-  }
 
   if(!isPlayerOpen){
     czmOpenPlayer();
@@ -987,7 +989,12 @@ window.czmGoHome=function(){
   if(window._czmReturnToTop){
     window._czmReturnToTop = false;
     window._czmInTopSongs = true;
-    czmSearchWasOpen = false; // reset search flag - top songs lebih prioritas
+    czmSearchWasOpen = false;
+    // Pastikan czm-home visible sebagai background
+    const homeEl = document.getElementById('czm-home');
+    if(homeEl) homeEl.classList.add('czm-on');
+    const topBar = document.querySelector('.top-bar');
+    if(topBar) topBar.style.display = '';
     const tspPage = document.getElementById('czm-top-songs-page');
     if(tspPage) tspPage.classList.add('open');
     // Tampilkan npbar lagi
@@ -2798,7 +2805,11 @@ window.czmOpenBs=function(id,e){
   const ov=document.getElementById('czm-bs-ov'),menu=document.getElementById('czm-bs-menu');
   ov.style.display='block';menu.style.display='block';
   requestAnimationFrame(()=>requestAnimationFrame(()=>menu.style.transform='translateY(0)'));
-  // Jangan sembunyikan npbar — biarkan apa adanya
+  // Sembunyikan npbar sementara agar tidak muncul di atas bottom sheet
+  if(window._czmInTopSongs){
+    const npbar=document.getElementById('czm-npbar');
+    if(npbar) npbar.style.setProperty('visibility','hidden');
+  }
 };
 window.czmCloseBs=function(){
   const menu=document.getElementById('czm-bs-menu'),ov=document.getElementById('czm-bs-ov');
@@ -2806,6 +2817,9 @@ window.czmCloseBs=function(){
   setTimeout(()=>{
     if(menu)menu.style.display='none';
     if(ov)ov.style.display='none';
+    // Restore npbar visibility
+    const npbar=document.getElementById('czm-npbar');
+    if(npbar) npbar.style.removeProperty('visibility');
   },300);
 };
 window.czmBsPlay=function(){czmCloseBs();if(czmBsId)czmPlayById(czmBsId);};

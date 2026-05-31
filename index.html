@@ -1936,7 +1936,7 @@ href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2
 <p id="cp-copyright"> &copy; 2026 Development Cyberzain. All right reserved</p>
 </footer>
 <!-- NOW PLAYING BAR — di body level agar position:fixed selalu nempel layar -->
-<div class="czm-npbar" id="czm-npbar" onclick="if(window._czmInTopSongs){ window._czmReturnToTop=true; czmCloseArtistTopSongs(); setTimeout(czmOpenPlayer,50); } else { var _sov=document.getElementById('czm-search-ov');czmSearchWasOpen=!!(_sov&&_sov.classList.contains('czm-on'));czmOpenPlayer(); }">
+<div class="czm-npbar" id="czm-npbar" onclick="if(window._czmInTopSongs){ window._czmReturnToTop=true; window._czmInTopSongs=false; document.getElementById('czm-top-songs-page').classList.remove('open'); var _ap=document.getElementById('czm-artist-page'); if(_ap) _ap.classList.remove('open'); setTimeout(czmOpenPlayer,50); } else { var _sov=document.getElementById('czm-search-ov');czmSearchWasOpen=!!(_sov&&_sov.classList.contains('czm-on'));czmOpenPlayer(); }">
   <div class="czm-np-prog"><div class="czm-np-fill" id="czm-np-fill"></div></div>
   <img class="czm-np-thumb" id="czm-np-thumb" src="" alt="">
   <div class="czm-np-info">
