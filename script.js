@@ -1194,7 +1194,7 @@ function czmRenderRecentSearches() {
         <div class="czm-q-title">${a.name}</div>
         <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
       </div>
-      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet(safeKey)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet('${safeKey}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   });
 
@@ -1290,7 +1290,7 @@ window.czmSearchTyping = function(val){
         <div class="czm-q-title">${a.name}</div>
         <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
       </div>
-      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet(safeKey)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet('${safeKey}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   });
 
@@ -1577,7 +1577,7 @@ window.czmDoSearch=function(q){
             html+=`<div class="czm-qitem" onclick="czmHideSearch();czmOpenArtistPage('${safeKey}')">
               <div class="czm-q-artist-circle"><img data-src="${a.image}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" loading="lazy"></div>
               <div class="czm-q-info"><div class="czm-q-title">${a.name}</div><div class="czm-q-sub">Artis • ${a.pendengar} pendengar bulanan</div></div>
-              <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet(safeKey)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+              <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet('${safeKey}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             </div>`;
 
             // 2-3 lagu random dari artis ini (exclude duplikat)
@@ -2520,7 +2520,7 @@ window.czmOpenArtistTopSongs = function(){
       </div>
       <div class="czm-tsp-info">
         <div class="czm-tsp-title-txt${isActive?' czm-tsp-playing':''}">${s.title}</div>
-        <div class="czm-tsp-meta">${name} • ${s.duration||''} • ${fv(s.views)} pemutaran</div>
+        <div class="czm-tsp-meta">${name}${s.duration ? ' • '+s.duration : ''} • ${fv(s.views)} pemutaran</div>
       </div>
       <button class="czm-tsp-more" onclick="event.stopPropagation();czmOpenBs('${s.id}',event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
