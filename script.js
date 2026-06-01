@@ -1130,6 +1130,21 @@ window.czmDeleteRecentQ = function(q){
   else czmRenderRecentSearches();
 };
 
+/* Hapus artis dari histori — case-insensitive, cocokkan by name DAN key */
+window.czmDeleteArtistHistory = function(artistKey, artistName){
+  const kLow = artistKey.toLowerCase();
+  const nLow = artistName.toLowerCase();
+  czmRecentSearches = czmRecentSearches.filter(x => {
+    const xLow = x.toLowerCase();
+    return xLow !== kLow && xLow !== nLow;
+  });
+  localStorage.setItem('czm_recent_q', JSON.stringify(czmRecentSearches));
+  const inp = document.getElementById('czm-search-inp');
+  const val = inp ? inp.value.trim() : '';
+  if(val) czmSearchTyping(val);
+  else czmRenderRecentSearches();
+};
+
 // 1. Fungsi Utama (Jangan potong di tengah!)
 // --- AREA CZM ENGINE (Cari lokasi fungsi czmRenderHome, taruh di bawahnya) ---
 
@@ -1194,7 +1209,7 @@ function czmRenderRecentSearches() {
         <div class="czm-q-title">${a.name}</div>
         <div class="czm-q-sub">${a.pendengar} pendengar bulanan</div>
       </div>
-      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet('${safeKey}')"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <button class="czm-q-more-btn" onclick="event.stopPropagation();czmOpenArtistSheet('${safeKey}',true)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>`;
   });
 
@@ -2565,64 +2580,74 @@ window.czmCloseArtistTopSongs = function(){
 };
 
 /* Bottom sheet artis dari tampilan search — gaya YT Music */
-window.czmOpenArtistSheet = function(artistKey){
+window.czmOpenArtistSheet = function(artistKey, isFromHistory){
   const a = (typeof artists !== 'undefined') ? artists[artistKey] : null;
   const name = a ? a.name : artistKey;
   const listeners = a ? a.pendengar : '';
   const img = a ? a.image : '';
+  const safeKey = artistKey.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
   // Hapus overlay lama kalau ada
   const oldOv = document.getElementById('czm-art-sheet-ov');
   if(oldOv) oldOv.remove();
 
+  // Sembunyikan npbar selama bottom sheet terbuka
+  const _npbarArt = document.getElementById('czm-npbar');
+  if(_npbarArt) _npbarArt.style.setProperty('visibility','hidden');
+
+  const closeArtSheet = `(function(){document.getElementById('czm-art-sheet-ov').remove();var n=document.getElementById('czm-npbar');if(n)n.style.removeProperty('visibility');})()`;
+
   const ov = document.createElement('div');
   ov.id = 'czm-art-sheet-ov';
   ov.style.cssText = 'position:fixed;inset:0;z-index:10072;background:rgba(0,0,0,0.6);display:flex;flex-direction:column;justify-content:flex-end;';
+
+  const hapusHtml = isFromHistory ? `
+      <div onclick="czmDeleteArtistHistory('${safeKey}','${safeName}');${closeArtSheet}" style="display:flex;align-items:center;gap:16px;padding:15px 20px;font-size:14px;color:#fff;cursor:pointer;">
+        <i class="fa-solid fa-trash-can" style="color:#777;font-size:16px;width:20px;text-align:center;"></i>
+        Hapus dari histori
+      </div>` : '';
+
   ov.innerHTML = `
-    <div id="czm-art-sheet-menu" style="background:#1e2a3a;border-radius:16px 16px 0 0;padding:0 0 24px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);">
-      <!-- Handle -->
+    <div id="czm-art-sheet-menu" style="background:#162032;border-radius:16px 16px 0 0;padding:0 0 20px;transform:translateY(100%);transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);">
       <div style="display:flex;justify-content:center;padding:10px 0 4px;"><div style="width:36px;height:4px;background:#444;border-radius:2px;"></div></div>
-      <!-- Header artis -->
-      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px 14px;">
-        <img src="${img}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">
-        <div>
-          <div style="font-size:16px;font-weight:700;color:#fff;">${name}</div>
-          ${listeners ? `<div style="font-size:13px;color:#aaa;margin-top:2px;">${listeners} pendengar bulanan</div>` : ''}
+      <!-- Header mirip gambar 2: foto + nama + X button -->
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 18px 14px;border-bottom:1px solid rgba(255,255,255,.07);">
+        <img src="${img}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;background:#1a2d42;" onerror="this.style.display='none'">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+          ${listeners ? `<div style="font-size:12px;color:#aaa;margin-top:2px;">${listeners} pendengar bulanan</div>` : ''}
+        </div>
+        <button onclick="${closeArtSheet}" style="background:none;border:none;color:#aaa;font-size:18px;cursor:pointer;padding:6px;flex-shrink:0;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <!-- Action buttons row — warna sama dengan sheet lagu -->
+      <div style="display:flex;justify-content:space-around;padding:16px 8px;border-bottom:1px solid rgba(255,255,255,.07);">
+        <div onclick="czmArtistSheetShuffle('${safeKey}');${closeArtSheet}" style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;flex:1;">
+          <div style="width:52px;height:52px;background:#1e4a7a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#00d9ff;box-shadow:0 0 8px rgba(0,217,255,0.1);"><i class="fa-solid fa-shuffle"></i></div>
+          <span style="font-size:11px;color:#aaa;text-align:center;">Putar acak</span>
+        </div>
+        <div onclick="alert('Mix dari ${safeName} — coming soon');${closeArtSheet}" style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;flex:1;">
+          <div style="width:52px;height:52px;background:#1e4a7a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#00d9ff;box-shadow:0 0 8px rgba(0,217,255,0.1);"><i class="fa-solid fa-radio"></i></div>
+          <span style="font-size:11px;color:#aaa;text-align:center;">Mulai mix</span>
+        </div>
+        <div onclick="czmArtistSheetShare('${safeKey}');${closeArtSheet}" style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;flex:1;">
+          <div style="width:52px;height:52px;background:#1e4a7a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#00d9ff;box-shadow:0 0 8px rgba(0,217,255,0.1);"><i class="fa-solid fa-share-nodes"></i></div>
+          <span style="font-size:11px;color:#aaa;text-align:center;">Bagikan</span>
         </div>
       </div>
-      <div style="border-top:1px solid rgba(255,255,255,0.08);margin:0 0 8px;"></div>
-      <!-- Action buttons row -->
-      <div style="display:flex;gap:10px;padding:14px 16px 8px;justify-content:center;">
-        <div onclick="czmArtistSheetShuffle('${artistKey}');document.getElementById('czm-art-sheet-ov').remove();" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;">
-          <div style="width:52px;height:52px;background:#243548;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;"><i class="fa-solid fa-shuffle"></i></div>
-          <span style="font-size:11px;color:#ccc;text-align:center;">Putar acak</span>
-        </div>
-        <div onclick="alert('Mix dari ${name} — coming soon');document.getElementById('czm-art-sheet-ov').remove();" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;">
-          <div style="width:52px;height:52px;background:#243548;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;"><i class="fa-solid fa-radio"></i></div>
-          <span style="font-size:11px;color:#ccc;text-align:center;">Mulai mix</span>
-        </div>
-        <div onclick="czmArtistSheetShare('${artistKey}');document.getElementById('czm-art-sheet-ov').remove();" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;">
-          <div style="width:52px;height:52px;background:#243548;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;"><i class="fa-solid fa-share-nodes"></i></div>
-          <span style="font-size:11px;color:#ccc;text-align:center;">Bagikan</span>
-        </div>
-      </div>
-      <div style="border-top:1px solid rgba(255,255,255,0.08);margin:8px 0;"></div>
       <!-- List menu -->
-      <div onclick="czmHideSearch();czmOpenArtistPage('${artistKey}');document.getElementById('czm-art-sheet-ov')?.remove();" style="display:flex;align-items:center;gap:16px;padding:14px 20px;cursor:pointer;">
-        <i class="fa-solid fa-user" style="color:#aaa;font-size:18px;width:22px;text-align:center;"></i>
-        <span style="font-size:14px;color:#fff;font-weight:500;">Lihat artis</span>
+      <div onclick="czmHideSearch();czmOpenArtistPage('${safeKey}');${closeArtSheet}" style="display:flex;align-items:center;gap:16px;padding:15px 20px;font-size:14px;color:#fff;cursor:pointer;">
+        <i class="fa-solid fa-user" style="color:#777;font-size:16px;width:20px;text-align:center;"></i>
+        Lihat artis
       </div>
-      <div onclick="czmDeleteRecentQ('${name}');document.getElementById('czm-art-sheet-ov').remove();" style="display:flex;align-items:center;gap:16px;padding:14px 20px;cursor:pointer;">
-        <i class="fa-solid fa-trash-can" style="color:#aaa;font-size:18px;width:22px;text-align:center;"></i>
-        <span style="font-size:14px;color:#fff;font-weight:500;">Hapus dari histori</span>
-      </div>
+      ${hapusHtml}
     </div>`;
 
   document.body.appendChild(ov);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     document.getElementById('czm-art-sheet-menu').style.transform = 'translateY(0)';
   }));
-  ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
+  ov.addEventListener('click', e=>{ if(e.target===ov){ ov.remove(); const n=document.getElementById('czm-npbar');if(n)n.style.removeProperty('visibility'); } });
 };
 
 window.czmArtistSheetShuffle = function(artistKey){
@@ -2997,10 +3022,8 @@ window.czmOpenBs=function(id,e){
   ov.style.display='block';menu.style.display='block';
   requestAnimationFrame(()=>requestAnimationFrame(()=>menu.style.transform='translateY(0)'));
   // Sembunyikan npbar sementara agar tidak muncul di atas bottom sheet
-  if(window._czmInTopSongs){
-    const npbar=document.getElementById('czm-npbar');
-    if(npbar) npbar.style.setProperty('visibility','hidden');
-  }
+  const npbar=document.getElementById('czm-npbar');
+  if(npbar) npbar.style.setProperty('visibility','hidden');
 };
 window.czmCloseBs=function(){
   const menu=document.getElementById('czm-bs-menu'),ov=document.getElementById('czm-bs-ov');
