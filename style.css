@@ -8087,7 +8087,7 @@ box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 /* ===== HALAMAN LAGU TOP ===== */
 #music .czm-top-songs-page {
   display: none; position: fixed; inset: 0; z-index: 10062;
-  background: #000; flex-direction: column;
+  background: #0a1628; flex-direction: column;
   font-family: inherit;
 }
 #music .czm-top-songs-page.open { display: flex; }
