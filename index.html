@@ -1,293 +1,2622 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
+<script>if(window.location.hash)document.documentElement.style.visibility='hidden';</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Access</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
-}
-
-body{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    background:#0f172a;
-    background-image:
-    radial-gradient(circle at top,#2563eb20,transparent 45%),
-    radial-gradient(circle at bottom,#0ea5e920,transparent 40%);
-}
-
-.box{
-    width:360px;
-    padding:32px;
-    background:rgba(17,24,39,.88);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:14px;
-    backdrop-filter:blur(15px);
-    box-shadow:0 12px 30px rgba(0,0,0,.25);
-}
-
-.logo{
-    width:60px;
-    height:60px;
-    margin:auto;
-    margin-bottom:18px;
-    border-radius:50%;
-    background:#2563eb;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:#fff;
-    font-size:22px;
-}
-
-h2{
-    text-align:center;
-    color:#fff;
-    margin-bottom:8px;
-}
-
-.subtitle{
-    text-align:center;
-    color:#94a3b8;
-    font-size:13px;
-    margin-bottom:22px;
-}
-
-.input-group{
-    position:relative;
-    margin-bottom:15px;
-}
-
-.input-group i{
-    position:absolute;
-    left:15px;
-    top:50%;
-    transform:translateY(-50%);
-    color:#94a3b8;
-}
-
-.input-group input{
-    width:100%;
-    height:48px;
-    padding-left:45px;
-    border-radius:10px;
-    border:1px solid #374151;
-    background:#111827;
-    color:#fff;
-    outline:none;
-}
-
-.input-group input:focus{
-    border-color:#2563eb;
-}
-
-button{
-    width:100%;
-    height:48px;
-    border:none;
-    border-radius:10px;
-    background:#2563eb;
-    color:#fff;
-    font-size:15px;
-    cursor:pointer;
-    margin-top:10px;
-}
-
-button:hover{
-    background:#1d4ed8;
-}
-
-.logout{
-    background:#ef4444;
-}
-
-.logout:hover{
-    background:#dc2626;
-}
-
-#error{
-    color:#ef4444;
-    text-align:center;
-    margin-top:15px;
-}
-
-#confirmBox,
-#webview{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100vw;
-    height:100vh;
-    background:#fff;
-    z-index:9999;
-}
-
-iframe{
-    width:100%;
-    height:100%;
-    border:none;
-    display:block;
-}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<meta name="theme-color" content="#0a1628">
+<title>CyberZain Portfolio</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" type="image/jpeg" sizes="64x64"
+href="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/%2B62%20857-0071-1112%2020260124_225944.jpg">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="window._katexReady=true;"></script>
 </head>
-
 <body>
+<div class="top-bar">
+  <div class="time-box">
+    <i class="fas fa-clock"></i>
+    <span id="topTime">00:00</span>
+  </div>
 
-<div class="box" id="loginBox">
-
-<div class="logo">
-<i class="fa-solid fa-shield-halved"></i>
+  <button class="menu-toggle gaming-toggle" onclick="togglePanel(this)">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
 </div>
 
-<h2>Secure Access</h2>
-
-<p class="subtitle">
-Silakan login untuk melanjutkan
-</p>
-
-<div class="input-group">
-<i class="fa-solid fa-user"></i>
-<input type="text" id="nama" placeholder="Nama">
+<div id="panelOverlay" onclick="closePanel(event)">
+  <div id="panelMenu">
+<div class="rainbow-text"><i class="fas fa-cat" style="font-size:16px;opacity:0.8;"></i> Tech Community</div>
+  <!-- VIDEO TUTORIAL (ATAS MENU) -->
+<div class="project-video">
+  <video
+    src="https://github.com/PretyFX69/music-files2/raw/refs/heads/main/ssstik.io_@ntp7765_1771387116868.mp4"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="metadata">
+  </video>
+  <div class="video-overlay"></div>
+<span></span> </div>
+  <!-- GRID MENU -->
+  <div class="panel-grid">
+<div class="panel-item" onclick="showPage('contact')">
+  <i class="fas fa-user"></i><span>Tentang Saya</span>
+</div>
+<div class="panel-item" onclick="showPage('cpanel')">
+  <i class="fas fa-server"></i><span>Create Server</span>
+</div>
+<div class="panel-item" onclick="showPage('apk-download')">
+  <i class="fas fa-download"></i><span>Download APK</span>
+</div>
+<div class="panel-item" onclick="showPage('ztools')">
+  <i class="fas fa-toolbox"></i><span>Z-Tools</span>
+</div>
+<div class="panel-item" onclick="showPage('music')">
+  <i class="fas fa-music"></i>
+  <span>Music</span>
+</div>
+<div class="panel-item" onclick="showPage('ai')">
+  <i class="fas fa-robot"></i>
+  <span>Ai Chat</span>
+</div>
+</div>
+  <div class="panel-footer">
+    <span class="online"></span> System Active • CyberZain
+  </div>
+</div>
+</div>
+<section>
+<div id="contact" class="main-content page-section">
+<div class="profile-banner">
+  <img class="profile-pic" src="https://raw.githubusercontent.com/PretyFX69/music-files/refs/heads/main/file_00000000900c71fdbdc8aa6090951431.png" alt="CyberZain Logo">
 </div>
 
-<div class="input-group">
-<i class="fa-solid fa-key"></i>
-<input type="password" id="key" placeholder="Kunci Akses">
+  <footer  class="site-footer">
+  <p>Contact Me</p>
+  <a href="https://github.com/pretyfx69" target="_blank"><i class="fab fa-github"></i></a>
+  <a href="https://tiktok.com/@prtyfx_nracin69" target="_blank"><i class="fab fa-tiktok"></i></a>
+  <a href="https://www.instagram.com/alwayspretyfx?igsh=MWt1NnZ3dzV2dmNlMg==" target="_blank"><i class="fab fa-instagram"></i></a>
+  <a href="https://wa.me/6285700711112" target="_blank"><i class="fab fa-whatsapp"></i></a>
+  <a href="https://t.me/alwysprtyfx" target="_blank"><i class="fab fa-telegram"></i></a>
+
+</footer>
+  <img class="typing" src="https://readme-typing-svg.demolab.com?font=Fira+Code&amp;size=20&amp;color=00d9ff&amp;duration=5000&amp;pause=800&amp;width=515&amp;repeat=true&amp;background=00000000&amp;lines=Hai+Selamat+Datang+Di+Website+CyberZain👋;Perkenalkan+Nama+Saya:Zain+Suryo+Negoro+X-D;Disini+Saya+Akan+menampilkan+Suatu+Project;Project+Ini+Telah+Dibuat+Dengan+Pemograman" alt="Typing SVG"/>
+  <!-- Stats Section -->
+  <div class="stats-container">
+    <div class="stat-box">
+      <div class="stat-number">16</div>
+      <div class="stat-label">Years Ago</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">07-15-2009</div>
+      <div class="stat-label">birthday date</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">3</div>
+      <div class="stat-label">Years Experience</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">5+</div>
+      <div class="stat-label">Techs</div>
+      </div>
+<!-- About Me Section -->
+<div id="about">
+  <h2 class="rainbow-text" style="font-size:22px; margin-bottom:16px; text-align:left;">Tentang Saya</h2>
+  <div style="display:flex; align-items:center; gap:16px; margin-bottom:18px; text-align:left;">
+    <img src="https://raw.githubusercontent.com/pretyfx68/czm-uploads/refs/heads/main/uploads/WA_1778855456356.jpeg" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #00d9ff;box-shadow:0 0 10px #00d9ff;flex-shrink:0;">
+    <div style="text-align:left;">
+      <div style="font-weight:bold;font-size:18px;color:#fff;">Zain Suryo Negoro</div>
+      <div style="font-size:13px;color:#00d9ff;margin-top:3px;"><i class="fas fa-code" style="margin-right:5px;"></i>Frontend Dev &amp; Graphic Designer</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;"><i class="fas fa-location-dot" style="margin-right:5px;"></i>Indonesia</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;justify-content:flex-start;">
+    <span style="background:rgba(0,217,255,0.1);border:1px solid rgba(0,217,255,0.3);color:#00d9ff;font-size:12px;padding:4px 12px;border-radius:99px;"><i class="fas fa-graduation-cap" style="margin-right:4px;"></i>SMA / Self-taught</span>
+    <span style="background:rgba(0,217,255,0.1);border:1px solid rgba(0,217,255,0.3);color:#00d9ff;font-size:12px;padding:4px 12px;border-radius:99px;"><i class="fas fa-briefcase" style="margin-right:4px;"></i>Freelancer</span>
+    <span style="background:rgba(0,217,255,0.1);border:1px solid rgba(0,217,255,0.3);color:#00d9ff;font-size:12px;padding:4px 12px;border-radius:99px;"><i class="fas fa-calendar" style="margin-right:4px;"></i>3 Tahun Pengalaman</span>
+  </div>
+  <p style="text-align:left;text-indent:0;">Halo, saya Zain — seorang pengembang front-end dan desainer grafis muda dari Indonesia yang mulai mengenal dunia coding sejak masih duduk di bangku SMP. Rasa penasaran yang besar terhadap teknologi mendorong saya untuk terus belajar secara otodidak, bereksperimen dengan berbagai tools dan platform untuk menciptakan sesuatu yang unik, fungsional, dan bermanfaat bagi banyak orang.</p>
+  <p style="text-align:left;text-indent:0;">Perjalanan saya di dunia web dimulai dari HTML dan CSS sederhana, lalu berkembang ke JavaScript, Python, dan berbagai framework modern. Saya percaya bahwa kode yang baik bukan hanya yang berjalan dengan benar, tapi juga yang bersih, terstruktur, dan mudah dipelihara. Visual Studio Code adalah teman setia saya sehari-hari, namun saya selalu terbuka untuk mencoba tools baru demi meningkatkan workflow dan produktivitas.</p>
+  <p style="text-align:left;text-indent:0;">Selain coding, saya juga mendalami dunia desain grafis — mulai dari membuat logo, konten media sosial, hingga ilustrasi digital. Saya percaya bahwa perpaduan antara kemampuan coding dan desain adalah kombinasi yang kuat untuk menciptakan karya yang tidak hanya berfungsi dengan baik, tetapi juga tampil memukau dan meninggalkan kesan mendalam bagi penggunanya.</p>
+  <p style="text-align:left;text-indent:0;">Saat ini saya aktif bekerja sebagai freelancer, membantu klien mewujudkan ide-ide mereka menjadi produk digital yang nyata. Saya selalu mengutamakan hasil yang profesional, komunikasi yang baik, dan solusi yang tepat sasaran. Bagi saya, setiap proyek adalah kesempatan untuk belajar hal baru dan memberikan yang terbaik.</p>
+</div>
+  </div>
+
+<!-- Hobi &amp; Minat Section -->
+
+<div class="hobi-section">
+  <div style="background:rgba(10,30,50,0.7);backdrop-filter:blur(12px);border-left:3px solid #00d9ff;border-right:3px solid #00d9ff;border-top:1px solid rgba(0,217,255,0.3);border-bottom:1px solid rgba(0,217,255,0.3);border-radius:20px;padding:24px 20px;box-shadow:0 0 15px rgba(0,217,255,0.15);width:100%;box-sizing:border-box;">
+    <div class="hobi-header">
+      <div class="hobi-icon-box"><i class="fas fa-heart"></i></div>
+      <div class="hobi-title">Hobi &amp; Minat</div>
+    </div>
+    <div class="hobi-grid">
+      <div class="hobi-card">
+        <span class="hobi-card-icon"><i class="fas fa-code"></i></span>
+        <div class="hobi-card-name">Coding</div>
+        <div class="hobi-card-desc">Eksplorasi teknologi &amp; bikin proyek baru</div>
+      </div>
+      <div class="hobi-card">
+        <span class="hobi-card-icon"><i class="fas fa-gamepad"></i></span>
+        <div class="hobi-card-name">Gaming</div>
+        <div class="hobi-card-desc">Strategi &amp; RPG games</div>
+      </div>
+      <div class="hobi-card">
+        <span class="hobi-card-icon"><i class="fas fa-palette"></i></span>
+        <div class="hobi-card-name">Desain</div>
+        <div class="hobi-card-desc">UI/UX &amp; ilustrasi digital</div>
+      </div>
+      <div class="hobi-card">
+        <span class="hobi-card-icon"><i class="fas fa-music"></i></span>
+        <div class="hobi-card-name">Musik</div>
+        <div class="hobi-card-desc">Gitar &amp; produksi musik</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<button onclick="login()">
-<i class="fa-solid fa-arrow-right-to-bracket"></i>
- Masuk
+<!-- My Skills New Section -->
+
+<div style="width:calc(100% + 40px); margin-left:-20px; margin-top:30px; margin-bottom:10px; padding:0 20px; box-sizing:border-box; display:flex; flex-direction:column; gap:20px;">
+<h2 style="text-align:center; font-size:28px; margin-bottom:20px; color:#fff;">Kemampuan Saya</h2>
+  <!-- Frontend Development -->
+  <div class="skillcard">
+    <div class="skillcard-header">
+      <div class="skillcard-icon-box"><i class="fas fa-table-columns"></i></div>
+      <div class="skillcard-title">Frontend Development</div>
+    </div>
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-code"></i> HTML/CSS</span>
+        <span class="skillcard-item-pct">67%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:67%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-chevron-right"></i> JavaScript</span>
+        <span class="skillcard-item-pct">45%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:45%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fab fa-react"></i> React</span>
+        <span class="skillcard-item-pct">30%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:30%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-terminal"></i> TypeScript</span>
+        <span class="skillcard-item-pct">25%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:25%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-palette"></i> Tailwind CSS</span>
+        <span class="skillcard-item-pct">79%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:79%"></div></div>
+    </div>
+  </div>
+
+  <!-- Backend Development -->
+  <div class="skillcard">
+    <div class="skillcard-header">
+      <div class="skillcard-icon-box"><i class="fas fa-server"></i></div>
+      <div class="skillcard-title">Backend Development</div>
+    </div>
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-terminal"></i> Node.js</span>
+        <span class="skillcard-item-pct">35%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:35%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fab fa-python"></i> Python</span>
+        <span class="skillcard-item-pct">61%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:61%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-database"></i> MongoDB</span>
+        <span class="skillcard-item-pct">40%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:40%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-globe"></i> REST API</span>
+        <span class="skillcard-item-pct">50%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:50%"></div></div>
+    </div>
+  </div>
+
+  <!-- Tools &amp; Design -->
+  <div class="skillcard">
+    <div class="skillcard-header">
+      <div class="skillcard-icon-box"><i class="fas fa-wrench"></i></div>
+      <div class="skillcard-title">Tools &amp; Design</div>
+    </div>
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fab fa-git-alt"></i> Git/GitHub</span>
+        <span class="skillcard-item-pct">55%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:55%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fab fa-figma"></i> Figma</span>
+        <span class="skillcard-item-pct">45%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:45%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-mobile-screen"></i> Responsive Design</span>
+        <span class="skillcard-item-pct">72%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:72%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-pen-ruler"></i> UI/UX Design</span>
+        <span class="skillcard-item-pct">60%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:60%"></div></div>
+    </div>
+    <hr class="skillcard-divider">
+
+    <div class="skillcard-item">
+      <div class="skillcard-item-top">
+        <span class="skillcard-item-label"><i class="fas fa-terminal"></i> Bash/Termux</span>
+        <span class="skillcard-item-pct">75%</span>
+      </div>
+      <div class="skillcard-bar-bg"><div class="skillcard-bar-fill" style="width:75%"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- What I Do Section -->
+<div style="width:calc(100% + 40px); margin-left:-20px; margin-top:20px; margin-bottom:10px; padding:0 20px; box-sizing:border-box;">
+  <h2 style="text-align:center; font-size:28px; margin-bottom:20px; color:#fff;">Apa Yang Saya Lakukan?</h2>
+  <div style="display:flex; flex-direction:column; gap:16px;">
+
+    <div style="background:rgba(10,30,50,0.7); backdrop-filter:blur(12px); border:1px solid rgba(0,217,255,0.15); border-radius:18px; padding:22px 20px; box-shadow:0 0 15px rgba(0,217,255,0.15); display:flex; flex-direction:column; gap:8px; transition:0.3s;" class="whatido-card" onmouseover="this.style.boxShadow='0 0 25px rgba(0,217,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.boxShadow='0 0 15px rgba(0,217,255,0.15)';this.style.transform=''">
+      <div style="font-size:28px; color:#00d9ff;"><i class="fas fa-code"></i></div>
+      <div style="font-weight:bold; font-size:17px; color:#fff;">Clean Code</div>
+      <div style="color:rgba(255,255,255,0.65); font-size:14px; line-height:1.5;">Menulis kode yang bersih, terstruktur, dan mudah dipelihara</div>
+    </div>
+
+    <div style="background:rgba(10,30,50,0.7); backdrop-filter:blur(12px); border:1px solid rgba(0,217,255,0.15); border-radius:18px; padding:22px 20px; box-shadow:0 0 15px rgba(0,217,255,0.15); display:flex; flex-direction:column; gap:8px; transition:0.3s;" class="whatido-card" onmouseover="this.style.boxShadow='0 0 25px rgba(0,217,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.boxShadow='0 0 15px rgba(0,217,255,0.15)';this.style.transform=''">
+      <div style="font-size:28px; color:#00d9ff;"><i class="fas fa-palette"></i></div>
+      <div style="font-weight:bold; font-size:17px; color:#fff;">Desain Modern</div>
+      <div style="color:rgba(255,255,255,0.65); font-size:14px; line-height:1.5;">Menciptakan tampilan yang estetis dan user-friendly</div>
+    </div>
+
+    <div style="background:rgba(10,30,50,0.7); backdrop-filter:blur(12px); border:1px solid rgba(0,217,255,0.15); border-radius:18px; padding:22px 20px; box-shadow:0 0 15px rgba(0,217,255,0.15); display:flex; flex-direction:column; gap:8px; transition:0.3s;" class="whatido-card" onmouseover="this.style.boxShadow='0 0 25px rgba(0,217,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.boxShadow='0 0 15px rgba(0,217,255,0.15)';this.style.transform=''">
+      <div style="font-size:28px; color:#00d9ff;"><i class="fas fa-bolt"></i></div>
+      <div style="font-weight:bold; font-size:17px; color:#fff;">Performa Tinggi</div>
+      <div style="color:rgba(255,255,255,0.65); font-size:14px; line-height:1.5;">Optimasi kecepatan dan efisiensi aplikasi</div>
+    </div>
+
+    <div style="background:rgba(10,30,50,0.7); backdrop-filter:blur(12px); border:1px solid rgba(0,217,255,0.15); border-radius:18px; padding:22px 20px; box-shadow:0 0 15px rgba(0,217,255,0.15); display:flex; flex-direction:column; gap:8px; transition:0.3s;" class="whatido-card" onmouseover="this.style.boxShadow='0 0 25px rgba(0,217,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.boxShadow='0 0 15px rgba(0,217,255,0.15)';this.style.transform=''">
+      <div style="font-size:28px; color:#00d9ff;"><i class="fas fa-lightbulb"></i></div>
+      <div style="font-weight:bold; font-size:17px; color:#fff;">Inovatif</div>
+      <div style="color:rgba(255,255,255,0.65); font-size:14px; line-height:1.5;">Selalu mengikuti tren teknologi terbaru</div>
+    </div>
+
+    <div style="background:rgba(10,30,50,0.7); backdrop-filter:blur(12px); border:1px solid rgba(0,217,255,0.15); border-radius:18px; padding:22px 20px; box-shadow:0 0 15px rgba(0,217,255,0.15); display:flex; flex-direction:column; gap:8px; transition:0.3s;" class="whatido-card" onmouseover="this.style.boxShadow='0 0 25px rgba(0,217,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.boxShadow='0 0 15px rgba(0,217,255,0.15)';this.style.transform=''">
+      <div style="font-size:28px; color:#00d9ff;"><i class="fas fa-mobile-screen"></i></div>
+      <div style="font-weight:bold; font-size:17px; color:#fff;">Responsive Design</div>
+      <div style="color:rgba(255,255,255,0.65); font-size:14px; line-height:1.5;">Tampilan yang sempurna di semua ukuran layar</div>
+    </div>
+
+    <div style="background:rgba(10,30,50,0.7); backdrop-filter:blur(12px); border:1px solid rgba(0,217,255,0.15); border-radius:18px; padding:22px 20px; box-shadow:0 0 15px rgba(0,217,255,0.15); display:flex; flex-direction:column; gap:8px; transition:0.3s;" class="whatido-card" onmouseover="this.style.boxShadow='0 0 25px rgba(0,217,255,0.4)';this.style.transform='translateY(-3px)'" onmouseout="this.style.boxShadow='0 0 15px rgba(0,217,255,0.15)';this.style.transform=''">
+      <div style="font-size:28px; color:#00d9ff;"><i class="fas fa-shield-halved"></i></div>
+      <div style="font-weight:bold; font-size:17px; color:#fff;">Keamanan</div>
+      <div style="color:rgba(255,255,255,0.65); font-size:14px; line-height:1.5;">Membangun aplikasi yang aman dan terlindungi</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Featured Projects Section -->
+<div id="featured-projects">
+  <h2>Fitur-Fitur Project</h2>
+  
+  <div class="skills-grid">
+    
+    <!-- CLI &amp; Terminal Tools -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fas fa-terminal"></i>
+        </div>
+        <h3>CLI &amp; Terminal Tools</h3>
+      </div>
+      <p>Pengembangan tools command-line untuk automasi dan produktivitas</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Bash Scripting</span>
+        <span class="skill-tag">Termux Automation</span>
+        <span class="skill-tag">LOLCAT UI</span>
+        <span class="skill-tag">CLI Utilities</span>
+      </div>
+    </div>
+
+    <!-- Modern Web Stack -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fab fa-react"></i>
+        </div>
+        <h3>Modern Web Stack</h3>
+      </div>
+      <p>Aplikasi web fullstack dengan teknologi terkini</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Next.js 14</span>
+        <span class="skill-tag">React</span>
+        <span class="skill-tag">TypeScript</span>
+        <span class="skill-tag">Tailwind CSS</span>
+      </div>
+    </div>
+
+    <!-- Python Development -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fab fa-python"></i>
+        </div>
+        <h3>Python Development</h3>
+      </div>
+      <p>Scripting dan automasi dengan Python</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Data Processing</span>
+        <span class="skill-tag">API Development</span>
+        <span class="skill-tag">Automation</span>
+        <span class="skill-tag">Tooling</span>
+      </div>
+    </div>
+
+    <!-- Database &amp; Backend -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fas fa-database"></i>
+        </div>
+        <h3>Database &amp; Backend</h3>
+      </div>
+      <p>Sistem database dan backend architecture</p>
+      <div class="skill-tags">
+        <span class="skill-tag">MongoDB</span>
+        <span class="skill-tag">CRUD Systems</span>
+        <span class="skill-tag">Authentication</span>
+        <span class="skill-tag">API Design</span>
+      </div>
+    </div>
+
+    <!-- Tool Development -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fas fa-tools"></i>
+        </div>
+        <h3>Tools Development</h3>
+      </div>
+      <p>Pengembangan tools dan utilitas praktis</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Framework Development</span>
+        <span class="skill-tag">Utility Scripts</span>
+        <span class="skill-tag">Productivity Tools</span>
+        <span class="skill-tag">System Automation</span>
+      </div>
+    </div>
+
+    <!-- Type Safety -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fab fa-js-square"></i>
+        </div>
+        <h3>Type Safety</h3>
+      </div>
+      <p>Pengembangan dengan type-safe JavaScript</p>
+      <div class="skill-tags">
+        <span class="skill-tag">TypeScript</span>
+        <span class="skill-tag">Interface Design</span>
+        <span class="skill-tag">Type Safety</span>
+        <span class="skill-tag">Code Quality</span>
+      </div>
+    </div>
+
+    <!-- Danxy Tools Framework -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fas fa-code-branch"></i>
+        </div>
+        <h3>PretvFX Tools Framework</h3>
+      </div>
+      <p>Framework multitools terintegrasi untuk automasi, scraping, dan utilitas sistem dengan antarmuka CLI interaktif</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Bash</span>
+        <span class="skill-tag">Termux</span>
+        <span class="skill-tag">LOLCAT</span>
+        <span class="skill-tag">Python</span>
+      </div>
+    </div>
+
+    <!-- Modern Web Platform -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fas fa-globe"></i>
+        </div>
+        <h3>Modern Web Platform</h3>
+      </div>
+      <p>Platform web fullstack dengan desain modern, performa optimal, dan sistem real-time updates</p>
+      <div class="skill-tags">
+        <span class="skill-tag">Next.js</span>
+        <span class="skill-tag">TypeScript</span>
+        <span class="skill-tag">Tailwind</span>
+        <span class="skill-tag">MongoDB</span>
+      </div>
+    </div>
+
+    <!-- Community Forum System -->
+    <div class="skill-category">
+      <div class="skill-category-header">
+        <div class="skill-category-icon">
+          <i class="fas fa-comments"></i>
+        </div>
+        <h3>Community Forum System</h3>
+      </div>
+      <p>Sistem forum komunitas dengan fitur lengkap: authentication, real-time chat, dan user management</p>
+      <div class="skill-tags">
+        <span class="skill-tag">MongoDB</span>
+        <span class="skill-tag">Next.js</span>
+        <span class="skill-tag">WebSocket</span>
+        <span class="skill-tag">Redis</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="contact-section">
+ <div class="contact-box">
+    <h2>Kirim Pesan</h2>
+    <div class="contact-field">
+      <label>Nama</label>
+      <input type="text" placeholder="Nama Anda" id="contactNama">
+    </div>
+    <div class="contact-field">
+      <label>Email</label>
+      <input type="email" placeholder="email@example.com" id="contactEmail">
+    </div>
+    <div class="contact-field">
+      <label>Subjek</label>
+      <input type="text" placeholder="Subjek pesan" id="contactSubjek">
+    </div>
+    <div class="contact-field">
+      <label>Pesan</label>
+      <textarea placeholder="Tulis pesan Anda di sini..." id="contactPesan"></textarea>
+    </div>
+    <button class="contact-btn" onclick="kirimPesan()">
+      <i class="fas fa-paper-plane"></i> Kirim Pesan
+    </button>
+  </div>
+</div>
+</div>
+  </section>
+  <!-- Z-TOOLS PAGE -->
+<section id="ztools" class="page-section">
+  <div class="zt-wrap">
+
+    <!-- TAB BUTTONS — scrollable -->
+    <div class="zt-tabs-wrap" id="zt-tabs-wrap">
+      <div class="zt-tabs-fade-left"  id="zt-fade-left"></div>
+      <div class="zt-tabs-fade-right" id="zt-fade-right"></div>
+      <button class="zt-tab-arr zt-tab-arr-left hidden" id="zt-arr-left" onclick="ztTabScroll(-1)"><i class="fas fa-chevron-left"></i></button>
+      <button class="zt-tab-arr zt-tab-arr-right" id="zt-arr-right" onclick="ztTabScroll(1)"><i class="fas fa-chevron-right"></i></button>
+    <div class="zt-tabs" id="zt-tabs-scroll">
+      <button class="zt-tab active" onclick="ztSwitchTab('tiktok')">
+        <i class="fab fa-tiktok"></i> TikTok DL
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('instagram')">
+        <i class="fab fa-instagram"></i> Instagram DL
+      </button>
+            <button class="zt-tab" onclick="ztSwitchTab('facebook')">
+        <i class="fab fa-facebook"></i> Facebook DL
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('ssweb')">
+        <i class="fas fa-camera"></i> SS Web
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('remini')">
+        <i class="fas fa-magic"></i> Remini
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('phone')">
+        <i class="fas fa-mobile-alt"></i> Cek Nomor
+      </button>
+            <button class="zt-tab" onclick="ztSwitchTab('fileurl')">
+        <i class="fas fa-link"></i> File to URL
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('videoaudio')">
+        <i class="fas fa-film"></i> Video to Audio
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('imgsearch')">
+        <i class="fas fa-images"></i> Image Search
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('wiki')">
+        <i class="fab fa-wikipedia-w"></i> Wikipedia
+      </button>
+      <button class="zt-tab" onclick="ztSwitchTab('anime')">
+        <i class="fas fa-star"></i> Random Anime
+      </button>
+                  <button class="zt-tab zt-tab-ngaji" onclick="ztSwitchTab('ngaji')">
+        <i class="fas fa-moon"></i>Murottal
+      </button>
+            <button class="zt-tab" onclick="ztSwitchTab('speedtest')">
+        <i class="fas fa-tachometer-alt"></i> Speed Test
+      </button>
+
+    </div>
+    </div>
+    </div>
+
+    <!-- DASHBOARD PANEL -->
+    <div id="zt-dashboard" class="zt-panel zt-panel-dashboard active">
+      <div class="zt-dash-wrap">
+
+        <!-- Header -->
+        <div class="zt-dash-header">
+          <button class="zt-dash-logo" onclick="ztOpenMenu()" title="Buka Menu"><i class="fas fa-toolbox"></i></button>
+          <div>
+            <div class="zt-dash-title">Z-Tools</div>
+            <div class="zt-dash-sub">by CyberZain</div>
+          </div>
+        </div>
+
+        <!-- Cards -->
+        <div class="zt-dash-cards">
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(0,217,255,0.2),rgba(0,217,255,0.08));border-color:rgba(0,217,255,0.3);">
+              <i class="fas fa-network-wired" style="color:#00d9ff;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">IP Kamu</div>
+              <div class="zt-dash-card-val" id="zt-dash-ip"><i class="fas fa-spinner fa-spin" style="font-size:11px;"></i></div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(74,222,128,0.2),rgba(74,222,128,0.08));border-color:rgba(74,222,128,0.3);">
+              <i class="fas fa-battery-three-quarters" id="zt-dash-bat-icon" style="color:#4ade80;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Baterai</div>
+              <div class="zt-dash-card-val" id="zt-dash-bat">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(168,85,247,0.08));border-color:rgba(168,85,247,0.3);">
+              <i class="fas fa-clock" style="color:#a855f7;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Waktu</div>
+              <div class="zt-dash-card-val" id="zt-dash-time">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08));border-color:rgba(251,191,36,0.3);">
+              <i class="fas fa-wifi" style="color:#fbbf24;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Koneksi</div>
+              <div class="zt-dash-card-val" id="zt-dash-net">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(249,115,22,0.2),rgba(249,115,22,0.08));border-color:rgba(249,115,22,0.3);">
+              <i class="fas fa-mobile-alt" style="color:#f97316;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Platform</div>
+              <div class="zt-dash-card-val" id="zt-dash-ua">–</div>
+            </div>
+          </div>
+
+          <div class="zt-dash-card">
+            <div class="zt-dash-card-icon" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(236,72,153,0.08));border-color:rgba(236,72,153,0.3);">
+              <i class="fas fa-globe" style="color:#ec4899;"></i>
+            </div>
+            <div class="zt-dash-card-info">
+              <div class="zt-dash-card-label">Timezone</div>
+              <div class="zt-dash-card-val" id="zt-dash-tz">–</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Info box -->
+        <div class="zt-dash-info">
+          <i class="fas fa-circle-info" style="color:#00d9ff;font-size:15px;flex-shrink:0;"></i>
+          <div>Pilih tool dari menu <i class="fas fa-toolbox" style="color:#00d9ff;font-size:11px;"></i> untuk mulai.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- WIKIPEDIA -->
+    <div id="zt-wiki" class="zt-panel">
+      <div class="zt-search-box">
+        <input id="zt-wiki-input" type="text" placeholder="Cari artikel Wikipedia..." onkeydown="if(event.key==='Enter')ztSearchWiki()">
+        <button onclick="ztSearchWiki()"><i class="fas fa-search"></i></button>
+      </div>
+      <!-- Multi-bahasa -->
+      <div class="zt-wiki-langs-wrap"><div class="zt-wiki-langs">
+        <button class="zt-wiki-lang-btn active" onclick="ztSetLang('id',this)"><span class="zt-flag">🇮🇩</span> Indonesia</button>
+        <button class="zt-wiki-lang-btn" onclick="ztSetLang('en',this)"><span class="zt-flag">🇬🇧</span> English</button>
+        <button class="zt-wiki-lang-btn" onclick="ztSetLang('ja',this)"><span class="zt-flag">🇯🇵</span> 日本語</button>
+        <button class="zt-wiki-lang-btn" onclick="ztSetLang('ar',this)"><span class="zt-flag">🇸🇦</span> العربية</button>
+        <button class="zt-wiki-lang-btn" onclick="ztSetLang('fr',this)"><span class="zt-flag">🇫🇷</span> Français</button>
+        <button class="zt-wiki-lang-btn" onclick="ztSetLang('de',this)"><span class="zt-flag">🇩🇪</span> Deutsch</button>
+        <button class="zt-wiki-lang-btn" onclick="ztSetLang('ko',this)"><span class="zt-flag">🇰🇷</span> 한국어</button>
+        <button class="zt-wiki-lang-btn" onclick="ztSetLang('zh',this)"><span class="zt-flag">🇨🇳</span> 中文</button>
+      </div></div>
+      <!-- Reader modal -->
+      <div id="zt-wiki-reader" class="zt-wiki-reader" style="display:none;">
+        <div class="zt-wiki-reader-header">
+          <button class="zt-wiki-reader-back" onclick="ztWikiCloseReader()"><i class="fas fa-arrow-left"></i></button>
+          <span id="zt-wiki-reader-title">Wikipedia</span>
+          <a id="zt-wiki-reader-ext" href="#" target="_blank"><i class="fas fa-external-link-alt"></i></a>
+        </div>
+        <div id="zt-wiki-reader-body" class="zt-wiki-reader-body"></div>
+        <!-- Floating back button fallback -->
+        <button onclick="ztWikiCloseReader()" style="position:fixed;bottom:28px;right:20px;z-index:10001;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#00d9ff,#0099cc);border:none;color:#000;font-size:18px;box-shadow:0 4px 20px rgba(0,217,255,0.5);cursor:pointer;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div id="zt-wiki-result" class="zt-result-area"></div>
+    </div>
+
+    <!-- RANDOM ANIME -->
+    <div id="zt-anime" class="zt-panel">
+      <div class="zt-anime-cats">
+        <button class="zt-cat-btn active" onclick="ztSetAnimeCat('waifu',this)">Waifu</button>
+        <button class="zt-cat-btn" onclick="ztSetAnimeCat('neko',this)">Neko</button>
+        <button class="zt-cat-btn" onclick="ztSetAnimeCat('shinobu',this)">Shinobu</button>
+        <button class="zt-cat-btn" onclick="ztSetAnimeCat('megumin',this)">Megumin</button>
+        <button class="zt-cat-btn" onclick="ztSetAnimeCat('cuddle',this)">Cuddle</button>
+        <button class="zt-cat-btn" onclick="ztSetAnimeCat('hug',this)">Hug</button>
+        <button class="zt-cat-btn" onclick="ztSetAnimeCat('pat',this)">Pat</button>
+        <button class="zt-cat-btn" onclick="ztSetAnimeCat('blush',this)">Blush</button>
+      </div>
+      <div id="zt-anime-result" class="zt-anime-result">
+        <div class="zt-anime-placeholder">
+          <i class="fas fa-image"></i>
+          <p>Tekan tombol untuk generate gambar anime random!</p>
+        </div>
+      </div>
+      <button class="zt-gen-btn" onclick="ztRandomAnime()">
+        <i class="fas fa-random"></i> Generate Random
+      </button>
+    </div>
+
+    <!-- CEK NOMOR HP -->
+    <div id="zt-phone" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,rgba(34,197,94,0.25),rgba(16,185,129,0.15));border-color:rgba(34,197,94,0.35);">
+          <i class="fas fa-sim-card" style="color:#22c55e;"></i>
+        </div>
+        <h3 class="zt-dl-title">Cek Nomor HP</h3>
+        <p class="zt-dl-desc">Info operator, wilayah, dan jenis nomor</p>
+        <div class="zt-search-box">
+          <input id="zt-phone-input" type="tel" placeholder="Contoh: 0812345678910" onkeydown="if(event.key==='Enter')ztCheckPhone()">
+          <button onclick="ztCheckPhone()"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="zt-phone-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+    <!-- TIKTOK DOWNLOAD -->
+    <div id="zt-tiktok" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon"><i class="fab fa-tiktok"></i></div>
+        <h3 class="zt-dl-title">Tiktok Downloader</h3>
+        <p class="zt-dl-desc">Video &amp; Foto tanpa watermark</p>
+        <div class="zt-search-box">
+          <input id="zt-tiktok-input" type="url" placeholder="Paste link TikTok di sini..." onkeydown="if(event.key==='Enter')ztDownload('tiktok')">
+          <button onclick="ztDownload('tiktok')"><i class="fas fa-download"></i></button>
+        </div>
+        <div class="zt-fmt-btns">
+          <button class="zt-fmt active" onclick="ztSetFmt(this,'mp4')">📹 MP4</button>
+          <button class="zt-fmt" onclick="ztSetFmt(this,'mp3')">🎵 MP3</button>
+        </div>
+        <div id="zt-tiktok-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+    <!-- INSTAGRAM DOWNLOAD -->
+    <div id="zt-instagram" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)"><i class="fab fa-instagram"></i></div>
+        <h3 class="zt-dl-title">Instagram Downloader</h3>
+        <p class="zt-dl-desc">Reels, Post, Story</p>
+        <div class="zt-search-box">
+          <input id="zt-ig-input" type="url" placeholder="Paste link Instagram di sini..." onkeydown="if(event.key==='Enter')ztDownload('ig')">
+          <button onclick="ztDownload('ig')"><i class="fas fa-download"></i></button>
+        </div>
+        <div class="zt-fmt-btns">
+          <button class="zt-fmt active" onclick="ztSetFmt(this,'mp4')">📹 MP4</button>
+          <button class="zt-fmt" onclick="ztSetFmt(this,'mp3')">🎵 MP3</button>
+        </div>
+        <div id="zt-ig-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+    <!-- NGAJI -->
+    <div id="zt-ngaji" class="zt-panel">
+      <div class="zt-ngaji-wrap">
+
+        <!-- ② PLAYER — di atas sebelum list -->
+        <div class="zt-ngaji-player" id="zt-ngaji-player">
+          <div class="zt-ngp-inner">
+            <!-- Now playing info -->
+            <div class="zt-ngp-now">
+              <div class="zt-ngp-disc" id="zt-ngp-disc"><i class="fas fa-quran"></i></div>
+              <div class="zt-ngp-txt">
+                <div class="zt-ngp-surah-name" id="zt-ngp-name">—</div>
+                <div class="zt-ngp-surah-arab" id="zt-ngp-arab">—</div>
+                <div class="zt-ngp-meta" id="zt-ngp-meta">—</div>
+              </div>
+              <div class="zt-eq paused" id="zt-ngp-eq">
+                <div class="zt-eq-bar"></div><div class="zt-eq-bar"></div>
+                <div class="zt-eq-bar"></div><div class="zt-eq-bar"></div>
+                <div class="zt-eq-bar"></div>
+              </div>
+            </div>
+
+            <!-- Custom progress -->
+            <div class="zt-ngp-progress-wrap">
+              <div class="zt-ngp-time-row">
+                <span class="zt-ngp-time-cur" id="zt-ngp-cur">0:00</span>
+                <span class="zt-ngp-time-dur" id="zt-ngp-dur">0:00</span>
+              </div>
+              <div class="zt-ngp-track" id="zt-ngp-track" onclick="ztNgpSeek(event)">
+                <div class="zt-ngp-fill" id="zt-ngp-fill"></div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="zt-ngp-controls">
+              <button class="zt-ngp-btn" id="zt-ngp-prev" onclick="ztNgajiPrev()"><i class="fas fa-step-backward"></i> Prev</button>
+              <button class="zt-ngp-playpause" id="zt-ngp-pp" onclick="ztNgpToggle()"><i class="fas fa-play" id="zt-ngp-pp-icon"></i></button>
+              <button class="zt-ngp-btn" id="zt-ngp-next" onclick="ztNgajiNext()">Next <i class="fas fa-step-forward"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ③ Search -->
+        <div class="zt-ngaji-search-wrap">
+          <div class="zt-ngaji-search">
+            <input id="zt-ngaji-search" type="text" placeholder="&#x1F50D; Cari nama surah..." oninput="ztNgajiFilter(this.value)">
+            <button class="zt-ngaji-search-clear" onclick="ztNgajiClear()"><i class="fas fa-times"></i> Reset</button>
+          </div>
+        </div>
+
+        <!-- ④ Daftar Surah — floating cards, no outer box -->
+        <div class="zt-surah-section-label">114 Surah</div>
+        <div class="zt-surah-list-wrap" id="zt-surah-list"></div>
+
+        <!-- Hidden audio -->
+        <audio id="zt-ngaji-audio" preload="none"
+          onplay="ztNgpPlay()" onpause="ztNgpPause()"
+          ontimeupdate="ztNgpTick()" onloadedmetadata="ztNgpMeta()"
+          onended="ztNgajiNext()"></audio>
+
+      </div>
+    </div>
+
+    <!-- FILE TO URL PANEL -->
+    <div id="zt-fileurl" class="zt-panel">
+
+      <!-- Header -->
+      <div class="zt-dl-box">
+        <div class="zt-va-icon"><i class="fas fa-file"></i><i class="fas fa-arrow-right zt-va-arrow"></i><i class="fas fa-link"></i></div>
+        <h3 class="zt-va-title">File to URL</h3>
+        <p class="zt-va-sub">Upload simpan foto/video lalu ubah menjadi link</p>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="zt-va-tabs">
+        <button class="zt-fu-tab active" id="zt-fu-tab-upload" onclick="ztFuSwitchTab('upload')">
+          <i class="fas fa-upload"></i> Upload
+        </button>
+        <button class="zt-fu-tab" id="zt-fu-tab-history" onclick="ztFuSwitchTab('history')">
+          <i class="fas fa-history"></i> Riwayat
+          <span class="zt-fu-hist-badge" id="zt-fu-hist-badge" style="display:none"></span>
+        </button>
+      </div>
+
+      <!-- UPLOAD VIEW -->
+      <div id="zt-fu-view-upload">
+        <div class="zt-fu-dropzone" id="zt-fu-dropzone"
+          onclick="document.getElementById('zt-fu-input').click()"
+          ondragover="ztFuDragOver(event)" ondragleave="ztFuDragLeave(event)" ondrop="ztFuDrop(event)">
+          <i class="fas fa-cloud-upload-alt zt-fu-drop-icon"></i>
+          <div class="zt-fu-drop-text">Klik atau drag &amp; drop file di sini</div>
+          <div class="zt-fu-drop-hint">Foto (JPG PNG GIF WEBP) · Video (MP4 MOV MKV AVI) · Max 25MB</div>
+          <input id="zt-fu-input" type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp,image/bmp,video/mp4,video/quicktime,video/x-matroska,video/x-msvideo,video/webm,video/3gpp"
+            style="display:none" onchange="ztFuSelected(this)">
+        </div>
+
+        <div id="zt-fu-preview-wrap" style="display:none" class="zt-fu-preview-wrap">
+          <div id="zt-fu-preview-inner"></div>
+          <div class="zt-fu-meta" id="zt-fu-meta"></div>
+        </div>
+
+        <button class="zt-fu-upload-btn" id="zt-fu-btn" onclick="ztFuUpload()" style="display:none">
+          <i class="fas fa-upload"></i> Upload &amp; Dapat URL
+        </button>
+
+        <div id="zt-fu-progress-wrap" style="display:none" class="zt-fu-progress-wrap">
+          <div class="zt-fu-bar-track"><div class="zt-fu-bar" id="zt-fu-bar"></div></div>
+          <div class="zt-fu-bar-label" id="zt-fu-bar-label">Uploading...</div>
+        </div>
+
+        <div id="zt-fu-result" class="zt-fu-result" style="display:none">
+          <div class="zt-fu-result-label"><i class="fas fa-check-circle"></i> Berhasil!</div>
+          <div class="zt-fu-url-wrap">
+            <input id="zt-fu-url" class="zt-fu-result-url" readonly>
+            <button class="zt-fu-copy-btn" onclick="ztFuCopy()" id="zt-fu-copy-btn"><i class="fas fa-copy"></i></button>
+          </div>
+          <div class="zt-fu-actions">
+            <a id="zt-fu-open" href="#" target="_blank" class="zt-fu-action-btn"><i class="fas fa-external-link-alt"></i> Buka</a>
+            <button class="zt-fu-action-btn" onclick="ztFuReset()"><i class="fas fa-redo"></i> Upload Lagi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY VIEW -->
+      <div id="zt-fu-view-history" style="display:none">
+        <div id="zt-fu-hist-empty" class="zt-fu-hist-empty">
+          <i class="fas fa-inbox"></i>
+          <div>Belum ada riwayat upload</div>
+        </div>
+        <div class="zt-fu-hist-top" id="zt-fu-hist-top" style="display:none">
+          <span class="zt-fu-hist-count" id="zt-fu-hist-count"></span>
+        </div>
+        <div id="zt-fu-history" class="zt-fu-history"></div>
+      </div>
+
+    </div>
+
+    <!-- SPEED TEST PANEL -->
+    <div id="zt-speedtest" class="zt-panel">
+      <div class="zt-speed-wrap">
+
+        <!-- Header -->
+        <div class="zt-speed-hero">
+          <div class="zt-speed-hero-icon">
+            <i class="fas fa-tachometer-alt"></i>
+          </div>
+          <h3 class="zt-speed-hero-title">Internet Speed Test</h3>
+          <p class="zt-speed-hero-desc">Ukur kecepatan internet kamu secara akurat</p>
+        </div>
+
+        <!-- Gauges -->
+        <div class="zt-speed-gauges-wrap">
+          <div class="zt-speed-gauge-box">
+            <div class="zt-speed-gauge-icon" style="color:#22c55e"><i class="fas fa-arrow-down"></i></div>
+            <div class="zt-speed-gauge-val" id="zt-speed-dl">—</div>
+            <div class="zt-speed-gauge-unit">Mbps</div>
+            <div class="zt-speed-gauge-label">Download</div>
+          </div>
+          <div class="zt-speed-gauge-sep"></div>
+          <div class="zt-speed-gauge-box">
+            <div class="zt-speed-gauge-icon" style="color:#fbbf24"><i class="fas fa-bolt"></i></div>
+            <div class="zt-speed-gauge-val" id="zt-speed-ping">—</div>
+            <div class="zt-speed-gauge-unit">ms</div>
+            <div class="zt-speed-gauge-label">Ping</div>
+          </div>
+          <div class="zt-speed-gauge-sep"></div>
+          <div class="zt-speed-gauge-box">
+            <div class="zt-speed-gauge-icon" style="color:#a855f7"><i class="fas fa-server"></i></div>
+            <div class="zt-speed-gauge-val" id="zt-speed-jitter">—</div>
+            <div class="zt-speed-gauge-unit">ms</div>
+            <div class="zt-speed-gauge-label">Jitter</div>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="zt-speed-bar-outer" id="zt-speed-bar-wrap" style="display:none">
+          <div class="zt-speed-bar-track">
+            <div class="zt-speed-bar-fill" id="zt-speed-bar"></div>
+          </div>
+        </div>
+
+        <!-- Status text -->
+        <div id="zt-speed-status" class="zt-speed-status-text"></div>
+
+        <!-- Start button -->
+        <button class="zt-speed-start-btn" id="zt-speed-btn" onclick="ztSpeedTest()">
+          <i class="fas fa-play"></i> Mulai Test
+        </button>
+
+        <!-- Rating -->
+        <div id="zt-speed-rating" class="zt-speed-rating" style="display:none"></div>
+
+        <!-- History -->
+        <div id="zt-speed-history" class="zt-speed-history"></div>
+
+      </div>
+    </div>
+
+    <!-- IMAGE SEARCH PANEL -->
+    <div id="zt-imgsearch" class="zt-panel">
+      <div class="zt-img-wrap">
+
+        <div class="zt-search-box">
+          <input id="zt-img-input" type="text" placeholder="Cari gambar... (gojo, aesthetic, nature)" onkeydown="if(event.key==='Enter')ztImgSearch()">
+          <button onclick="ztImgSearch()"><i class="fas fa-search"></i></button>
+        </div>
+        <div id="zt-img-result" class="zt-img-result">
+          <div class="zt-img-placeholder">
+            <i class="fas fa-images"></i>
+            <p>Cobalah Cari Gambar Sesuai Dengan Pemikiranmu Sendiri</p>
+          </div>
+        </div>
+        <button id="zt-img-more" class="zt-img-more-btn" style="display:none" onclick="ztImgSearch(true)">
+          <i class="fas fa-plus"></i> Muat Lebih Banyak
+        </button>
+      </div>
+    </div>
+
+    <!-- VIDEO TO AUDIO -->
+    <div id="zt-videoaudio" class="zt-panel">
+      <div class="zt-va-wrap">
+        <div class="zt-va-hero">
+          <div class="zt-va-icon"><i class="fas fa-film"></i><i class="fas fa-arrow-right zt-va-arrow"></i><i class="fas fa-music"></i></div>
+          <h3 class="zt-va-title">Video to Audio</h3>
+          <p class="zt-va-sub">Extract audio dari video yang kamu upload</p>
+        </div>
+
+        <!-- VA Tabs -->
+        <div class="zt-va-tabs">
+          <button class="zt-va-tab active" id="zt-va-tab-upload" onclick="ztVaSwitchTab('upload')">
+            <i class="fas fa-cloud-upload-alt"></i> Upload
+          </button>
+          <button class="zt-va-tab" id="zt-va-tab-history" onclick="ztVaSwitchTab('history')">
+            <i class="fas fa-history"></i> Riwayat
+            <span class="zt-va-hist-badge" id="zt-va-hist-badge" style="display:none"></span>
+          </button>
+        </div>
+
+        <!-- Upload Panel -->
+        <div id="zt-va-upload-panel" style="display:flex;flex-direction:column;gap:14px;">
+          <!-- Dropzone -->
+          <div class="zt-va-dropzone" id="zt-va-dropzone"
+            onclick="document.getElementById('zt-va-input').click()"
+            ondragover="ztVaDragOver(event)" ondragleave="ztVaDragLeave(event)" ondrop="ztVaDrop(event)">
+            <i class="fas fa-cloud-upload-alt zt-va-drop-icon"></i>
+            <div class="zt-va-drop-text">Klik atau drag & drop video di sini</div>
+            <div class="zt-va-drop-hint">MP4 · MKV · AVI · MOV · WEBM</div>
+            <input type="file" id="zt-va-input" accept="video/*" style="display:none" onchange="ztVaSelected(this)">
+          </div>
+
+          <!-- File info -->
+          <div class="zt-va-fileinfo" id="zt-va-fileinfo" style="display:none">
+            <i class="fas fa-file-video" style="color:#00d9ff;font-size:1.2rem;flex-shrink:0"></i>
+            <div class="zt-va-fileinfo-text">
+              <div class="zt-va-filename" id="zt-va-filename"></div>
+              <div class="zt-va-filesize" id="zt-va-filesize"></div>
+            </div>
+            <button class="zt-va-clear-btn" onclick="ztVaReset()"><i class="fas fa-times"></i></button>
+          </div>
+
+          <!-- Format -->
+          <div class="zt-va-options" id="zt-va-options" style="display:none">
+            <div class="zt-va-opt-label"><i class="fas fa-file-audio"></i> Format Output: <strong style="color:#00fff6">MP3</strong></div>
+          </div>
+
+          <!-- Convert button -->
+          <button class="zt-va-convert-btn" id="zt-va-convert-btn" onclick="ztVaConvert()" style="display:none">
+            <i class="fas fa-magic"></i> Mulai Konversi
+          </button>
+
+          <!-- Progress -->
+          <div class="zt-va-progress-wrap" id="zt-va-progress-wrap" style="display:none">
+            <div class="zt-va-status" id="zt-va-status">Memuat ffmpeg...</div>
+            <div class="zt-va-bar-track"><div class="zt-va-bar" id="zt-va-bar"></div></div>
+            <div class="zt-va-bar-label" id="zt-va-bar-label">0%</div>
+          </div>
+
+          <!-- Result -->
+          <div class="zt-va-result" id="zt-va-result" style="display:none">
+            <div class="zt-va-result-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="zt-va-result-text">Konversi selesai!</div>
+            <button class="zt-va-download-btn" id="zt-va-download-btn" onclick="ztVaDoDownload()">
+              <i class="fas fa-download"></i> Download Audio
+            </button>
+            <button class="zt-va-again-btn" onclick="ztVaReset()">
+              <i class="fas fa-redo"></i> Konversi Lagi
+            </button>
+          </div>
+        </div>
+
+        <!-- History Panel -->
+        <div id="zt-va-history-panel" style="display:none">
+          <div id="zt-va-hist-empty" class="zt-va-hist-empty">
+            <i class="fas fa-history"></i>
+            Belum ada riwayat konversi
+          </div>
+          <div class="zt-va-hist-top" id="zt-va-hist-top" style="display:none">
+            <span class="zt-va-hist-count" id="zt-va-hist-count"></span>
+            <button class="zt-va-hist-clear-btn" onclick="ztVaHistClearAll()">
+              <i class="fas fa-trash"></i> Hapus Semua
+            </button>
+          </div>
+          <div id="zt-va-history" class="zt-va-history"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FACEBOOK DOWNLOADER -->
+    <div id="zt-facebook" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#1877f2,#0d5bb5)">
+          <i class="fab fa-facebook"></i>
+        </div>
+        <h3 class="zt-dl-title">Facebook Downloader</h3>
+        <p class="zt-dl-desc">Download video dari Facebook dan fb.watch</p>
+        <div class="zt-search-box">
+          <input id="zt-fb-input" type="url" placeholder="Paste link Facebook di sini..." onkeydown="if(event.key==='Enter')ztDownloadFB()">
+          <button onclick="ztDownloadFB()"><i class="fas fa-download"></i></button>
+        </div>
+        <div id="zt-fb-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+    <!-- SCREENSHOT WEBSITE -->
+    <div id="zt-ssweb" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
+          <i class="fas fa-camera"></i>
+        </div>
+        <h3 class="zt-dl-title">Screenshot Website</h3>
+        <p class="zt-dl-desc">Tangkap tampilan website secara instan</p>
+
+        <!-- Device Toggle -->
+        <div class="zt-ss-device-tabs">
+          <button class="zt-ss-device-btn active" id="zt-ss-btn-desktop" onclick="ztSsSetDevice('desktop',this)">
+            <i class="fas fa-desktop"></i> Desktop
+          </button>
+          <button class="zt-ss-device-btn" id="zt-ss-btn-mobile" onclick="ztSsSetDevice('mobile',this)">
+            <i class="fas fa-mobile-alt"></i> Mobile
+          </button>
+          <button class="zt-ss-device-btn" id="zt-ss-btn-tablet" onclick="ztSsSetDevice('tablet',this)">
+            <i class="fas fa-tablet-alt"></i> Tablet
+          </button>
+        </div>
+
+        <!-- URL Input -->
+        <div class="zt-search-box">
+          <input id="zt-ss-input" type="url" placeholder="https://example.com" onkeydown="if(event.key==='Enter')ztSsWeb()">
+          <button onclick="ztSsWeb()"><i class="fas fa-camera"></i></button>
+        </div>
+
+        <div id="zt-ss-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+    <!-- REMINI / ENHANCE FOTO -->
+    <div id="zt-remini" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#be185d,#ec4899)">
+          <i class="fas fa-magic"></i>
+        </div>
+        <h3 class="zt-dl-title">Remini</h3>
+        <p class="zt-dl-desc">Perjelas & restore foto buram via AI</p>
+
+        <!-- Mode tabs -->
+        <div class="zt-remini-mode-tabs">
+          <button class="zt-remini-mode-btn active" data-mode="enhance" onclick="ztReminiSetMode('enhance',this)">
+            <i class="fas fa-star"></i> Enhance
+          </button>
+          <button class="zt-remini-mode-btn" data-mode="recolor" onclick="ztReminiSetMode('recolor',this)">
+            <i class="fas fa-palette"></i> Recolor
+          </button>
+          <button class="zt-remini-mode-btn" data-mode="dehaze" onclick="ztReminiSetMode('dehaze',this)">
+            <i class="fas fa-cloud-sun"></i> Dehaze
+          </button>
+        </div>
+
+        <!-- Upload area -->
+        <div class="zt-remini-upload-area" id="zt-remini-drop" onclick="document.getElementById('zt-remini-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="ztReminiDrop(event)">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Tap untuk pilih foto</p>
+          <small>JPG / PNG / WEBP — Max 5MB</small>
+        </div>
+        <input type="file" id="zt-remini-input" accept="image/*" style="display:none" onchange="ztReminiPreview(event)">
+
+        <!-- Preview original -->
+        <img id="zt-remini-orig-img" class="zt-remini-preview" style="display:none" alt="Preview">
+
+        <!-- Enhance button -->
+        <button class="zt-remini-btn" id="zt-remini-btn" onclick="ztReminiProcess()" disabled>
+          <i class="fas fa-magic"></i> Enhance Sekarang
+        </button>
+
+        <!-- Progress -->
+        <div id="zt-remini-progress" style="display:none;margin-top:12px;">
+          <div style="background:rgba(255,255,255,0.07);border-radius:20px;height:6px;overflow:hidden;">
+            <div style="height:100%;border-radius:20px;background:linear-gradient(90deg,#be185d,#ec4899);width:40%;animation:ztHdSlide 1.2s ease-in-out infinite;box-shadow:0 0 8px rgba(236,72,153,0.5);"></div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-top:5px;" id="zt-remini-status">Memproses...</div>
+        </div>
+
+        <!-- Compare result -->
+        <div class="zt-remini-compare" id="zt-remini-compare">
+          <div class="zt-remini-compare-tabs">
+            <button class="zt-remini-compare-tab active" onclick="ztReminiCompareTab('after',this)"><i class="fas fa-star" style="font-size:10px;color:#ec4899;"></i> Hasil</button>
+            <button class="zt-remini-compare-tab" onclick="ztReminiCompareTab('before',this)"><i class="fas fa-image" style="font-size:10px;"></i> Asli</button>
+          </div>
+          <div class="zt-remini-compare-img active" id="zt-remini-img-after">
+            <img id="zt-remini-img-after-el" src="" alt="Hasil Remini">
+          </div>
+          <div class="zt-remini-compare-img" id="zt-remini-img-before">
+            <img id="zt-remini-img-before-el" src="" alt="Foto Asli">
+          </div>
+        </div>
+
+        <!-- Download -->
+        <a id="zt-remini-dl" class="zt-remini-dl-btn" style="display:none;" download="remini_result.jpg">
+          <i class="fas fa-download"></i> Download Foto HD
+        </a>
+
+        <div id="zt-remini-result" class="zt-result-area"></div>
+      </div>
+    </div>
+
+
+    <div id="zt-qrgen" class="zt-panel">
+      <div class="zt-dl-box">
+        <div class="zt-dl-icon" style="background:linear-gradient(135deg,#0a3d6b,#00d9ff)">
+          <i class="fas fa-qrcode"></i>
+        </div>
+        <h3 class="zt-dl-title">QR Code Generator</h3>
+        <p class="zt-dl-desc">Buat QR Code dari teks, link, atau apapun</p>
+
+        <div style="display:flex;gap:8px;margin-bottom:10px;">
+          <input id="zt-qr-input" class="zt-input" type="text" placeholder="Masukkan teks atau URL..."
+            style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:12px;padding:12px 16px;color:#fff;font-size:14px;outline:none;"
+            onkeydown="if(event.key==='Enter') ztQrGenerate()">
+          <button onclick="ztQrGenerate()" style="flex-shrink:0;padding:0 18px;border-radius:12px;background:linear-gradient(135deg,rgba(0,217,255,0.25),rgba(168,85,247,0.2));border:1px solid rgba(0,217,255,0.4);color:#00d9ff;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.boxShadow='0 0 16px rgba(0,217,255,0.35)'" onmouseout="this.style.boxShadow='none'">
+            <i class="fas fa-qrcode"></i>
+          </button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:rgba(255,255,255,0.45);">Ukuran:</span>
+          <div style="display:flex;gap:6px;" id="zt-qr-size-btns">
+            <button class="zt-fmt active" onclick="ztQrSetSize(200,this)">S</button>
+            <button class="zt-fmt" onclick="ztQrSetSize(300,this)">M</button>
+            <button class="zt-fmt" onclick="ztQrSetSize(400,this)">L</button>
+          </div>
+          <span style="font-size:12px;color:rgba(255,255,255,0.45);">Warna:</span>
+          <input type="color" id="zt-qr-color" value="#000000"
+            style="width:34px;height:28px;border:none;background:none;cursor:pointer;padding:0;" title="Warna QR">
+          <input type="color" id="zt-qr-bgcolor" value="#ffffff"
+            style="width:34px;height:28px;border:none;background:none;cursor:pointer;padding:0;" title="Background">
+        </div>
+
+        <div id="zt-qr-placeholder" style="text-align:center;padding:30px 0;opacity:0.25;">
+          <i class="fas fa-qrcode" style="font-size:72px;"></i>
+          <p style="font-size:13px;margin-top:8px;">Masukkan teks lalu tap tombol QR</p>
+        </div>
+
+        <div id="zt-qr-out" style="display:none;flex-direction:column;align-items:center;gap:12px;margin-top:6px;">
+          <div style="padding:14px;background:#fff;border-radius:14px;display:inline-block;box-shadow:0 0 24px rgba(0,217,255,0.2);">
+            <canvas id="zt-qr-canvas"></canvas>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <button class="zt-btn" onclick="ztQrDownload('png')">
+              <i class="fas fa-download"></i> Download PNG
+            </button>
+            <button class="zt-btn" onclick="ztQrDownload('svg')"
+              style="background:rgba(0,217,255,0.08);border:1px solid rgba(0,217,255,0.25);color:#00d9ff;">
+              <i class="fas fa-code"></i> Download SVG
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+</section>
+
+<section id="ai" class="page-section active">
+<div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <div class="chat-container" id="chatContainer">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-hero">
+                    <div class="hero-icon">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <h1 class="hero-title">Selamat Datang di ZainAI</h1>
+                    <p class="hero-subtitle">Asisten AI Cerdas Bertenaga VPS - Siap Membantu Anda</p>
+
+                </div>
+
+                <div class="features-section">
+                    <h3 class="section-title">Apa yang bisa saya bantu?</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card" onclick="sendPrompt('Jelaskan tentang artificial intelligence dan machine learning')">
+                            <i class="fa-solid fa-lightbulb feature-icon"></i>
+                            <h4 class="feature-title">Pengetahuan</h4>
+                            <p class="feature-desc">Pertanyaan umum &amp; edukasi</p>
+                        </div>
+                        <div class="feature-card" onclick="sendPrompt('Buatkan contoh kode Python untuk web scraping')">
+                            <i class="fa-solid fa-code feature-icon"></i>
+                            <h4 class="feature-title">Pemrograman</h4>
+                            <p class="feature-desc">Coding &amp; debugging</p>
+                        </div>
+                        <div class="feature-card" onclick="sendPrompt('Buatkan cerita pendek tentang petualangan di luar angkasa')">
+                            <i class="fa-solid fa-book feature-icon"></i>
+                            <h4 class="feature-title">Kreativitas</h4>
+                            <p class="feature-desc">Menulis &amp; brainstorming</p>
+                        </div>
+                        <div class="feature-card" onclick="sendPrompt('Analisis tren teknologi AI di tahun 2024')">
+                            <i class="fa-solid fa-chart-line feature-icon"></i>
+                            <h4 class="feature-title">Analisis</h4>
+                            <p class="feature-desc">Data &amp; insights</p>
+                        </div>
+                        <div class="feature-card" onclick="sendPrompt('Berikan tips produktivitas untuk bekerja dari rumah')">
+                            <i class="fa-solid fa-briefcase feature-icon"></i>
+                            <h4 class="feature-title">Produktivitas</h4>
+                            <p class="feature-desc">Tips &amp; strategi</p>
+                        </div>
+                        <div class="feature-card" onclick="sendPrompt('Jelaskan konsep blockchain dengan bahasa sederhana')">
+                            <i class="fa-solid fa-graduation-cap feature-icon"></i>
+                            <h4 class="feature-title">Pembelajaran</h4>
+                            <p class="feature-desc">Tutorial &amp; panduan</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-row">
+                <button class="gear-btn" id="gearBtn" onclick="openAttachSheet()" title="Lampirkan Gambar">
+                    <i class="fa-regular fa-plus" style="font-weight:300;"></i>
+                </button>
+
+                <div class="input-container">
+                    <button class="attach-btn gear-inside" id="gearInside" onclick="openAttachSheet()" title="Lampirkan Gambar">
+                        <i class="fa-regular fa-plus" style="font-weight:300;"></i>
+                    </button>
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="userInput" 
+                            placeholder="Balasan Untuk ZainAI" 
+                            rows="1"
+                            maxlength="2000"
+                            onkeydown="handleKeyPress(event)"
+                            oninput="autoResize(this)"
+                        ></textarea>
+                        <div class="char-counter" id="charCounter">0/2000</div>
+                    </div>
+                    <button id="sendBtn" onclick="sendMessage()" disabled title="Send Message">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat History Slide Panel (dipindah ke luar #ai via JS) -->
+
+    <!-- Help/Fitur Modal -->
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-overlay" onclick="settingsOverlayClick()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fa-solid fa-sliders"></i>
+                    Pengaturan
+                </h2>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <button class="btn-icon" onclick="showInfo()" title="Info" style="width:30px;height:30px;border-radius:8px;font-size:13px;">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </button>
+                    <button class="close-btn" onclick="closeSettings()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <label class="settings-label"><i class="fa-solid fa-compass"></i> Topik</label>
+                    <div class="topic-dropdown-wrap" id="topicDropdownWrap">
+                        <button class="topic-dropdown-btn" id="topicDropdownBtn" onclick="toggleTopicDropdown()">
+                            <span id="topicDropdownLabel"><i class="fa-solid fa-earth-asia"></i> Umum</span>
+                            <i class="fa-solid fa-chevron-down topic-chevron" id="topicChevron"></i>
+                        </button>
+                        <div class="topic-dropdown-menu" id="topicDropdownMenu">
+                            <div class="topic-option active" data-topic="umum" onclick="selectTopic(this,'umum','fa-earth-asia','Umum')">
+                                <i class="fa-solid fa-earth-asia"></i> Umum
+                            </div>
+                            <div class="topic-option" data-topic="matematika" onclick="selectTopic(this,'matematika','fa-square-root-variable','Matematika')">
+                                <i class="fa-solid fa-square-root-variable"></i> Matematika
+                            </div>
+                            <div class="topic-option" data-topic="coding" onclick="selectTopic(this,'coding','fa-code','Coding')">
+                                <i class="fa-solid fa-code"></i> Coding
+                            </div>
+                            <div class="topic-option" data-topic="bahasa" onclick="selectTopic(this,'bahasa','fa-book-open','Bahasa &amp; Sastra')">
+                                <i class="fa-solid fa-book-open"></i> Bahasa &amp; Sastra
+                            </div>
+                            <div class="topic-option" data-topic="sains" onclick="selectTopic(this,'sains','fa-flask','Sains')">
+                                <i class="fa-solid fa-flask"></i> Sains
+                            </div>
+                            <div class="topic-option" data-topic="sejarah" onclick="selectTopic(this,'sejarah','fa-landmark','Sejarah')">
+                                <i class="fa-solid fa-landmark"></i> Sejarah
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label"><i class="fa-solid fa-brain"></i> Pola Berpikir</label>
+                    <div class="sett-row">
+                        <div class="sett-pill" data-length="short" onclick="selectResponseLength('short')">
+                            <i class="fa-solid fa-bolt"></i><span>Singkat</span>
+                        </div>
+                        <div class="sett-pill" data-length="long" onclick="selectResponseLength('long')">
+                            <i class="fa-solid fa-magnifying-glass"></i><span>Riset Mendalam</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <label class="settings-label"><i class="fa-solid fa-comments"></i> Model AI</label>
+                    <div class="sett-row">
+                        <div class="sett-pill active" data-style="neutral" onclick="selectResponseStyle('neutral')">
+                            <i class="fa-solid fa-cube"></i><span>Normal</span>
+                        </div>
+                        <div class="sett-pill sett-pill-danger" data-style="angry" onclick="selectResponseStyle('angry')">
+                            <i class="fa-solid fa-skull"></i><span>Worm-AI</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeSettings()">Batal</button>
+                <button class="btn-primary" onclick="saveSettings()">
+                    <i class="fa-solid fa-check"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal" id="infoModal">
+        <div class="modal-overlay" onclick="closeInfo()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Tentang ZainAI
+                </h2>
+                <button class="close-btn" onclick="closeInfo()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="info-section">
+                    <div class="info-logo">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <h3>ZainAI Assistant</h3>
+                    <p class="version">Version 1.0.0 Beta</p>
+                </div>
+
+                <div class="info-item">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <div>
+                        <strong>Developer</strong>
+                        <p>Zain Suryo Negoro</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fa-solid fa-bolt"></i>
+                    <div>
+                        <strong>Powered By</strong>
+                        <p>Zain-AI - Ultra Fast AI Inference</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fa-solid fa-star"></i>
+                    <div>
+                        <strong>Fitur Utama</strong>
+                        <ul class="feature-list">
+                            <li>Respons AI super cepat</li>
+                            <li>Multiple model AI pilihan</li>
+                            <li>Antarmuka responsif mobile</li>
+                            <li>Chat history management</li>
+                        </ul>
+                    </div>
+                </div>
+
+              
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+
+<section id="apk-download" class="page-section apk-page">
+
+  <!-- Header -->
+  <div class="apk-header">
+    <div class="apk-header-glow"></div>
+    <div class="apk-header-content">
+        <h1 class="apk-title">Download <span class="apk-title-accent">Mod Apk</span></h1>
+      <p class="apk-subtitle">Aplikasi premium &amp; mod terpilih — gratis, aman, dan selalu update</p>
+      <div class="apk-stats">
+        <div class="apk-stat"><span id="apkCount">13</span><small>Aplikasi</small></div>
+        <div class="apk-stat-div"></div>
+        <div class="apk-stat"><span>100%</span><small>Gratis</small></div>
+        <div class="apk-stat-div"></div>
+        <div class="apk-stat"><span>MOD</span><small>Premium</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="apk-search-wrap">
+    <i class="fas fa-search apk-search-icon"></i>
+    <input type="text" id="searchApk" class="apk-search-input" placeholder="Cari aplikasi..." onkeyup="searchAPK()">
+    <div class="apk-search-pulse"></div>
+  </div>
+
+  <!-- Grid -->
+  <div id="apkList" class="apk-grid"></div>
+
+  <!-- Empty state -->
+  <div id="apkEmpty" class="apk-empty" style="display:none;">
+    <i class="fas fa-search"></i>
+    <p>Tidak ada aplikasi ditemukan</p>
+  </div>
+
+  <!-- Pagination -->
+  <div id="apkPagination" class="apk-pagination"></div>
+
+</section>
+<section id="music" class="page-section">
+
+<!-- ============================================================
+     HIDDEN LEGACY: elemen lama tetap ada agar script.js tidak error
+     Semua disembunyikan, JS lama pakai audio, cd, playBtn dll ini
+     ============================================================ -->
+<div style="display:none!important;visibility:hidden!important;pointer-events:none!important;position:absolute!important;opacity:0!important;">
+  <div class="bg"></div>
+  <header class="brand">CyberZain-MUSIC</header>
+  <select id="categorySelect">
+    <option value="">— Pilih Kategori —</option>
+    <option value="😝🤙🏻">Playlist Anda</option>
+    <option value="Lagu Terbaru">Lagu Terbaru</option>
+    <option value="Sedang Trend">Sedang Trend</option>
+  </select>
+  <div class="player">
+    <button id="menuBtn" class="menu-btn">⋮</button>
+    <div id="menuPanel" class="menu-panel">
+      <div class="menu-item" id="downloadMusic">Download Music</div>
+      <div class="menu-item" id="speedControl">Kecepatan Music</div>
+      <div class="menu-item" id="qualityMenuBtn">Kualitas Audio ▸</div>
+      <div class="menu-item" id="sleepTimeBtn">Sleep Time ▸</div>
+      <div class="menu-item" id="equalizerBtn">Equalizer ▸</div>
+      <div class="menu-item" id="contactOwner">Hubungi Pemilik</div>
+      <div id="qualitySubmenu" class="submenu">
+        <div class="submenu-item" data-quality="96">96 kbps</div>
+        <div class="submenu-item" data-quality="128">128 kbps</div>
+        <div class="submenu-item" data-quality="192">192 kbps</div>
+        <div class="submenu-item" data-quality="320">320 kbps</div>
+      </div>
+      <div id="sleepSubmenu" class="submenu">
+        <div class="submenu-item" data-time="5">5 menit</div>
+        <div class="submenu-item" data-time="10">10 menit</div>
+        <div class="submenu-item" data-time="15">15 menit</div>
+        <div class="submenu-item" data-time="30">30 menit</div>
+        <div class="submenu-item" data-time="60">1 jam</div>
+      </div>
+      <div id="equalizerSubmenu" class="submenu">
+        <div class="submenu-item" data-eq="bass">Bass</div>
+        <div class="submenu-item" data-eq="treble">Treble</div>
+        <div class="submenu-item" data-eq="flat">Flat</div>
+      </div>
+      <div class="menu-item" id="reportBtn">Report Lagu</div>
+    </div>
+    <div class="cd-box">
+      <div id="cd" class="cd"></div>
+    </div>
+    <div class="visualizer" id="visualizer">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+    <div class="yt-info">
+      <div class="title-wrap"><h2 id="nowTitle" class="title-scroll">Tidak ada lagu diputar</h2></div>
+      <p id="nowArtist">—</p>
+    </div>
+    <div class="yt-bar" id="seekBar"><div id="progress"></div></div>
+    <div class="time-row"><span id="current">0:00</span><span id="duration">0:00</span></div>
+    <div class="controls">
+      <button id="prevBtn">⏮</button>
+      <button id="playBtn">▶</button>
+      <button id="nextBtn">⏭</button>
+    </div>
+    <audio id="audioPlayer" preload="metadata"></audio>
+  </div>
+  <button class="btn" id="toggleLoop">Mode: Mengganti Music Selanjutnya</button>
+</div>
+
+<!-- ============================================================
+     NEW UI — YouTube Music Style (CyberZain Music)
+     Semua variabel/function pakai prefix czm_ agar zero konflik
+     ============================================================ -->
+<!-- VIEW: HOME -->
+<div id="czm-home" class="czm-view czm-on">
+  <div class="czm-topbar">
+    <div class="czm-logo">
+      <span class="czm-logo-title czm-rainbow">CyberZain</span><span class="czm-logo-sub">&nbsp;Music</span>
+    </div>
+    <div class="czm-topbar-right">
+      <button class="czm-icon-btn" onclick="czmOpenSearch()" title="Cari"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+  </div>
+  <!-- Pills + tombol playlist sejajar -->
+  <div style="display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,0.05);background:inherit;">
+    <button onclick="czmOpenPlm()" style="flex-shrink:0;background:none;border:none;color:#aaa;font-size:12px;cursor:pointer;padding:10px 10px 10px 16px;-webkit-tap-highlight-color:transparent;transition:color .15s;display:flex;flex-direction:column;align-items:center;gap:3px;" onmouseenter="this.style.color='#00d9ff'" onmouseleave="this.style.color='#aaa'">
+      <i class="fa-solid fa-list" style="font-size:16px;"></i>
+      <span style="font-size:10px;font-weight:600;white-space:nowrap;">Playlist</span>
+    </button>
+    <div style="width:1px;height:28px;background:rgba(255,255,255,0.1);flex-shrink:0;"></div>
+    <div class="czm-pills" id="czm-pills" style="border-bottom:none;flex:1;">
+      <div class="czm-pill active" data-f="all"      onclick="czmMood(this,'all')">Semua</div>
+      <div class="czm-pill"        data-f="sad"      onclick="czmMood(this,'sad')">Sedih</div>
+      <div class="czm-pill"        data-f="senang"   onclick="czmMood(this,'senang')">Senang</div>
+      <div class="czm-pill"        data-f="trending" onclick="czmMood(this,'trending')">Trending</div>
+      <div class="czm-pill"        data-f="baru"     onclick="czmMood(this,'baru')">Bersantai</div>
+    </div>
+  </div>
+  <div class="czm-home-body" id="czm-home-body"></div>
+</div>
+
+<!-- VIEW: PLAYER -->
+<div id="czm-player" class="czm-view">
+
+  <!-- TOPBAR: chevron kiri + title + dots kanan -->
+  <div class="czm-player-topbar">
+    <button class="czm-back" onclick="czmGoHome()"><i class="fa-solid fa-chevron-down"></i></button>
+    <!-- Normal: DIPUTAR DARI + nama -->
+    <div class="czm-topbar-center">
+      <div class="czm-topbar-label">Diputar dari</div>
+      <div class="czm-topbar-source" id="czm-topbar-source">CyberZain Music</div>
+    </div>
+    <!-- Saat tab terbuka: thumbnail kecil + judul -->
+    <div class="czm-topbar-mini" id="czm-topbar-mini">
+      <img class="czm-topbar-mini-art" id="czm-topbar-mini-art" src="" alt="">
+      <div class="czm-topbar-mini-info">
+        <div class="czm-topbar-mini-title" id="czm-topbar-mini-title">—</div>
+        <div class="czm-topbar-mini-artist" id="czm-topbar-mini-artist">—</div>
+      </div>
+    </div>
+    <button class="czm-icon-btn" id="czm-more-toggle" onclick="czmToggleMore()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    <button class="czm-icon-btn" id="czm-mini-play-btn" onclick="event.stopPropagation();czmToggle()" style="display:none;"><i class="fa-solid fa-play" id="czm-mini-play-ico"></i></button>
+  </div>
+
+  <!-- MORE MENU -->
+  <div class="czm-more-menu" id="czm-more-menu">
+    <div class="czm-mi" onclick="czmDl()"><i class="fa-solid fa-download"></i> Download</div>
+    <div class="czm-mi" onclick="czmAddToPlaylistFromMenu()"><i class="fa-solid fa-plus"></i> Simpan ke Playlist</div>
+    <div class="czm-mi" onclick="czmToggleLoop()"><i class="fa-solid fa-repeat" id="czm-loop-ico"></i> <span id="czm-loop-lbl">Loop: Off</span></div>
+    <div class="czm-mi" onclick="czmSleep()"><i class="fa-solid fa-moon"></i> Sleep Timer</div>
+    <div class="czm-mi" onclick="czmSpeedSheet()"><i class="fa-solid fa-gauge-high"></i> Kecepatan</div>
+    <div class="czm-mi" onclick="czmQualitySheet()"><i class="fa-solid fa-sliders"></i> Kualitas Audio</div>
+    <div class="czm-mi" onclick="czmReportSong()"><i class="fa-solid fa-flag"></i> Laporkan</div>
+  </div>
+
+  <!-- NEXT HEADER: Diputar dari + Simpan + Filter Chips — tampil hanya saat tab BERIKUTNYA aktif -->
+<div id="czm-next-header" style="display:none; background:#0f2035; padding:0; flex-shrink:0; border-block:1px solid rgba(255,255,255,0.1);">
+    <div class="czm-from-row">
+      <div>
+        <div class="czm-from-label">Diputar dari</div>
+        <div class="czm-from-name" id="czm-from-name">CyberZain Music</div>
+      </div>
+      <button class="czm-save-btn" onclick="czmAddToPlaylistFromMenu()"><i class="fa-solid fa-list-ul"></i> Simpan</button>
+    </div>
+    <div class="czm-filter-bar" id="czm-filter-bar">
+      <button class="czm-filter-chip active" data-filter="all"      onclick="czmSetFilter(this,'all')">All</button>
+      <button class="czm-filter-chip"         data-filter="populer" onclick="czmSetFilter(this,'populer')">Populer</button>
+      <button class="czm-filter-chip"         data-filter="temukan" onclick="czmSetFilter(this,'temukan')">Temukan</button>
+      <button class="czm-filter-chip"         data-filter="pesta"   onclick="czmSetFilter(this,'pesta')">Pesta</button>
+      <button class="czm-filter-chip"         data-filter="romansa" onclick="czmSetFilter(this,'romansa')">Romansa</button>
+    </div>
+  </div>
+
+  <!-- SCROLL AREA: semua konten yang bisa di-scroll -->
+  <div class="czm-scroll-area" id="czm-scroll-area">
+
+    <!-- FULL VIEW body (album art + controls) -->
+    <div class="czm-player-body">
+      <div class="czm-full-view" id="czm-full-view">
+        <div class="czm-art-wrap" id="czm-art-wrap">
+        <img id="czm-art" src="" alt="cover">
+        <video id="czm-video" loop playsinline style="display:none;width:100%;height:100%;object-fit:cover;"></video>
+      </div>
+        <div class="czm-info-row">
+          <div class="czm-info-text">
+            <div class="czm-title-clip"><span class="czm-stitle" id="czm-stitle">—</span></div>
+            <div class="czm-sartist" id="czm-sartist">—</div>
+          </div>
+        </div>
+        <!-- Action pills: Like, Dislike, Simpan, Share, Download -->
+        <div class="czm-action-row">
+          <button class="czm-action-pill" id="czm-like-btn" onclick="czmToggleLike()">
+            <i class="fa-regular fa-thumbs-up"></i> Suka
+          </button>
+          <button class="czm-action-pill" id="czm-dislike-btn" onclick="czmToggleDislike()">
+            <i class="fa-regular fa-thumbs-down"></i> Tidak Suka
+          </button>
+          <button class="czm-action-pill" onclick="czmAddToPlaylistFromMenu()">
+            <i class="fa-solid fa-list-ul"></i> Simpan
+          </button>
+          <button class="czm-action-pill" onclick="czmBsShare()">
+            <i class="fa-solid fa-share-nodes"></i> Bagikan
+          </button>
+          <button class="czm-action-pill" onclick="czmDl()">
+            <i class="fa-solid fa-download"></i> Download
+          </button>
+        </div>
+        <div class="czm-seekbar-wrap">
+          <div class="czm-seekbar" id="czm-seekbar" onclick="czmSeek(event)">
+            <div id="czm-prog"></div>
+            <div class="czm-seek-thumb" id="czm-seek-thumb"></div>
+          </div>
+          <div class="czm-times"><span id="czm-cur">0:00</span><span id="czm-dur">0:00</span></div>
+        </div>
+        <div class="czm-ctrl">
+          <button class="czm-cbtn" id="czm-shuffle-btn" onclick="czmToggleShuffle()"><i class="fa-solid fa-shuffle"></i></button>
+          <button class="czm-cbtn" onclick="czmPrev()"><i class="fa-solid fa-backward-step"></i></button>
+          <button class="czm-playbtn" id="czm-playbtn" onclick="czmToggle()"><i class="fa-solid fa-play" id="czm-play-ico"></i></button>
+          <button class="czm-cbtn" onclick="czmNext()"><i class="fa-solid fa-forward-step"></i></button>
+          <button class="czm-cbtn" id="czm-repeat-btn" onclick="czmToggleLoop()"><i class="fa-solid fa-repeat" id="czm-loop-ico2"></i></button>
+        </div>
+        <div class="czm-vis" id="czm-vis">
+          <div class="czm-vbar"></div><div class="czm-vbar"></div><div class="czm-vbar"></div>
+          <div class="czm-vbar"></div><div class="czm-vbar"></div><div class="czm-vbar"></div>
+          <div class="czm-vbar"></div><div class="czm-vbar"></div><div class="czm-vbar"></div>
+          <div class="czm-vbar"></div><div class="czm-vbar"></div><div class="czm-vbar"></div>
+          <div class="czm-vbar"></div><div class="czm-vbar"></div><div class="czm-vbar"></div>
+        </div>
+
+        <!-- TENTANG ARTIS: muncul saat scroll ke bawah di full view -->
+        <div class="czm-inline-artist" id="czm-inline-artist"></div>
+
+        <!-- PLAYLIST BOX: muncul di bawah saat lagu dari playlist -->
+        <div id="czm-player-pl-box" style="display:none; padding: 0 0 16px;"></div>
+
+      </div>
+    </div>
+
+    <!-- COLLAPSED VIEW -->
+    <div class="czm-collapsed-view" id="czm-collapsed-view">
+
+      <!-- Tab BERIKUTNYA -->
+      <div class="czm-tab-content czm-tab-hidden" id="czm-tab-content-next">
+        <div id="czm-pl-box"></div>
+      </div>
+
+      <!-- Tab TERKAIT -->
+      <div class="czm-tab-content czm-tab-hidden" id="czm-tab-content-related">
+        <div id="czm-related-box">
+          <div style="text-align:center;color:#555;padding:48px 0;font-size:14px;">Memuat rekomendasi...</div>
+        </div>
+      </div>
+
+      <!-- Tab TENTANG ARTIS -->
+      <div class="czm-tab-content czm-tab-hidden" id="czm-tab-content-artist">
+        <div id="czm-artist-box">
+          <div style="text-align:center;color:#555;padding:48px 0;font-size:14px;">Memuat info artis...</div>
+        </div>
+      </div>
+
+    </div><!-- end czm-collapsed-view -->
+
+  </div><!-- end czm-scroll-area -->
+
+  <!-- Tab bar dihapus -->
+
+</div>
+
+<!-- RELATED SEARCH OVERLAY: fullscreen khusus tab TERKAIT -->
+<div id="czm-rel-search-ov" style="display:none;position:fixed;inset:0;background:#0f2035;z-index:10035;flex-direction:column;">
+  <!-- Topbar search -->
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 14px 14px;background:#0f2035;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+    <button onclick="czmCloseRelatedSearch()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px;flex-shrink:0;">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div style="flex:1;display:flex;align-items:center;background:#152840;border-radius:24px;padding:10px 16px;gap:10px;">
+      <i class="fa-solid fa-magnifying-glass" style="color:#777;font-size:14px;flex-shrink:0;"></i>
+      <input id="czm-rel-search-inp" type="text" placeholder="Cari lagu di rekomendasi..."
+        style="background:none;border:none;color:#fff;font-size:15px;outline:none;width:100%;font-family:inherit;"
+        oninput="czmDoRelatedSearch(this.value)"
+        autofocus>
+      <button id="czm-rel-search-clear" onclick="document.getElementById('czm-rel-search-inp').value='';czmDoRelatedSearch('');this.style.display='none';"
+        style="display:none;background:none;border:none;color:#666;font-size:18px;cursor:pointer;padding:0;flex-shrink:0;">✕</button>
+    </div>
+  </div>
+  <!-- Hasil search -->
+  <div id="czm-rel-search-res" style="flex:1;overflow-y:auto;padding:8px 0;">
+    <div style="text-align:center;color:#444;padding:60px 0;font-size:14px;">
+      <i class="fa-solid fa-magnifying-glass" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.3;"></i>
+      Ketik untuk mencari lagu
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div class="czm-search-ov" id="czm-search-ov">
+  <!-- Progress bar loading YT Music style -->
+  <div class="czm-srch-progress" id="czm-srch-progress">
+    <div class="czm-srch-progress-bar"></div>
+  </div>
+  <!-- Top bar: back + search input + clear -->
+  <div class="czm-search-bar" id="czm-search-bar">
+    <button class="czm-icon-btn" onclick="czmCloseSearch()"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="czm-search-input-wrap">
+      <i class="fa-solid fa-magnifying-glass czm-srch-ico"></i>
+      <input type="text" id="czm-search-inp" placeholder="Cari lagu, artis..." oninput="czmSearchTyping(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();czmDoSearch(this.value);}" autocomplete="off">
+      <button class="czm-srch-clear" id="czm-srch-clear" onclick="document.getElementById('czm-search-inp').value='';czmDoSearch('');this.style.display='none';" style="display:none;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  </div>
+
+  <!-- Filter chips: Semua | Lagu | Trending | Sedih -->
+  <div class="czm-srch-chips" id="czm-srch-chips" style="display:none;">
+    <button class="czm-srch-chip active" data-chip="semua"  onclick="czmSrchChip('semua',this)">Semua</button>
+    <button class="czm-srch-chip"        data-chip="lagu"   onclick="czmSrchChip('lagu',this)">Lagu</button>
+    <button class="czm-srch-chip"        data-chip="trend"  onclick="czmSrchChip('trend',this)">Trending</button>
+    <button class="czm-srch-chip"        data-chip="sad"    onclick="czmSrchChip('sad',this)">Sedih</button>
+  </div>
+
+  <!-- Result area -->
+  <div class="czm-search-res" id="czm-search-res"></div>
+</div>
+
+<!-- NOW PLAYING BAR (dipindah ke body level) -->
+
+<!-- BOTTOM SHEET -->
+<div class="czm-bs-ov"   id="czm-bs-ov"   onclick="czmCloseBs()"></div>
+<div class="czm-bs-menu" id="czm-bs-menu">
+  <div class="czm-bs-handle"><span></span></div>
+  <div class="czm-bs-head">
+    <img id="czm-bs-img" src="" style="width:48px;height:48px;border-radius:6px;object-fit:cover;flex-shrink:0;">
+    <div style="flex:1;min-width:0;">
+      <div id="czm-bs-title"  style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;"></div>
+      <div id="czm-bs-artist" style="font-size:12px;color:#aaa;margin-top:2px;"></div>
+    </div>
+    <button class="czm-icon-btn" onclick="czmCloseBs()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="czm-bs-actions">
+    <div class="czm-bs-act" onclick="czmBsQueueNext()">
+      <div class="czm-bs-act-ico"><i class="fa-solid fa-list-check"></i></div>
+      <span class="czm-bs-act-lbl">Putar setelah<br>ini</span>
+    </div>
+    <div class="czm-bs-act" onclick="czmBsAddPl()">
+      <div class="czm-bs-act-ico"><i class="fa-solid fa-list-ul"></i></div>
+      <span class="czm-bs-act-lbl">Simpan ke<br>playlist</span>
+    </div>
+    <div class="czm-bs-act" onclick="czmBsShare()">
+      <div class="czm-bs-act-ico"><i class="fa-solid fa-share-nodes"></i></div>
+      <span class="czm-bs-act-lbl">Bagikan</span>
+    </div>
+  </div>
+  <div class="czm-bs-list">
+    <div class="czm-bsi" onclick="czmBsPlay()"><i class="fa-solid fa-play" style="width:20px;color:#777;"></i> Putar</div>
+    <div class="czm-bsi" onclick="czmBsDl()"><i class="fa-solid fa-download" style="width:20px;color:#777;"></i> Download</div>
+    <div class="czm-bsi" onclick="czmBsLike()" id="czm-bs-like-row">
+      <i class="fa-regular fa-heart" id="czm-bs-like-ico" style="width:20px;color:#777;"></i>
+      <span id="czm-bs-like-lbl">Simpan ke galeri</span>
+    </div>
+    <div class="czm-bsi" onclick="czmBsReport()"><i class="fa-solid fa-flag" style="width:20px;color:#777;"></i> Laporkan</div>
+  </div>
+</div>
+
+<!-- HALAMAN LAGU TOP ARTIS -->
+<div class="czm-top-songs-page" id="czm-top-songs-page">
+  <div class="czm-tsp-header">
+    <button class="czm-tsp-back" onclick="czmCloseArtistTopSongs()"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="czm-tsp-title" id="czm-tsp-title">Lagu top</div>
+    <button class="czm-tsp-playpause" id="czm-tsp-playpause" onclick="czmTspTogglePlay()"><i class="fa-solid fa-pause" id="czm-tsp-play-ico"></i></button>
+  </div>
+  <div class="czm-tsp-list" id="czm-tsp-list"></div>
+</div>
+
+</section>
+
+<!-- Kirim Pesan Section -->
+
+
+  <div id="apkModal" class="apk-modal-overlay" style="display:none;" onclick="if(event.target===this)closeInfo()">
+  <div class="apk-modal-box">
+    <button class="apk-modal-close" onclick="closeInfo()"><i class="fas fa-times"></i></button>
+    <h3 id="apkTitle" class="apk-modal-title"></h3>
+    <p id="apkDesc" class="apk-modal-desc"></p>
+    <button onclick="closeInfo()" class="apk-modal-btn">Tutup</button>
+  </div>
+</div>
+<footer class="site-footer">
+  <p>TechsStack Programming</p>
+<a><i class="fab fa-python"></i></a>
+<a><i class="fab fa-php"></i></a>
+<a><i class="fab fa-java"></i></a>
+<a><i class="fab fa-html5"></i></a>
+<a><i class="fab fa-css3-alt"></i></a>
+<a><i class="fab fa-js"></i></a>
+<a><i class="fab fa-gitlab"></i></a>
+<a><i class="fab fa-stack-overflow"></i></a>
+<a><i class="fab fa-bitbucket"></i></a>
+<a><i class="fab fa-laravel"></i></a>
+<a><i class="fab fa-vuejs"></i></a>
+<a><i class="fab fa-angular"></i></a>
+<a><i class="fab fa-react"></i></a>
+<a><i class="fab fa-linux"></i></a>
+<a><i class="fab fa-d-and-d"></i></a>
+<a><i class="fab fa-node-js"></i></a>
+<a><i class="fas fa-bug"></i></a>
+<p id="cp-copyright"> &copy; 2026 Development Cyberzain. All right reserved</p>
+</footer>
+<!-- NOW PLAYING BAR — di body level agar position:fixed selalu nempel layar -->
+<div class="czm-npbar" id="czm-npbar" onclick="czmNpbarClick()">
+  <div class="czm-np-prog"><div class="czm-np-fill" id="czm-np-fill"></div></div>
+  <img class="czm-np-thumb" id="czm-np-thumb" src="" alt="">
+  <div class="czm-np-info">
+    <div class="czm-np-title-clip"><div class="czm-np-title" id="czm-np-title">—</div></div>
+    <div class="czm-np-artist" id="czm-np-artist">—</div>
+  </div>
+  <div class="czm-np-ctrl">
+    <button class="czm-np-btn" onclick="event.stopPropagation();czmPrev()"><i class="fa-solid fa-backward-step"></i></button>
+    <button class="czm-np-btn" id="czm-np-play" onclick="event.stopPropagation();czmToggle()"><i class="fa-solid fa-play" id="czm-np-ico"></i></button>
+    <button class="czm-np-btn" onclick="event.stopPropagation();czmNext()"><i class="fa-solid fa-forward-step"></i></button>
+  </div>
+</div>
+
+<!-- PLAYLIST MODAL — di dalam section#music, z-index di atas player (10003) -->
+<div id="czm-plm-ov" onclick="czmClosePlm()" style="display:none;position:fixed;inset:0;background:rgba(15,32,53,0.6);z-index:10025;"></div>
+<div id="czm-plm-modal" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:10026;background:#1a2d42;border-radius:16px 16px 0 0;max-height:85vh;overflow:hidden;flex-direction:column;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1);">
+
+<!-- Pilih Playlist Bottom Sheet -->
+  <div style="display:flex;justify-content:center;padding:10px 0 4px;flex-shrink:0;">
+    <div style="width:36px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;"></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;">
+    <span style="font-size:16px;font-weight:700;color:#fff;"><i class="fa-solid fa-music" style="color:#00d9ff;margin-right:8px;"></i>Playlist Saya</span>
+    <button onclick="czmClosePlm()" style="background:none;border:none;color:#aaa;font-size:20px;cursor:pointer;padding:4px;"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div style="padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;gap:10px;align-items:center;">
+    <input id="czm-plm-new" placeholder="Nama playlist baru..." style="flex:1;background:#152840;border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 14px;color:#fff;font-size:14px;outline:none;">
+    <button onclick="czmCreatePl()" style="background:#00d9ff;border:none;color:#fff;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;"><i class="fa-solid fa-plus"></i> Buat</button>
+  </div>
+  <div id="czm-plm-list" style="overflow-y:auto;flex:1;padding:6px 0;"></div>
+</div>
+<div id="czm-plm-detail" class="czm-pld-page">
+  <!-- Hero header -->
+  <div class="czm-pld-hero">
+    <div class="czm-pld-hero-bg" id="czm-pld-hero-bg"></div>
+    <div class="czm-pld-hero-overlay"></div>
+    <div class="czm-pld-hero-top">
+      <button class="czm-pld-back" onclick="czmClosePlDetail()"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="czm-pld-delete" onclick="czmPlDetailMore()"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>
+    <div class="czm-pld-hero-art" id="czm-pld-hero-art">
+      <i class="fa-solid fa-music"></i>
+    </div>
+    <div class="czm-pld-hero-info">
+      <div class="czm-pld-label">PLAYLIST</div>
+      <div class="czm-pld-name" id="czm-plm-dname"></div>
+      <div class="czm-pld-count" id="czm-pld-count"></div>
+    </div>
+    <div class="czm-pld-hero-actions">
+      <button class="czm-pld-play-all" onclick="czmPlayAllFromDetail()">
+        <i class="fa-solid fa-play"></i> Putar Semua
+      </button>
+      <button class="czm-pld-shuffle-btn" onclick="czmShuffleFromDetail()">
+        <i class="fa-solid fa-shuffle"></i>
+      </button>
+      <button class="czm-pld-repeat-btn" id="czm-pld-repeat-btn" onclick="czmToggleLoopFromDetail()">
+        <i class="fa-solid fa-repeat" id="czm-pld-repeat-ico"></i>
+      </button>
+    </div>
+  </div>
+  <!-- Song list -->
+  <div id="czm-plm-dsongs" class="czm-pld-songs"></div>
+</div>
+
+<div id="czm-plpick-ov" onclick="czmClosePlPick()" style="display:none;position:fixed;inset:0;background:rgba(7,15,26,0.65);z-index:10030;backdrop-filter:blur(3px);"></div>
+<div id="czm-plpick-sheet" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:10031;background:#1e3248;border-radius:16px 16px 0 0;overflow:hidden;flex-direction:column;transform:translateY(100%);transition:transform .28s cubic-bezier(.32,.72,0,1);max-height:80vh;box-shadow:0 -4px 40px rgba(0,0,0,0.6);">
+  <!-- Handle -->
+  <div style="display:flex;justify-content:center;padding:10px 0 6px;flex-shrink:0;">
+    <span style="width:36px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;display:block;"></span>
+  </div>
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;">
+    <span style="font-size:16px;font-weight:700;color:#fff;">Pilih Playlist</span>
+    <button onclick="czmClosePlPick()" style="background:rgba(255,255,255,0.08);border:none;color:#aaa;font-size:16px;cursor:pointer;padding:6px 10px;border-radius:8px;line-height:1;"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <!-- List -->
+  <div id="czm-plpick-list" style="overflow-y:auto;flex:1;"></div>
+  <!-- Batal -->
+  <div onclick="czmClosePlPick()" style="text-align:center;padding:16px;font-size:15px;font-weight:600;color:#aaa;cursor:pointer;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;letter-spacing:0.3px;">Batal</div>
+</div>
+
+
+
+<!-- ── Lightbox Modal ── -->
+<div class="zt-lightbox" id="zt-lightbox">
+  <div class="zt-lightbox-overlay" onclick="ztLightboxClose()"></div>
+  <div class="zt-lightbox-counter" id="zt-lb-counter"></div>
+  <button class="zt-lightbox-close" onclick="ztLightboxClose()"><i class="fas fa-times"></i></button>
+  <button class="zt-lightbox-nav zt-lightbox-prev" id="zt-lb-prev" onclick="ztLightboxNav(-1)"><i class="fas fa-chevron-left"></i></button>
+  <button class="zt-lightbox-nav zt-lightbox-next" id="zt-lb-next" onclick="ztLightboxNav(1)"><i class="fas fa-chevron-right"></i></button>
+  <div class="zt-lightbox-inner">
+    <img class="zt-lightbox-img" id="zt-lb-img" src="" alt="" onclick="this.classList.toggle('zoomed')">
+  </div>
+  <div class="zt-lightbox-bottom">
+    <a id="zt-lb-save" class="zt-lightbox-btn save" download target="_blank"><i class="fas fa-download"></i> Simpan</a>
+    <a id="zt-lb-open" class="zt-lightbox-btn open" target="_blank"><i class="fas fa-external-link-alt"></i> Buka Tab</a>
+  </div>
+</div>
+
+<!-- ═══════════════ CPANEL SECTION ═══════════════ -->
+<section id="cpanel" class="page-section cpanel-page">
+
+  <!-- Header -->
+  <div class="cpanel-header">
+    <div class="cpanel-header-glow"></div>
+    <h1 class="cpanel-title">Create <span class="cpanel-accent">Pterodactyl</span></h1>
+    <p class="cpanel-subtitle">Create Server Pterodactyl Secara Gratis. Ingin List Lebih Banyak? Aktifkan Pengguna Premium Anda.</p>
+  </div>
+
+  <!-- Tab Switcher -->
+  <div class="cp-tab-bar">
+    <div class="cp-tab active" id="cp-tab-form" onclick="cpSwitchTab('form')">
+      <i class="fas fa-plus-circle"></i> Buat Panel
+    </div>
+    <div class="cp-tab" id="cp-tab-riwayat" onclick="cpSwitchTab('riwayat')">
+      <i class="fas fa-history"></i> Riwayat
+      <span id="cp-riwayat-tab-count" class="cp-riwayat-tab-count" style="display:none;"></span>
+    </div>
+  </div>
+
+  <!-- TAB: Form Create -->
+  <div id="cp-tab-panel-form">
+  <!-- Form Create -->
+  <div class="cpanel-form-box" style="position:relative;">
+    <!-- Badge Premium (pojok kanan atas) -->
+    <div id="cp-prem-badge" class="cp-prem-badge" onclick="cpOpenPremInfo()" style="display:none;">
+      <i class="fas fa-crown"></i> Premium
+    </div>
+
+    <div class="cpanel-username-label"><i class="fas fa-user"></i> Username Panel</div>
+    <input type="text" id="cp-username" placeholder="contoh: zain123" autocomplete="off" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(0,217,255,0.2);border-radius:10px;padding:11px 14px;color:#fff;font-size:13px;outline:none;margin-bottom:16px;">
+
+    <!-- Plan Selector -->
+    <div class="cpanel-plan-label"><i class="fas fa-layer-group"></i> Pilih Plan</div>
+
+    <!-- FREE plans vertical -->
+    <div class="cpanel-plans-v" id="cp-plans-free">
+      <!-- Divider non premium -->
+      <div class="cp-plans-divider cp-plans-divider-free">
+        <span><i class="fas fa-user" style="color:#00d9ff;margin-right:5px;font-size:10px;"></i>Plan Gratis</span>
+      </div>
+      <div class="cpanel-plan-v" data-plan="1" data-free="1" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">1 GB</div><div class="cpv-specs">RAM 1GB • CPU 30%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="2" data-free="1" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">2 GB</div><div class="cpv-specs">RAM 2GB • CPU 60%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <!-- Tombol Premium -->
+      <div class="cpanel-plan-prem-btn" onclick="cpShowTokenInput()" id="cp-arrow-card">
+        <i class="fas fa-crown" style="color:#ffaa00;font-size:18px;"></i>
+        <div class="cpv-left" style="flex:1;">
+          <div class="cpv-name" style="color:#ffaa00;">Premium</div>
+          <div class="cpv-specs">Buka plan 3GB – Unli</div>
+        </div>
+        <i class="fas fa-chevron-right cpanel-arrow-icon" style="color:#ffaa00;font-size:13px;transition:transform 0.3s;"></i>
+      </div>
+    </div>
+
+    <!-- Premium plans (hidden sampai token benar) -->
+    <div id="cp-plans-prem" class="cpanel-plans-v" style="display:none;margin-top:4px;">
+      <!-- Divider premium -->
+      <div class="cp-plans-divider">
+        <span><i class="fas fa-crown" style="color:#ffaa00;margin-right:5px;font-size:10px;"></i>Plan Premium</span>
+      </div>
+      <div class="cpanel-plan-v" data-plan="3" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">3 GB</div><div class="cpv-specs">RAM 3GB • CPU 90%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="4" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">4 GB</div><div class="cpv-specs">RAM 4GB • CPU 110%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="5" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">5 GB</div><div class="cpv-specs">RAM 5GB • CPU 140%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="6" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">6 GB</div><div class="cpv-specs">RAM 6GB • CPU 170%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="7" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">7 GB</div><div class="cpv-specs">RAM 7GB • CPU 200%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="8" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">8 GB</div><div class="cpv-specs">RAM 8GB • CPU 230%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="9" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">9 GB</div><div class="cpv-specs">RAM 9GB • CPU 260%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="10" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">10 GB</div><div class="cpv-specs">RAM 10GB • CPU 290%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="11" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">11 GB</div><div class="cpv-specs">RAM 11GB • CPU 320%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v" data-plan="12" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name">12 GB</div><div class="cpv-specs">RAM 12GB • CPU 360%</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+      <div class="cpanel-plan-v cpanel-plan-v-unli" data-plan="unli" onclick="cpSelectPlan(this)">
+        <div class="cpv-left"><div class="cpv-name" style="color:#ffaa00;">∞ Unli</div><div class="cpv-specs">Unlimited semua</div></div>
+        <i class="fas fa-check cpv-check"></i>
+      </div>
+    </div>
+
+    <!-- Create Button -->
+    <button class="cpanel-create-btn" id="cp-create-btn" onclick="cpCreatePanel()">
+      <i class="fas fa-plus-circle"></i> Buat Panel
+    </button>
+
+  </div>
+  </div><!-- end cp-tab-panel-form -->
+
+  <!-- TAB: Riwayat -->
+  <div id="cp-tab-panel-riwayat" style="display:none;">
+    <div class="cp-riwayat-panel">
+      <div class="cp-riwayat-panel-header">
+        <span id="cp-history-counter" class="cp-history-counter"></span>
+      </div>
+      <div id="cp-history-list" class="cpanel-history-list"></div>
+    </div>
+  </div>
+
+  <!-- Floating Token Modal -->
+  <div id="cp-token-modal" class="cpanel-token-modal" style="display:none;" onclick="cpCloseTokenModal(event)">
+    <div class="cpanel-token-float">
+      <div class="cpanel-token-float-header">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <i class="fas fa-crown" style="color:#ffaa00;font-size:16px;"></i>
+          <span style="font-weight:800;color:#fff;font-size:15px;">Aktifkan Premium</span>
+        </div>
+        <button onclick="document.getElementById('cp-token-modal').style.display='none'" style="background:rgba(255,255,255,0.08);border:none;color:#aaa;font-size:16px;cursor:pointer;padding:6px 10px;border-radius:8px;"><i class="fas fa-times"></i></button>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:0 0 14px;">Masukkan token premium untuk membuka plan 3GB hingga Unlimited.</p>
+      <div class="cpanel-lock-input-wrap">
+        <input type="password" id="cp-prem-code" placeholder="Masukan Kata Kunci Token..." class="cpanel-lock-input" onkeydown="if(event.key==='Enter')cpCheckCode()">
+        <button class="cpanel-lock-submit" onclick="cpCheckCode()"><i class="fas fa-unlock"></i></button>
+      </div>
+      <div id="cp-code-status" class="cpanel-code-status"></div>
+      <div class="cpanel-lock-divider">Belum punya token?</div>
+      <a href="https://wa.me/6285713164894?text=Halo%20PretyFX69%2C%20saya%20mau%20beli%20token%20premium%20panel%20Pterodactyl"
+         target="_blank" class="cpanel-wa-btn">
+        <i class="fab fa-whatsapp"></i> Beli Token di PretyFX69
+      </a>
+    </div>
+  </div>
+
+  <!-- Modal Info Premium -->
+  <div id="cp-prem-info-modal" class="cpanel-token-modal" style="display:none;" onclick="cpClosePremInfo(event)">
+    <div class="cpanel-token-float">
+      <div class="cpanel-token-float-header">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <i class="fas fa-crown" style="color:#ffaa00;font-size:18px;"></i>
+          <span style="font-weight:800;color:#fff;font-size:16px;">Status Premium</span>
+        </div>
+        <button onclick="document.getElementById('cp-prem-info-modal').style.display='none'" style="background:rgba(255,255,255,0.08);border:none;color:#aaa;font-size:16px;cursor:pointer;padding:6px 10px;border-radius:8px;"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="cp-prem-info-body">
+        <div class="cp-prem-info-icon">👑</div>
+        <div class="cp-prem-info-title">Kamu Sudah Premium!</div>
+        <div class="cp-prem-info-desc">Semua plan dari 3GB hingga Unlimited sudah terbuka. Riwayat pembuatan panel kamu juga nggak ada batasnya — bebas bikin sebanyak apapun.</div>
+        <div class="cp-prem-info-perks">
+          <div class="cp-perm-perk"><i class="fas fa-check-circle" style="color:#22c55e"></i> Plan 3GB – 12GB + Unlimited</div>
+          <div class="cp-perm-perk"><i class="fas fa-check-circle" style="color:#22c55e"></i> Riwayat panel unlimited</div>
+          <div class="cp-perm-perk"><i class="fas fa-check-circle" style="color:#22c55e"></i> Akses penuh tanpa batas</div>
+        </div>
+      </div>
+      <button class="cp-prem-logout-btn" onclick="cpLogoutPremium()">
+        <i class="fas fa-sign-out-alt"></i> Logout Premium
+      </button>
+    </div>
+  </div>
+
+</section>
+
+<!-- cPanel Result Modal -->
+<div id="cp-result-modal" class="cpanel-result-modal" style="display:none;" onclick="cpCloseResultModal(event)">
+  <div id="cp-result" class="cpanel-result"></div>
+</div>
+
+<!-- CZ Custom Confirm Modal -->
+<div id="cz-confirm-overlay">
+  <div id="cz-confirm-box">
+    <div id="cz-confirm-icon"><i class="fas fa-trash-alt"></i></div>
+    <div id="cz-confirm-title">Konfirmasi Hapus</div>
+    <div id="cz-confirm-msg"></div>
+    <div class="cz-confirm-btns">
+      <button id="cz-confirm-cancel"><i class="fas fa-times"></i> Batal</button>
+      <button id="cz-confirm-ok"><i class="fas fa-trash"></i> Hapus</button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- Chat History Slide Panel - di luar semua section agar tidak ter-clip oleh overflow:hidden -->
+<div class="ai-chat-panel-overlay" id="aiChatPanelOverlay" onclick="closeChatHistoryPanel()"></div>
+<div class="ai-chat-panel" id="aiChatPanel">
+    <div class="ai-chat-panel-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div class="ai-chat-panel-logo">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <span class="ai-chat-panel-title">ZainAI</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button class="ai-chat-panel-close" onclick="openSettings();" title="Settings">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="ai-chat-panel-close" onclick="closeChatHistoryPanel()">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+        </div>
+    </div>
+
+    <button class="ai-chat-new-btn" onclick="startNewChat(); closeChatHistoryPanel();">
+        <i class="fa-solid fa-plus"></i> New Chat
+    </button>
+
+    <!-- Single History (mode-based) -->
+    <div class="ai-chat-hist-section" id="activeHistSection">
+        <div class="ai-chat-hist-label" id="activeHistLabel">Riwayat Chat</div>
+        <div class="ai-chat-hist-list" id="activeHistList">
+            <div class="ai-chat-hist-empty">Belum ada riwayat</div>
+        </div>
+    </div>
+
+    <div class="ai-chat-panel-footer">
+        <!-- Signed Out State -->
+        <div id="aiPanelSignedOut" class="ai-signin-footer-box">
+            <button class="ai-signin-footer-btn" onclick="aiOpenSignIn()">Sign in</button>
+            <button class="ai-create-acc-btn" onclick="aiOpenSignUp()">Create account</button>
+        </div>
+        <!-- Signed In State -->
+        <div id="aiPanelSignedIn" class="ai-chat-user-row" style="display:none;">
+            <div class="ai-chat-user-avatar" id="aiUserAvatar">Z</div>
+            <div style="flex:1;min-width:0;" onclick="aiOpenEditUsername()" style="cursor:pointer;">
+                <div class="ai-chat-user-name" id="aiUserName" style="cursor:pointer;">ZainAI User</div>
+                <div class="ai-chat-user-email" id="aiUserEmail">Belum masuk</div>
+            </div>
+            <button class="ai-signout-btn" id="aiSignoutBtn" onclick="event.stopPropagation(); aiSignOutStep()" title="Keluar">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Chat History Button - di luar section agar tidak ter-clip -->
+<button class="ai-float-chat-btn" id="aiFloatChatBtn" onclick="toggleChatHistoryPanel()" title="Riwayat Chat" style="display:none;visibility:hidden;opacity:0;pointer-events:none;">
+    <i class="fa-solid fa-bars-staggered"></i>
+    <span class="ai-float-chat-badge" id="aiFloatChatBadge" style="display:none;"></span>
+</button>
+<!-- Attach Image Bottom Sheet -->
+<div class="ai-attach-overlay" id="aiAttachOverlay" onclick="closeAttachSheet()"></div>
+<div class="ai-attach-sheet" id="aiAttachSheet">
+    <div class="ai-attach-handle"></div>
+    <div class="ai-attach-title">Lampirkan Gambar</div>
+    <div class="ai-attach-options">
+        <button class="ai-attach-opt" onclick="triggerCamera()">
+            <div class="ai-attach-opt-icon"><i class="fa-solid fa-camera"></i></div>
+            <span>Kamera</span>
+        </button>
+        <button class="ai-attach-opt" onclick="triggerGallery()">
+            <div class="ai-attach-opt-icon"><i class="fa-regular fa-image"></i></div>
+            <span>Foto</span>
+        </button>
+    </div>
+</div>
+<!-- Hidden file inputs -->
+<input type="file" id="aiCameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImageAttach(event)">
+<input type="file" id="aiGalleryInput" accept="image/*" style="display:none" onchange="handleImageAttach(event)">
+<!-- History Item Context Menu -->
+<div class="ai-hist-ctx-menu" id="aiHistCtxMenu">
+    <button class="ai-hist-ctx-btn" onclick="aiHistCtxDoRename()">
+        <i class="fa-solid fa-pen"></i> Ganti Nama
+    </button>
+    <button class="ai-hist-ctx-btn pin" id="aiHistCtxPinBtn" onclick="aiHistCtxDoPin()">
+        <i class="fa-solid fa-thumbtack"></i> <span id="aiHistCtxPinLabel">Sematkan</span>
+    </button>
+    <button class="ai-hist-ctx-btn danger" id="aiHistCtxDelete" onclick="aiHistCtxDoDelete()">
+        <i class="fa-solid fa-trash"></i> Hapus
+    </button>
+</div>
+<!-- Sign In Modal -->
+<div id="aiSignInModal" class="ai-auth-overlay" onclick="aiCloseAuthIfOutside(event)">
+    <div class="ai-auth-modal">
+        <button class="ai-auth-close" onclick="aiCloseAuth()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ai-auth-header-row">
+            <div class="ai-auth-robot-icon"><i class="fa-solid fa-robot"></i></div>
+            <div>
+                <h2 class="ai-auth-title">Welcome back</h2>
+                <p class="ai-auth-sub">Sign in to continue with ZainAI</p>
+            </div>
+        </div>
+        <div class="ai-auth-field">
+            <label>Email</label>
+            <input type="email" id="aiSignInEmail" placeholder="you@example.com" autocomplete="off">
+        </div>
+        <div class="ai-auth-field">
+            <label>Password</label>
+            <div class="ai-auth-pw-wrap">
+                <input type="password" id="aiSignInPw" placeholder="Enter your password">
+                <button class="ai-auth-eye" onclick="aiToggleEye('aiSignInPw',this)"><i class="fa-solid fa-eye"></i></button>
+            </div>
+        </div>
+        <p style="text-align:right;margin:-8px 0 12px;"><span onclick="aiOpenForgotPassword()" style="color:#00d9ff;font-size:13px;cursor:pointer;">Lupa password?</span></p>
+        <button class="ai-auth-submit" id="aiSignInBtn" onclick="aiDoSignIn()">Sign in</button>
+        <p class="ai-auth-switch">Don't have an account? <span onclick="aiSwitchToSignUp()">Sign up</span></p>
+    </div>
+</div>
+<!-- Sign Up Modal -->
+<div id="aiSignUpModal" class="ai-auth-overlay" onclick="aiCloseAuthIfOutside(event)">
+    <div class="ai-auth-modal">
+        <button class="ai-auth-close" onclick="aiCloseAuth()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ai-auth-header-row">
+            <div class="ai-auth-robot-icon"><i class="fa-solid fa-robot"></i></div>
+            <div>
+                <h2 class="ai-auth-title">Create account</h2>
+                <p class="ai-auth-sub">Sign up to start using ZainAI</p>
+            </div>
+        </div>
+        <div class="ai-auth-field">
+            <label>Username</label>
+            <input type="text" id="aiSignUpUsername" placeholder="Masukkan username kamu" autocomplete="off">
+        </div>
+        <div class="ai-auth-field">
+            <label>Email</label>
+            <input type="email" id="aiSignUpEmail" placeholder="you@example.com" autocomplete="off">
+        </div>
+        <div class="ai-auth-field">
+            <label>Password</label>
+            <div class="ai-auth-pw-wrap">
+                <input type="password" id="aiSignUpPw" placeholder="Enter your password">
+                <button class="ai-auth-eye" onclick="aiToggleEye('aiSignUpPw',this)"><i class="fa-solid fa-eye"></i></button>
+            </div>
+        </div>
+        <div class="ai-auth-field">
+            <label>Confirm Password</label>
+            <input type="password" id="aiSignUpPwConfirm" placeholder="Confirm your password">
+        </div>
+        <button class="ai-auth-submit" onclick="aiDoSignUp()">Create account</button>
+        <p class="ai-auth-switch">Already have an account? <span onclick="aiSwitchToSignIn()">Sign in</span></p>
+    </div>
+</div>
+<!-- Confirm Logout Modal -->
+<div id="aiSignOutModal" class="ai-auth-overlay" onclick="aiCloseSignOutModal(event)">
+    <div class="ai-auth-modal" style="text-align:center;">
+        <div class="ai-auth-logo" style="background:rgba(255,60,60,0.15);"><span style="color:#ff5555;">!</span></div>
+        <h2 class="ai-auth-title">Keluar?</h2>
+        <p class="ai-auth-sub">Chat akan direset dan kamu perlu login lagi untuk melihat riwayat.</p>
+        <button class="ai-auth-submit" style="background:#ff5555;color:#fff;margin-bottom:10px;" onclick="aiConfirmSignOut()">Ya, Keluar</button>
+        <button class="ai-auth-submit" style="background:rgba(0,217,255,0.08);color:#fff;border:1px solid rgba(0,217,255,0.2);" onclick="aiCloseSignOutModal()">Batal</button>
+    </div>
+</div>
+<!-- Forgot Password Step 1: Input Email -->
+<div id="aiForgotModal" class="ai-auth-overlay" onclick="aiCloseAuthIfOutside(event)">
+    <div class="ai-auth-modal">
+        <button class="ai-auth-close" onclick="aiCloseAuth()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ai-auth-header-row">
+            <div class="ai-auth-robot-icon"><i class="fa-solid fa-key"></i></div>
+            <div>
+                <h2 class="ai-auth-title">Lupa Password</h2>
+                <p class="ai-auth-sub">Masukkan email untuk menerima kode</p>
+            </div>
+        </div>
+        <div class="ai-auth-field">
+            <label>Email</label>
+            <input type="email" id="aiForgotEmail" placeholder="you@example.com" autocomplete="off">
+        </div>
+        <button class="ai-auth-submit" id="aiForgotSendBtn" onclick="aiSendOTP()">Kirim Kode</button>
+        <p class="ai-auth-switch">Ingat password? <span onclick="aiSwitchToSignIn()">Sign in</span></p>
+    </div>
+</div>
+
+<!-- Forgot Password Step 2: Input OTP + New Password -->
+<div id="aiOTPModal" class="ai-auth-overlay" onclick="aiCloseAuthIfOutside(event)">
+    <div class="ai-auth-modal">
+        <button class="ai-auth-close" onclick="aiCloseAuth()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ai-auth-header-row">
+            <div class="ai-auth-robot-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+                <h2 class="ai-auth-title">Verifikasi Kode</h2>
+                <p class="ai-auth-sub">Cek email kamu untuk kode 6 digit</p>
+            </div>
+        </div>
+        <div class="ai-auth-field">
+            <label>Kode OTP</label>
+            <input type="text" id="aiOTPInput" placeholder="Masukkan 6 digit kode" maxlength="6" autocomplete="off">
+        </div>
+        <div class="ai-auth-field">
+            <label>Password Baru</label>
+            <div class="ai-auth-pw-wrap">
+                <input type="password" id="aiNewPw" placeholder="Minimal 6 karakter">
+                <button class="ai-auth-eye" onclick="aiToggleEye('aiNewPw',this)"><i class="fa-solid fa-eye"></i></button>
+            </div>
+        </div>
+        <div class="ai-auth-field">
+            <label>Konfirmasi Password Baru</label>
+            <input type="password" id="aiNewPwConfirm" placeholder="Ulangi password baru">
+        </div>
+        <button class="ai-auth-submit" id="aiOTPVerifyBtn" onclick="aiVerifyOTP()">Confirm Password</button>
+        <p class="ai-auth-switch" style="font-size:12px;opacity:0.6;" id="aiOTPTimer">Kode berlaku 5 menit</p>
+    </div>
+</div>
+
+<!-- Edit Username Modal -->
+<div id="aiEditUsernameModal" class="ai-auth-overlay" onclick="aiCloseEditUsername(event)">
+    <div class="ai-auth-modal">
+        <button class="ai-auth-close" onclick="aiCloseEditUsername()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="ai-auth-header-row">
+            <div class="ai-auth-robot-icon"><i class="fa-solid fa-user-pen"></i></div>
+            <div>
+                <h2 class="ai-auth-title">Ganti Username</h2>
+                <p class="ai-auth-sub">Masukkan username baru kamu</p>
+            </div>
+        </div>
+        <div class="ai-auth-field">
+            <label>Username Baru</label>
+            <input type="text" id="aiNewUsername" placeholder="Username baru" autocomplete="off">
+        </div>
+        <button class="ai-auth-submit" id="aiSaveUsernameBtn" onclick="aiSaveUsername()">Simpan</button>
+    </div>
+</div>
+
+<!-- ZT Menu Panel Overlay -->
+<div class="zt-menu-overlay" id="ztMenuOverlay" onclick="ztCloseMenu()"></div>
+
+<!-- ZT Menu Panel -->
+<div class="zt-menu-panel" id="ztMenuPanel">
+  <div class="zt-menu-header">
+    <div class="zt-menu-header-left">
+      <div class="zt-menu-logo"><i class="fas fa-toolbox"></i></div>
+      <span class="zt-menu-title">Z-Tools</span>
+    </div>
+    <button class="zt-menu-close" onclick="ztCloseMenu()"><i class="fas fa-chevron-left"></i></button>
+  </div>
+
+  <div class="zt-menu-body">
+    <!-- Beranda -->
+    <div class="zt-menu-beranda">
+      <div class="zt-menu-beranda-badge"><i class="fas fa-toolbox"></i> Z-Tools</div>
+      <div class="zt-menu-beranda-tagline">Semua yang kamu butuhkan,<br>dalam satu tempat.</div>
+      <div class="zt-menu-beranda-sub">Download video, screenshot web, generate QR, cek nomor, dan masih banyak lagi — gratis tanpa iklan.</div>
+      <div class="zt-menu-beranda-divider"></div>
+      <div class="zt-menu-beranda-pills">
+        <span class="zt-menu-pill"><i class="fas fa-bolt"></i> Fast</span>
+        <span class="zt-menu-pill"><i class="fas fa-shield-alt"></i> Safe</span>
+        <span class="zt-menu-pill"><i class="fas fa-infinity"></i> Free</span>
+      </div>
+    </div>
+
+    <!-- Menu list (tanpa kategori) -->
+    <button class="zt-menu-item active" id="ztmi-dashboard" onclick="ztMenuSwitch('dashboard')">
+      <div class="zt-menu-item-icon"><i class="fas fa-chart-pie"></i></div>
+      <span class="zt-menu-item-text">Dashboard</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-tiktok" onclick="ztMenuSwitch('tiktok')">
+      <div class="zt-menu-item-icon"><i class="fab fa-tiktok"></i></div>
+      <span class="zt-menu-item-text">TikTok DL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-instagram" onclick="ztMenuSwitch('instagram')">
+      <div class="zt-menu-item-icon"><i class="fab fa-instagram"></i></div>
+      <span class="zt-menu-item-text">Instagram DL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-facebook" onclick="ztMenuSwitch('facebook')">
+      <div class="zt-menu-item-icon"><i class="fab fa-facebook"></i></div>
+      <span class="zt-menu-item-text">Facebook DL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-ssweb" onclick="ztMenuSwitch('ssweb')">
+      <div class="zt-menu-item-icon"><i class="fas fa-camera"></i></div>
+      <span class="zt-menu-item-text">Screenshot Web</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-qrgen" onclick="ztMenuSwitch('qrgen')">
+      <div class="zt-menu-item-icon"><i class="fas fa-qrcode"></i></div>
+      <span class="zt-menu-item-text">QR Code Generator</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+        <button class="zt-menu-item" id="ztmi-videoaudio" onclick="ztMenuSwitch('videoaudio')">
+      <div class="zt-menu-item-icon"><i class="fas fa-film"></i></div>
+      <span class="zt-menu-item-text">Video to Audio</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-fileurl" onclick="ztMenuSwitch('fileurl')">
+      <div class="zt-menu-item-icon"><i class="fas fa-link"></i></div>
+      <span class="zt-menu-item-text">File to URL</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+        <button class="zt-menu-item" id="ztmi-phone" onclick="ztMenuSwitch('phone')">
+      <div class="zt-menu-item-icon"><i class="fas fa-mobile-alt"></i></div>
+      <span class="zt-menu-item-text">Cek Nomor HP</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-remini" onclick="ztMenuSwitch('remini')">
+      <div class="zt-menu-item-icon"><i class="fas fa-magic"></i></div>
+      <span class="zt-menu-item-text">Remini</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-speedtest" onclick="ztMenuSwitch('speedtest')">
+      <div class="zt-menu-item-icon"><i class="fas fa-tachometer-alt"></i></div>
+      <span class="zt-menu-item-text">Speed Test</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-imgsearch" onclick="ztMenuSwitch('imgsearch')">
+      <div class="zt-menu-item-icon"><i class="fas fa-images"></i></div>
+      <span class="zt-menu-item-text">Image Search</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-wiki" onclick="ztMenuSwitch('wiki')">
+      <div class="zt-menu-item-icon"><i class="fab fa-wikipedia-w"></i></div>
+      <span class="zt-menu-item-text">Wikipedia</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-anime" onclick="ztMenuSwitch('anime')">
+      <div class="zt-menu-item-icon"><i class="fas fa-star"></i></div>
+      <span class="zt-menu-item-text">Random Anime</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+    <button class="zt-menu-item" id="ztmi-ngaji" onclick="ztMenuSwitch('ngaji')">
+      <div class="zt-menu-item-icon" style="color:#4ade80"><i class="fas fa-moon"></i></div>
+      <span class="zt-menu-item-text">Murottal</span>
+      <i class="fas fa-chevron-right zt-menu-item-arr"></i>
+    </button>
+  </div>
+</div>
+
+<!-- FAB buka ZT Menu -->
+<button class="zt-menu-fab" id="ztMenuFab" onclick="ztOpenMenu()" title="Z-Tools Menu">
+  <i class="fas fa-toolbox"></i>
 </button>
 
-<div id="error"></div>
 
+<script src="script.js"></script>
+<div id="czm-artist-page">
+  <div class="czm-ap-hero" id="czm-ap-hero">
+    <img id="czm-ap-hero-img" src="">
+    <div class="czm-ap-hero-overlay"></div>
+    <button class="czm-ap-back" onclick="czmCloseArtistPage()"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="czm-ap-name" id="czm-ap-name"></div>
+    <div class="czm-ap-meta" id="czm-ap-meta"></div>
+  </div>
+  <div class="czm-ap-body">
+    <div class="czm-ap-controls">
+      <div class="czm-ap-ctrl-left">
+        <img class="czm-ap-ctrl-art" id="czm-ap-ctrl-art" src="">
+        <button class="czm-ap-ctrl-btn czm-ap-plus" onclick="czmApAddCurrentToPl()" title="Tambah ke playlist">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <button class="czm-ap-ctrl-btn" onclick="czmApOpenCurrentBs()" title="Opsi lagu">
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+      </div>
+      <div class="czm-ap-ctrl-right">
+        <button class="czm-ap-repeat-btn" id="czm-ap-repeat-btn" onclick="czmApToggleShuffle()">
+          <i class="fa-solid fa-shuffle" id="czm-ap-repeat-ico"></i>
+        </button>
+        <button class="czm-ap-play-btn" id="czm-ap-play-btn" onclick="czmArtistPageTogglePlay()">
+          <i class="fa-solid fa-play" id="czm-ap-play-ico"></i>
+        </button>
+      </div>
+    </div>
+    <div class="czm-ap-genre" id="czm-ap-genre"></div>
+    <div class="czm-ap-section-label">
+      <span class="czm-ap-section-left">LAGU POPULER <span id="czm-ap-songs-arrow" class="czm-ap-songs-arrow"><i class="fa-solid fa-chevron-right"></i></span></span>
+      <button class="czm-ap-semua-btn" onclick="czmOpenArtistTopSongs()">Semua <i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+    <div id="czm-ap-songs"></div>
+    <div class="czm-ap-section-label" style="margin-top:8px;">ARTIS LAINNYA</div>
+    <div id="czm-ap-other-artists" class="czm-ap-other-artists"></div>
+  </div>
 </div>
-<div class="box" id="confirmBox">
-
-<div class="logo">
-<i class="fa-solid fa-user-check"></i>
-</div>
-
-<h2>Selamat Datang</h2>
-
-<p class="subtitle" id="welcome">
-Lanjutkan sebagai
-</p>
-
-<button onclick="enterApp()">
-<i class="fa-solid fa-arrow-right"></i>
- Masuk
-</button>
-
-<button class="logout" onclick="logout()">
-<i class="fa-solid fa-right-from-bracket"></i>
- Logout
-</button>
-
-</div>
-
-<div id="webview">
-<iframe
-id="frame"
-src="https://pretyfx69.github.io/zain-multidevice.web.id">
-</iframe>
-</div>
-
-<script>
-
-const users = [
-
-{
-nama:"Zain",
-key:"ApkMultifungsiKey:YrdevnkpdiYfcs"
-},
-
-{
-nama:"Yadi Suryadi",
-key:"ApkMultifungsiKey:Oaigwbsjsoxinwwppapiheenduxev"
-}
-
-];
-
-window.onload=function(){
-
-const login=localStorage.getItem("isLogin");
-const username=localStorage.getItem("username");
-
-if(login==="true"){
-
-document.getElementById("loginBox").style.display="none";
-document.getElementById("confirmBox").style.display="block";
-
-document.getElementById("welcome").innerHTML=
-"Lanjutkan sebagai <b>"+username+"</b>";
-
-}
-
-};
-function login(){
-
-const nama=document.getElementById("nama").value.trim().toLowerCase();
-const key=document.getElementById("key").value.trim();
-
-const user=users.find(function(u){
-return u.nama.toLowerCase()===nama && u.key===key;
-});
-
-if(user){
-
-localStorage.setItem("isLogin","true");
-localStorage.setItem("username",user.nama);
-
-document.getElementById("loginBox").style.display="none";
-document.getElementById("confirmBox").style.display="block";
-
-document.getElementById("welcome").innerHTML=
-"Lanjutkan sebagai <b>"+user.nama+"</b>";
-
-document.getElementById("error").innerHTML="";
-
-}else{
-
-document.getElementById("error").innerHTML=
-"Nama atau Kunci Akses tidak valid.";
-
-}
-
-}
-
-function enterApp(){
-
-document.getElementById("confirmBox").style.display="none";
-document.getElementById("webview").style.display="block";
-
-}
-
-function logout(){
-
-localStorage.removeItem("isLogin");
-localStorage.removeItem("username");
-
-location.reload();
-
-}
-
-</script>
 
 </body>
 </html>
