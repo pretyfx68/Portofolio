@@ -29,7 +29,7 @@ body{
     radial-gradient(circle at bottom,#0ea5e920,transparent 40%);
 }
 
-.login-box{
+.box{
     width:360px;
     padding:32px;
     background:rgba(17,24,39,.88);
@@ -56,21 +56,19 @@ body{
 h2{
     text-align:center;
     color:#fff;
-    font-size:24px;
-    font-weight:600;
+    margin-bottom:8px;
 }
 
 .subtitle{
     text-align:center;
     color:#94a3b8;
     font-size:13px;
-    margin-top:6px;
-    margin-bottom:24px;
+    margin-bottom:22px;
 }
 
 .input-group{
     position:relative;
-    margin-bottom:16px;
+    margin-bottom:15px;
 }
 
 .input-group i{
@@ -89,7 +87,6 @@ h2{
     border:1px solid #374151;
     background:#111827;
     color:#fff;
-    font-size:14px;
     outline:none;
 }
 
@@ -105,43 +102,52 @@ button{
     background:#2563eb;
     color:#fff;
     font-size:15px;
-    font-weight:500;
     cursor:pointer;
+    margin-top:10px;
 }
 
 button:hover{
     background:#1d4ed8;
 }
 
-button i{
-    margin-right:8px;
+.logout{
+    background:#ef4444;
+}
+
+.logout:hover{
+    background:#dc2626;
 }
 
 #error{
-    margin-top:15px;
-    text-align:center;
     color:#ef4444;
-    font-size:14px;
+    text-align:center;
+    margin-top:15px;
 }
 
+#confirmBox,
 #webview{
     display:none;
     position:fixed;
-    inset:0;
-    background:#000;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    background:#fff;
+    z-index:9999;
 }
 
 iframe{
     width:100%;
     height:100%;
     border:none;
+    display:block;
 }
 </style>
 </head>
 
 <body>
 
-<div class="login-box" id="loginBox">
+<div class="box" id="loginBox">
 
 <div class="logo">
 <i class="fa-solid fa-shield-halved"></i>
@@ -165,74 +171,122 @@ Silakan login untuk melanjutkan
 
 <button onclick="login()">
 <i class="fa-solid fa-arrow-right-to-bracket"></i>
-Masuk
+ Masuk
 </button>
 
 <div id="error"></div>
 
 </div>
+<div class="box" id="confirmBox">
+
+<div class="logo">
+<i class="fa-solid fa-user-check"></i>
+</div>
+
+<h2>Selamat Datang</h2>
+
+<p class="subtitle" id="welcome">
+Lanjutkan sebagai
+</p>
+
+<button onclick="enterApp()">
+<i class="fa-solid fa-arrow-right"></i>
+ Masuk
+</button>
+
+<button class="logout" onclick="logout()">
+<i class="fa-solid fa-right-from-bracket"></i>
+ Logout
+</button>
+
+</div>
 
 <div id="webview">
-<iframe src="https://pretyfx69.github.io/zain-multidevice.web.id"></iframe>
+<iframe
+id="frame"
+src="https://pretyfx69.github.io/zain-multidevice.web.id">
+</iframe>
 </div>
 
 <script>
+
 const users = [
+
 {
-    nama:"Zain",
-    key:"ApkMultifungsiKey:YrdevnkpdiYfcs"
+nama:"Zain",
+key:"ApkMultifungsiKey:YrdevnkpdiYfcs"
 },
+
 {
-    nama:"Yadi Suryadi",
-    key:"ApkMultifungsiKey:Oaigwbsjsoxinwwppapiheenduxev"
+nama:"Yadi Suryadi",
+key:"ApkMultifungsiKey:Oaigwbsjsoxinwwppapiheenduxev"
 }
+
 ];
 
-// Cek login saat halaman dibuka
-window.onload = function(){
+window.onload=function(){
 
-    const isLogin = localStorage.getItem("isLogin");
+const login=localStorage.getItem("isLogin");
+const username=localStorage.getItem("username");
 
-    if(isLogin === "true"){
-        document.getElementById("loginBox").style.display="none";
-        document.getElementById("webview").style.display="block";
-    }
+if(login==="true"){
+
+document.getElementById("loginBox").style.display="none";
+document.getElementById("confirmBox").style.display="block";
+
+document.getElementById("welcome").innerHTML=
+"Lanjutkan sebagai <b>"+username+"</b>";
+
+}
 
 };
-
 function login(){
 
-    const nama=document.getElementById("nama").value.trim();
-    const key=document.getElementById("key").value.trim();
+const nama=document.getElementById("nama").value.trim().toLowerCase();
+const key=document.getElementById("key").value.trim();
 
-    const user=users.find(u=>u.nama===nama && u.key===key);
+const user=users.find(function(u){
+return u.nama.toLowerCase()===nama && u.key===key;
+});
 
-    if(user){
+if(user){
 
-        // Simpan status login
-        localStorage.setItem("isLogin","true");
-        localStorage.setItem("username",user.nama);
+localStorage.setItem("isLogin","true");
+localStorage.setItem("username",user.nama);
 
-        document.getElementById("loginBox").style.display="none";
-        document.getElementById("webview").style.display="block";
+document.getElementById("loginBox").style.display="none";
+document.getElementById("confirmBox").style.display="block";
 
-    }else{
+document.getElementById("welcome").innerHTML=
+"Lanjutkan sebagai <b>"+user.nama+"</b>";
 
-        document.getElementById("error").innerHTML="Nama atau kunci akses tidak valid.";
+document.getElementById("error").innerHTML="";
 
-    }
+}else{
+
+document.getElementById("error").innerHTML=
+"Nama atau Kunci Akses tidak valid.";
 
 }
 
-// Fungsi logout (opsional)
+}
+
+function enterApp(){
+
+document.getElementById("confirmBox").style.display="none";
+document.getElementById("webview").style.display="block";
+
+}
+
 function logout(){
 
-    localStorage.removeItem("isLogin");
-    localStorage.removeItem("username");
+localStorage.removeItem("isLogin");
+localStorage.removeItem("username");
 
-    location.reload();
+location.reload();
 
 }
+
 </script>
 
 </body>
